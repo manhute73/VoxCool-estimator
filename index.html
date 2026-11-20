@@ -14,6 +14,7 @@
     .step-active { border-left: 4px solid #22c55e; background-color: rgba(34, 197, 94, 0.12); color: #22c55e; }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .formula-box { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
   </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -50,7 +51,7 @@
   </header>
 
   <!-- ===================================================================== -->
-  <!-- VIEW 1: CUSTOMER / PARTNER ESTIMATOR (WIZARD UI)                      -->
+  <!-- VIEW 1: CUSTOMER / PARTNER ESTIMATOR (GIỮ NGUYÊN 100%)                -->
   <!-- ===================================================================== -->
   <main id="view-customer" class="max-w-5xl mx-auto my-8 px-4">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-h-[580px] flex flex-col md:flex-row">
@@ -171,7 +172,7 @@
             </div>
           </div>
 
-          <!-- STEP 2: COMMODITY & DAILY OPERATIONS (Formulas completely hidden from customer) -->
+          <!-- STEP 2: COMMODITY & DAILY OPERATIONS -->
           <div id="step-2" class="hidden space-y-6 max-w-2xl">
             <div>
               <label class="block text-base font-bold text-slate-800 mb-2">1. Sức chứa hàng hóa của kho (Capacity of Cold Room)</label>
@@ -370,8 +371,8 @@
                   <div class="flex items-center justify-between">
                     <span class="text-lg font-medium">Tổng mức đầu tư dự kiến & Hoàn vốn:</span>
                     <div class="text-right">
-                      <div id="res-total-quote" class="text-xl font-extrabold">69,635,947 đ</div>
-                      <div id="res-payback" class="text-xs text-emerald-100">Hoàn vốn dự kiến: ~11.3 năm</div>
+                      <div id="res-total-quote" class="text-xl font-extrabold">75,135,947 đ</div>
+                      <div id="res-payback" class="text-xs text-emerald-100">Hoàn vốn dự kiến: ~12.2 năm</div>
                     </div>
                   </div>
                 </div>
@@ -409,7 +410,7 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- VIEW 2: ADMIN / R&D FULL EXCEL MODEL & LEAD MANAGEMENT                -->
+  <!-- VIEW 2: ADMIN / R&D PORTAL (TÁCH RÕ 5 PHẦN & CÔNG THỨC TỪNG MỤC)      -->
   <!-- ===================================================================== -->
   <section id="view-admin" class="hidden max-w-7xl mx-auto my-6 px-4 space-y-6">
     
@@ -418,24 +419,24 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-bold uppercase">Confidential — VOX Cool R&D</span>
-          <h1 class="text-xl font-bold text-slate-900">Hệ thống Công thức Kỹ thuật & Tài chính (Admin Engine)</h1>
+          <h1 class="text-xl font-bold text-slate-900">Hệ thống Công thức Kỹ thuật & Chiết tính CAPEX Minh bạch</h1>
         </div>
-        <p class="text-xs text-slate-500 mt-1">Giữ nguyên toàn bộ công thức từ file Excel gốc. Khi bạn chỉnh thông số tại đây, hệ thống tự động cập nhật công thức chạy ngầm cho giao diện Khách hàng.</p>
+        <p class="text-xs text-slate-500 mt-1">Tất cả biến số và công thức đều được tách riêng từng phần để R&D kiểm soát trực tiếp. Thay đổi tại đây sẽ áp dụng ngay cho bảng tính của Khách hàng.</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="resetAdminToExcelDefaults(true)" class="px-3 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm">
-          Khôi phục 100% số gốc Excel
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="resetAdminToPreset('standard')" class="px-3.5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm">
+          Chuẩn hóa thực tế (Đủ Ship + Làm tròn Pin)
         </button>
-        <button onclick="resetAdminToExcelDefaults(false)" class="px-3 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300">
-          Chuyển sang bản hiệu chỉnh (Penjico 5%)
+        <button onclick="resetAdminToPreset('excel_raw')" class="px-3.5 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300">
+          Khôi phục số file Excel gốc (Chưa cộng Ship khung)
         </button>
       </div>
     </div>
 
     <!-- Admin Sub-Tabs -->
-    <div class="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2 gap-4">
+    <div class="flex flex-wrap border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2 gap-3">
       <button onclick="switchAdminTab('calc')" id="admin-tab-calc" class="py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700">
-        1. Bảng tính Kỹ thuật & CAPEX (Cold Storage + Case 1_5 hrs)
+        1. Phân tách 5 bước Kỹ thuật & Tổng vốn đầu tư (CAPEX)
       </button>
       <button onclick="switchAdminTab('cashflow')" id="admin-tab-cashflow" class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800">
         2. Dòng tiền 10 năm & Bảng độ nhạy (5% – 35%)
@@ -446,236 +447,439 @@
       </button>
     </div>
 
-    <!-- ADMIN TAB 1: FULL ENGINEERING & CAPEX SHEET -->
-    <div id="admin-panel-calc" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
-      <!-- LEFT COLUMN: SHEET 'COLD STORAGE' -->
-      <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 class="font-bold text-slate-800 text-base">A. Sheet: Cold Storage (Công thức chạy ngầm)</h2>
-          <span class="text-xs text-slate-400">Khách hàng không thấy các hệ số này</span>
+    <!-- =================================================================== -->
+    <!-- ADMIN TAB 1: TÁCH 5 PHẦN RÕ RÀNG KÈM CÔNG THỨC TỪNG MỤC             -->
+    <!-- =================================================================== -->
+    <div id="admin-panel-calc" class="space-y-6">
+
+      <!-- PHẦN 1: KÍCH THƯỚC HÌNH HỌC & CHÊNH LỆCH NHIỆT ĐỘ -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center">01</span>
+            <h2 class="font-bold text-slate-800 text-base">Phần 1: Kích thước Hình học & Chênh lệch Nhiệt độ Kho</h2>
+          </div>
+          <span class="text-xs font-medium text-slate-500">Đầu vào cơ bản xác định diện tích truyền nhiệt bao che</span>
         </div>
 
-        <!-- Kích thước & Nhiệt độ -->
-        <div class="grid grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-500">Length (m)</label>
-            <input type="number" step="0.1" id="adm-L" value="2.5" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-500">Width (m)</label>
-            <input type="number" step="0.1" id="adm-W" value="2.0" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
-          </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-500">Height (m)</label>
-            <input type="number" step="0.1" id="adm-H" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+            <label class="block text-xs font-semibold text-slate-600">Chiều dài L (m)</label>
+            <input type="number" step="0.1" id="adm-L" value="2.5" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold">
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-500">Temp diff ΔT (K)</label>
-            <input type="number" step="1" id="adm-dT" value="60" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+            <label class="block text-xs font-semibold text-slate-600">Chiều rộng W (m)</label>
+            <input type="number" step="0.1" id="adm-W" value="2.0" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600">Chiều cao H (m)</label>
+            <input type="number" step="0.1" id="adm-H" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600">Chênh lệch nhiệt độ ΔT (K)</label>
+            <input type="number" step="1" id="adm-dT" value="60" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold">
           </div>
         </div>
 
-        <!-- Mục 1 & 2: Cooling of Commodity -->
-        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
-          <div class="text-xs font-bold text-emerald-700 uppercase">1 & 2. Cooling of Commodity (Khách chỉ nhập Capacity)</div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div>
-              <label class="block text-[11px] text-slate-500">Capacity (kg)</label>
-              <input type="number" id="adm-cap" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">% to be cooled</label>
-              <input type="number" step="0.01" id="adm-pct-cool" value="0.15" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Temp diff (K)</label>
-              <input type="number" step="0.5" id="adm-dT-comm" value="5" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Specific heat (kJ/kg.K)</label>
-              <input type="number" step="0.1" id="adm-cp-comm" value="4.0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
-            </div>
+        <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-3.5 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div>
+            <div class="text-slate-500">Thể tích kho ($V$): <strong id="out-geo-vol" class="text-slate-900">8.00 m³</strong></div>
+            <div class="formula-box text-[11px] text-slate-600 mt-0.5">Công thức: V = L × W × H</div>
           </div>
-          <div class="grid grid-cols-2 gap-2.5 pt-1">
-            <div>
-              <label class="block text-[11px] text-slate-500">Avg perspiration rate (kJ/kg)</label>
-              <input type="number" step="0.1" id="adm-persp" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
-            </div>
-            <div class="flex items-end justify-end">
-              <span class="text-xs text-slate-600">Heat Loss (I + II): <strong id="out-q-comm" class="text-slate-900">0.00</strong> kWh/ngày</span>
-            </div>
+          <div>
+            <div class="text-slate-500">Diện tích vách + trần ($A_{\text{wall+roof}}$): <strong id="out-geo-wall" class="text-slate-900">19.40 m²</strong></div>
+            <div class="formula-box text-[11px] text-slate-600 mt-0.5">Công thức: A_w = (L × W) + 2×(L × H) + 2×(W × H)</div>
           </div>
-        </div>
-
-        <!-- Mục 3 & 4: Vách, trần, nền -->
-        <div class="border border-slate-200 rounded-lg p-3.5 space-y-2.5">
-          <div class="text-xs font-bold text-emerald-700 uppercase">3 & 4. Leakage from Walls, Roof & Floor</div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[11px] text-slate-500">K walls & roof (W/m²K)</label>
-              <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">K floors (W/m²K)</label>
-              <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-          </div>
-          <div class="text-right text-xs text-slate-600">Heat Loss (Walls + Floor): <strong id="out-q-env" class="text-slate-900">10.40</strong> kWh/ngày</div>
-        </div>
-
-        <!-- Mục 5, 6, 7: Đèn, Mở cửa, Người -->
-        <div class="border border-slate-200 rounded-lg p-3.5 space-y-2.5">
-          <div class="text-xs font-bold text-emerald-700 uppercase">5, 6, 7. Electric Load, Door Opening & Humans</div>
-          <div class="grid grid-cols-3 gap-2.5">
-            <div>
-              <label class="block text-[11px] text-slate-500">Lights (kW × hrs)</label>
-              <div class="flex gap-1 mt-0.5">
-                <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
-                <input type="number" step="1" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
-              </div>
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Door (Lần × Energy gain kJ/K)</label>
-              <div class="flex gap-1 mt-0.5">
-                <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
-                <input type="number" step="0.5" id="adm-door-kj" value="30" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold bg-amber-50">
-              </div>
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Humans (Người × Giờ)</label>
-              <div class="flex gap-1 mt-0.5">
-                <input type="number" id="adm-human-cnt" value="2" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
-                <input type="number" id="adm-human-hrs" value="5" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
-              </div>
-            </div>
-          </div>
-          <div class="text-right text-xs text-slate-600">Tải nội bộ + Mở cửa: <strong id="out-q-int" class="text-slate-900">28.30</strong> kWh/ngày</div>
-        </div>
-
-        <!-- Tổng tải lạnh, COP, Giá điện -->
-        <div class="bg-slate-900 text-white rounded-lg p-4 space-y-3">
-          <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="block text-[11px] text-slate-400">Factor of safety (%)</label>
-              <input type="number" step="1" id="adm-safety" value="10" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-400">COP of chiller</label>
-              <input type="number" step="0.1" id="adm-cop" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-400">Giờ tắt máy nén/ngày</label>
-              <input type="number" step="0.5" id="adm-shift-hrs" value="5" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
-            </div>
-          </div>
-          <div class="grid grid-cols-3 gap-3 pt-1">
-            <div>
-              <label class="block text-[10px] text-slate-400">Peak tariff (đ/kWh)</label>
-              <input type="number" id="adm-p-peak" value="5964.2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Standard tariff (đ/kWh)</label>
-              <input type="number" id="adm-p-std" value="3467.2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-400">Off-peak tariff (đ/kWh)</label>
-              <input type="number" id="adm-p-off" value="2109.8" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
-            </div>
-          </div>
-          <div class="border-t border-slate-700 pt-2.5 flex justify-between text-xs">
-            <span>Tổng tải lạnh: <strong id="out-q-total" class="text-emerald-400">42.57 kWh/ngày</strong></span>
-            <span>Điện tiêu thụ: <strong id="out-e-month" class="text-emerald-400">798.1 kWh/tháng</strong></span>
-            <span>Tiết kiệm: <strong id="out-save-year" class="text-amber-400">6,152,559 đ/năm</strong></span>
+          <div>
+            <div class="text-slate-500">Diện tích nền ($A_{\text{floor}}$): <strong id="out-geo-floor" class="text-slate-900">5.00 m²</strong></div>
+            <div class="formula-box text-[11px] text-slate-600 mt-0.5">Công thức: A_f = L × W</div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: SHEET 'CASE 1_5 HRS' -->
-      <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 class="font-bold text-slate-800 text-base">B. Sheet: Case 1_5 hrs (Định lượng Pin & CAPEX)</h2>
-          <span class="text-xs px-2 py-0.5 bg-red-50 text-red-600 font-semibold rounded">Bảo mật nội bộ</span>
+      <!-- PHẦN 2: PHỤ TẢI NHIỆT LẠNH NGÀY (HEAT LOAD) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">02</span>
+            <h2 class="font-bold text-slate-800 text-base">Phần 2: Tính toán Phụ tải Nhiệt lạnh Hàng ngày ($Q_{\text{total}}$)</h2>
+          </div>
+          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded">Đơn vị chuẩn: kWh/ngày</span>
         </div>
 
-        <!-- Định lượng Pin PCM -->
-        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
-          <div class="text-xs font-bold text-sky-700 uppercase">1. Định lượng Pin lạnh PCM -21</div>
-          <div class="grid grid-cols-3 gap-3">
-            <div>
-              <label class="block text-[11px] text-slate-500">Thermal spec (kWh/kg)</label>
-              <input type="number" step="0.001" id="adm-bat-spec" value="0.087" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- 2A: Hàng hóa -->
+          <div class="border border-slate-200 rounded-lg p-4 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-emerald-700 uppercase">2A. Nhiệt làm lạnh & Hô hấp hàng hóa (Q1 + Q2)</span>
+              <span class="text-xs font-bold text-slate-900" id="out-q-comm">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Khối lượng 1 viên (kg)</label>
-              <input type="number" step="0.1" id="adm-bat-kg" value="2.6" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-500">Capacity M (kg)</label>
+                <input type="number" id="adm-cap" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">% nhập/ngày (p)</label>
+                <input type="number" step="0.01" id="adm-pct-cool" value="0.15" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">ΔT hàng (K)</label>
+                <input type="number" step="0.5" id="adm-dT-comm" value="5" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Cp (kJ/kg.K)</label>
+                <input type="number" step="0.1" id="adm-cp-comm" value="4.0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Hô hấp q_h (kJ/kg)</label>
+                <input type="number" step="0.1" id="adm-persp" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+              </div>
             </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Unit cost (đ/viên + VAT)</label>
-              <input type="number" id="adm-bat-price" value="140800" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-          </div>
-          <div class="bg-sky-50 px-3 py-2 rounded text-xs flex justify-between text-sky-900">
-            <span>Thermal Energy (+10%): <strong id="out-bat-kwh">9.75 kWh</strong></span>
-            <span>Weight: <strong id="out-bat-weight">112.12 kg</strong></span>
-            <span>Số viên pin: <strong id="out-bat-count">43.12 viên</strong></span>
-          </div>
-        </div>
-
-        <!-- Chi phí VOX Cool & Penjico -->
-        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
-          <div class="text-xs font-bold text-sky-700 uppercase">2. Cấu thành CAPEX (VOX Cool & Penjico)</div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[11px] text-slate-500">IoT system costs (VND)</label>
-              <input type="number" id="adm-iot-cost" value="22000000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Shipping Pin (đ/kg)</label>
-              <input type="number" id="adm-bat-ship-rate" value="3000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Khung Penjico (VND)</label>
-              <input type="number" id="adm-frame-cost" value="12128600" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-            </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Shipping khung (VND)</label>
-              <input type="number" id="adm-frame-ship" value="5000000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
+              • Q1 (Làm lạnh) = (M × p × ΔT_hàng × Cp) / 3600<br>
+              • Q2 (Hô hấp) = (M × q_h) / 3600
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3 pt-1">
-            <div>
-              <label class="block text-[11px] text-slate-500">Chi phí Penjico (%)</label>
-              <input type="number" step="1" id="adm-penjico-pct" value="50" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold text-amber-700 bg-amber-50">
+          <!-- 2B: Kết cấu bao che -->
+          <div class="border border-slate-200 rounded-lg p-4 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-emerald-700 uppercase">2B. Tổn thất truyền nhiệt Vách, Trần & Nền (Q3 + Q4)</span>
+              <span class="text-xs font-bold text-slate-900" id="out-q-env">10.40 kWh/ngày</span>
             </div>
-            <div>
-              <label class="block text-[11px] text-slate-500">Chi phí chiết khấu / Markup (%)</label>
-              <input type="number" step="1" id="adm-markup-pct" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold text-emerald-700 bg-emerald-50">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] text-slate-500">Hệ số K vách & trần (W/m²K)</label>
+                <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-500">Hệ số K nền (W/m²K)</label>
+                <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
+              </div>
+            </div>
+            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
+              • Q3 (Vách+Trần) = (A_w × ΔT × K_wall / 1000) × 24h<br>
+              • Q4 (Nền) = (A_f × ΔT × K_floor / 1000) × 24h
             </div>
           </div>
-        </div>
 
-        <!-- Summary Financial Box -->
-        <div class="bg-slate-900 text-white rounded-xl p-4 space-y-2.5">
-          <div class="flex justify-between text-xs text-slate-300">
-            <span>Total Chi phí VOX Cool:</span>
-            <strong id="out-vox-cost">28,408,338 đ</strong>
+          <!-- 2C: Tải nội bộ & Mở cửa -->
+          <div class="border border-slate-200 rounded-lg p-4 space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-emerald-700 uppercase">2C. Đèn chiếu sáng, Mở cửa & Người thao tác (Q5+Q6+Q7)</span>
+              <span class="text-xs font-bold text-slate-900" id="out-q-int">28.30 kWh/ngày</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5">
+              <div>
+                <label class="block text-[10px] text-slate-500">Đèn (kW × giờ)</label>
+                <div class="flex gap-1 mt-0.5">
+                  <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-bold">
+                  <input type="number" step="1" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-bold">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Mở cửa (Lần × kJ/m³K)</label>
+                <div class="flex gap-1 mt-0.5">
+                  <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-bold">
+                  <input type="number" step="0.5" id="adm-door-kj" value="30" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold bg-amber-50">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Người (Số người × giờ)</label>
+                <div class="flex gap-1 mt-0.5">
+                  <input type="number" id="adm-human-cnt" value="2" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-bold">
+                  <input type="number" id="adm-human-hrs" value="5" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-bold">
+                </div>
+              </div>
+            </div>
+            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
+              • Q5 (Đèn) = P_đèn × t_đèn | Q7 (Người) = N_người × t_người × 0.27 kW<br>
+              • Q6 (Mở cửa) = (Số lần × 0.5×V × Hệ số kJ × ΔT) / 3600
+            </div>
           </div>
-          <div class="flex justify-between text-xs text-slate-300">
-            <span>Total Chi phí Penjico (đã bao gồm khung):</span>
-            <strong id="out-penjico-cost">34,897,069 đ</strong>
-          </div>
-          <div class="flex justify-between text-sm font-bold text-emerald-400 border-t border-slate-700 pt-2">
-            <span>TOTAL CHI PHÍ BÁO GIÁ KHÁCH HÀNG:</span>
-            <span id="out-final-quote" class="text-lg">69,635,947 đ</span>
-          </div>
-          <div class="flex justify-between text-xs text-amber-300 pt-1">
-            <span>Thời gian hoàn vốn (Payback): <strong id="out-adm-payback">11.32 năm</strong></span>
-            <span>IRR 10 năm: <strong id="out-adm-irr">-1.9%</strong></span>
+
+          <!-- 2D: Hệ số an toàn & Tổng tải lạnh -->
+          <div class="border-2 border-emerald-500/40 bg-emerald-50/30 rounded-lg p-4 flex flex-col justify-between space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-emerald-800 uppercase">2D. Tổng hợp Phụ tải Lạnh có Hệ số An toàn</span>
+              <span class="text-sm font-extrabold text-emerald-700" id="out-q-total">42.57 kWh/ngày</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] text-slate-600">Tổng tải nhiệt thô Q_sum</label>
+                <div id="out-q-sum" class="mt-0.5 px-2.5 py-1.5 bg-white border rounded text-xs font-bold text-slate-700">38.70 kWh/ngày</div>
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-600">Hệ số an toàn Safety Factor (%)</label>
+                <input type="number" step="1" id="adm-safety" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 bg-white border border-emerald-400 rounded text-xs font-bold text-emerald-800">
+              </div>
+            </div>
+            <div class="formula-box text-[11px] bg-white p-2 rounded border border-emerald-200 text-slate-700">
+              • Q_sum = Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7<br>
+              • <strong>Q_total = Q_sum × (1 + Safety_Factor%)</strong>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- PHẦN 3: ĐIỆN NĂNG TIÊU THỤ & BÀI TOÁN TIẾT KIỆM EVN -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center">03</span>
+            <h2 class="font-bold text-slate-800 text-base">Phần 3: Điện năng Tiêu thụ Máy nén & Tiền tiết kiệm Giờ cao điểm (EVN)</h2>
+          </div>
+          <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded">Cơ sở 28 ngày/tháng (24 ngày thường + 4 Chủ nhật)</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600">COP hệ lạnh</label>
+            <input type="number" step="0.1" id="adm-cop" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border rounded text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600">Giờ cắt tải/ngày (h)</label>
+            <input type="number" step="0.5" id="adm-shift-hrs" value="5" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border rounded text-xs font-bold text-emerald-700">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600">Giá Cao điểm (đ/kWh)</label>
+            <input type="number" id="adm-p-peak" value="5964.2" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border rounded text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600">Giá Bình thường (đ/kWh)</label>
+            <input type="number" id="adm-p-std" value="3467.2" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border rounded text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600">Giá Thấp điểm (đ/kWh)</label>
+            <input type="number" id="adm-p-off" value="2109.8" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 bg-slate-50 border rounded text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div class="lg:col-span-7 formula-box text-[11px] text-slate-700 space-y-1">
+            <div>• Điện tiêu thụ ngày: <strong>E_day = Q_total / COP</strong> | Tháng: <strong>E_month = E_day × 30</strong></div>
+            <div>• Tiền điện nền năm: <strong>Cost_base = [24×(E_day/24)×(5×P_peak + 13×P_std + 6×P_off) + 4×(E_day/24)×(18×P_std + 6×P_off)] × 12</strong></div>
+            <div>• Tiền tiết kiệm năm: <strong>Savings_year = E_day × (h_cắt / 24) × (P_peak - P_off) × 24 ngày × 12 tháng</strong> (nếu h_cắt &le; 5h)</div>
+          </div>
+          <div class="lg:col-span-5 grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-white p-2.5 rounded border">
+              <div class="text-slate-500">Điện tiêu thụ nền:</div>
+              <div id="out-e-month" class="font-bold text-slate-900 text-sm">798.1 kWh/tháng</div>
+            </div>
+            <div class="bg-emerald-600 text-white p-2.5 rounded">
+              <div class="text-emerald-100">Tiết kiệm hàng năm:</div>
+              <div id="out-save-year" class="font-extrabold text-sm">6,152,559 đ (19.3%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHẦN 4: ĐỊNH LƯỢNG PIN LẠNH PCM -21 -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-sky-600 text-white font-bold text-xs flex items-center justify-center">04</span>
+            <h2 class="font-bold text-slate-800 text-base">Phần 4: Định lượng Số lượng & Khối lượng Pin lạnh PCM -21</h2>
+          </div>
+          <label class="flex items-center gap-2 text-xs font-semibold text-sky-800 bg-sky-50 px-3 py-1.5 rounded-lg cursor-pointer border border-sky-200">
+            <input type="checkbox" id="chk-round-bat" checked onchange="recalcAdmin()" class="accent-sky-600 w-4 h-4">
+            <span>Làm tròn lên số viên pin nguyên (CEILING)</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600">Mật độ trữ lạnh Pin (kWh/kg)</label>
+            <input type="number" step="0.001" id="adm-bat-spec" value="0.087" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border rounded-lg text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600">Khối lượng 1 viên Pin (kg/viên)</label>
+            <input type="number" step="0.1" id="adm-bat-kg" value="2.6" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border rounded-lg text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600">Đơn giá 1 viên Pin đã gồm VAT (đ/viên)</label>
+            <input type="number" id="adm-bat-price" value="140800" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-slate-50 border rounded-lg text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-sky-50/70 p-4 rounded-lg border border-sky-200">
+          <div class="lg:col-span-7 formula-box text-[11px] text-sky-950 space-y-1">
+            <div>• Nhiệt lượng cần trữ (+10% dự phòng): <strong>Q_PCM = Q_total × (h_cắt / 24) × 1.1</strong></div>
+            <div>• Số viên pin lý thuyết: <strong>N_raw = (Q_PCM / 0.087) / 2.6</strong> (Làm tròn lên: <strong id="out-bat-raw">43.12</strong> &rarr; <strong id="out-bat-count">44 viên</strong>)</div>
+            <div>• Tổng khối lượng pin thực tế: <strong>M_bat = N_bat × 2.6 kg</strong></div>
+          </div>
+          <div class="lg:col-span-5 grid grid-cols-3 gap-2 text-xs">
+            <div class="bg-white p-2.5 rounded border border-sky-200">
+              <div class="text-slate-500">Trữ lạnh (+10%):</div>
+              <div id="out-bat-kwh" class="font-bold text-sky-900">9.75 kWh</div>
+            </div>
+            <div class="bg-white p-2.5 rounded border border-sky-200">
+              <div class="text-slate-500">Tổng nặng Pin:</div>
+              <div id="out-bat-weight" class="font-bold text-sky-900">114.40 kg</div>
+            </div>
+            <div class="bg-sky-700 text-white p-2.5 rounded">
+              <div class="text-sky-100">Số lượng Pin:</div>
+              <div id="out-bat-count-box" class="font-extrabold">44 viên</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHẦN 5: CHIẾT TÍNH CHI TIẾT TỔNG VỐN ĐẦU TƯ (CAPEX) & CÔNG THỨC TỪNG DÒNG -->
+      <div class="bg-white rounded-xl shadow-sm border-2 border-slate-800 p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-slate-900 text-emerald-400 font-bold text-xs flex items-center justify-center">05</span>
+            <div>
+              <h2 class="font-bold text-slate-900 text-base">Phần 5: Chiết tính Chi tiết Tổng vốn Đầu tư (CAPEX) & Công thức Từng khoản mục</h2>
+              <p class="text-xs text-slate-500">Kiểm toán từng dòng chi phí để đảm bảo không sót phí vận chuyển hay tính trùng hoa hồng</p>
+            </div>
+          </div>
+
+          <!-- Tùy chọn quy tắc cộng CAPEX -->
+          <div class="flex flex-wrap items-center gap-3 text-xs">
+            <label class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg cursor-pointer font-semibold">
+              <input type="checkbox" id="chk-include-frameship" checked onchange="recalcAdmin()" class="accent-emerald-600 w-4 h-4">
+              <span>Cộng Shipping khung vào Tổng báo giá</span>
+            </label>
+            <select id="sel-penjico-base" onchange="recalcAdmin()" class="bg-amber-50 border border-amber-300 text-amber-900 font-semibold px-2.5 py-1.5 rounded-lg focus:outline-none">
+              <option value="all_capex">Phí Penjico % tính trên (VOX + Khung + Ship khung) [Theo Excel]</option>
+              <option value="mech_only">Phí Penjico % chỉ tính trên (Khung + Ship khung)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Bảng chiết tính từng dòng -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-900 text-white">
+                <th class="p-3 rounded-tl-lg w-12">Mã</th>
+                <th class="p-3">Khoản mục chi phí</th>
+                <th class="p-3 w-44">Giá trị đầu vào</th>
+                <th class="p-3">Công thức tính chi tiết</th>
+                <th class="p-3 text-right rounded-tr-lg w-40">Thành tiền (VND)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <!-- Nhóm A: VOX Cool -->
+              <tr class="bg-emerald-50/60 font-bold text-emerald-900">
+                <td colspan="5" class="px-3 py-2">I. CHI PHÍ THIẾT BỊ & VẬN CHUYỂN VOX COOL</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C1</td>
+                <td class="p-3 font-semibold">Chi phí Pin lạnh PCM -21</td>
+                <td class="p-3 text-slate-500"><span id="tbl-bat-qty">44</span> viên × <span id="tbl-bat-unit">140,800</span> đ</td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C1 = N_bat × Đơn_giá_pin</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c1">6,195,200 đ</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C2</td>
+                <td class="p-3 font-semibold">Hệ thống điều khiển & Giám sát IoT</td>
+                <td class="p-3">
+                  <input type="number" id="adm-iot-cost" value="22000000" oninput="recalcAdmin()" class="w-36 px-2 py-1 border rounded font-bold text-slate-800">
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C2 = Nhập cố định (Đã gồm VAT)</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c2">22,000,000 đ</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C3</td>
+                <td class="p-3 font-semibold">Chi phí vận chuyển Pin (Shipping Pin)</td>
+                <td class="p-3">
+                  <div class="flex items-center gap-1">
+                    <input type="number" id="adm-bat-ship-rate" value="3000" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold text-slate-800">
+                    <span class="text-slate-500">đ/kg</span>
+                  </div>
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C3 = M_bat (kg) × Đơn_giá_ship_pin</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c3">343,200 đ</td>
+              </tr>
+              <tr class="bg-slate-100 font-bold">
+                <td class="p-3">T1</td>
+                <td class="p-3 text-slate-900">TỔNG CHI PHÍ VOX COOL (T1)</td>
+                <td class="p-3"></td>
+                <td class="p-3 formula-box text-[11px] text-emerald-700">T1 = C1 + C2 + C3</td>
+                <td class="p-3 text-right text-emerald-700 text-sm" id="out-vox-cost">28,538,400 đ</td>
+              </tr>
+
+              <!-- Nhóm B: Penjico & Cơ khí -->
+              <tr class="bg-amber-50/70 font-bold text-amber-900">
+                <td colspan="5" class="px-3 py-2">II. CHI PHÍ KHUNG GIÁ ĐỠ, VẬN CHUYỂN & LẮP ĐẶT PENJICO</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C4</td>
+                <td class="p-3 font-semibold">Gia công khung giá đỡ cơ khí (Penjico)</td>
+                <td class="p-3">
+                  <input type="number" id="adm-frame-cost" value="12128600" oninput="recalcAdmin()" class="w-36 px-2 py-1 border rounded font-bold text-slate-800">
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C4 = Dự toán kết cấu khung treo/đỡ</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c4">12,128,600 đ</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C5</td>
+                <td class="p-3 font-semibold">Chi phí vận chuyển khung (Shipping khung)</td>
+                <td class="p-3">
+                  <input type="number" id="adm-frame-ship" value="5000000" oninput="recalcAdmin()" class="w-36 px-2 py-1 border rounded font-bold text-slate-800">
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C5 = Vận chuyển khung tới công trình</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c5">5,000,000 đ</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C6</td>
+                <td class="p-3 font-semibold">Phí dịch vụ & lắp đặt Penjico (%)</td>
+                <td class="p-3">
+                  <div class="flex items-center gap-1">
+                    <input type="number" step="1" id="adm-penjico-pct" value="50" oninput="recalcAdmin()" class="w-20 px-2 py-1 border border-amber-400 bg-amber-50 rounded font-bold text-amber-800">
+                    <span class="text-slate-500">%</span>
+                  </div>
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600" id="lbl-formula-c6">C6 = (T1 + C4 + C5) × %Penjico</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c6">22,833,500 đ</td>
+              </tr>
+              <tr class="bg-slate-100 font-bold">
+                <td class="p-3">T2</td>
+                <td class="p-3 text-slate-900">TỔNG CHI PHÍ PENJICO & VẬN CHUYỂN KHUNG (T2)</td>
+                <td class="p-3"></td>
+                <td class="p-3 formula-box text-[11px] text-amber-800" id="lbl-formula-t2">T2 = C4 + C5 + C6</td>
+                <td class="p-3 text-right text-amber-800 text-sm" id="out-penjico-cost">39,962,100 đ</td>
+              </tr>
+
+              <!-- Nhóm C: Tổng hợp & Markup -->
+              <tr class="bg-sky-50 font-bold text-sky-900">
+                <td colspan="5" class="px-3 py-2">III. TỔNG HỢP VỐN ĐẦU TƯ & GIÁ CHÀO KHÁCH HÀNG</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">T3</td>
+                <td class="p-3 font-semibold">Tổng chi phí gốc trước chiết khấu / dự phòng</td>
+                <td class="p-3"></td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">T3 = T1 + T2</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-t3">68,500,500 đ</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-500">C7</td>
+                <td class="p-3 font-semibold">Chi phí chiết khấu / Markup thương mại (%)</td>
+                <td class="p-3">
+                  <div class="flex items-center gap-1">
+                    <input type="number" step="1" id="adm-markup-pct" value="10" oninput="recalcAdmin()" class="w-20 px-2 py-1 border border-emerald-400 bg-emerald-50 rounded font-bold text-emerald-800">
+                    <span class="text-slate-500">%</span>
+                  </div>
+                </td>
+                <td class="p-3 formula-box text-[11px] text-slate-600">C7 = T3 × %Markup</td>
+                <td class="p-3 text-right font-bold text-slate-800" id="tbl-c7">6,850,050 đ</td>
+              </tr>
+              <tr class="bg-slate-900 text-white font-extrabold">
+                <td class="p-4 rounded-bl-lg text-emerald-400">CAPEX</td>
+                <td class="p-4 text-sm">TỔNG VỐN ĐẦU TƯ BÁO GIÁ KHÁCH HÀNG</td>
+                <td class="p-4 text-xs font-normal text-amber-300">Hoàn vốn: <strong id="out-adm-payback">12.24 năm</strong></td>
+                <td class="p-4 formula-box text-xs text-emerald-300">CAPEX = T3 + C7 = (T1 + T2) × (1 + %Markup)</td>
+                <td class="p-4 text-right text-lg text-emerald-400 rounded-br-lg" id="out-final-quote">75,350,550 đ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <!-- ADMIN TAB 2: 10-YEAR CASH FLOW & SENSITIVITY -->
@@ -683,7 +887,7 @@
       <div class="flex flex-wrap justify-between items-center gap-4">
         <div>
           <h3 class="font-bold text-slate-800 text-base">Phân tích Dòng tiền 10 năm & Bảng độ nhạy tiết kiệm (5% – 35%)</h3>
-          <p class="text-xs text-slate-500">Tự động cập nhật theo CAPEX và chi phí điện nền ở Tab 1</p>
+          <p class="text-xs text-slate-500">Tự động cập nhật theo Tổng vốn đầu tư (CAPEX) và chi phí điện nền ở Tab 1</p>
         </div>
         <div class="flex gap-3">
           <div>
@@ -701,6 +905,12 @@
         </div>
       </div>
 
+      <div class="flex items-center gap-4 text-xs bg-slate-50 p-3 rounded-lg border">
+        <span>IRR 10 năm dự kiến: <strong id="out-adm-irr" class="text-slate-900 text-sm">-2.5%</strong></span>
+        <span class="text-slate-400">|</span>
+        <span>Công thức dòng tiền ròng năm t: <code class="font-mono text-slate-700">CF(t) = Savings(t) - CAPEX(t) - OPEX(t)</code></span>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-7">
           <canvas id="cashflowChart" height="220"></canvas>
@@ -709,9 +919,9 @@
           <table class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 text-slate-700 border-b">
-                <th class="p-2">Percentage of Savings</th>
-                <th class="p-2 text-right">Savings / Year</th>
-                <th class="p-2 text-right">Payback (Year)</th>
+                <th class="p-2">Mức tiết kiệm (%)</th>
+                <th class="p-2 text-right">Tiết kiệm / Năm</th>
+                <th class="p-2 text-right">Hoàn vốn (Năm)</th>
               </tr>
             </thead>
             <tbody id="sensitivity-tbody" class="divide-y divide-slate-100"></tbody>
@@ -765,7 +975,7 @@
 
   <script>
     // =========================================================================
-    // STATE & GLOBAL CONFIG (Exact Excel defaults by default)
+    // STATE & GLOBAL CONFIG
     // =========================================================================
     let currentStep = 1;
     let activeInputId = 'cust-length';
@@ -774,51 +984,52 @@
     let cashflowChartInstance = null;
 
     let config = {
-      pctCooled: 0.15,         // C15: 15% commodity cooled/day
-      dTCommodity: 5.0,        // C16: 5 K
-      cpCommodity: 4.0,        // C17: 4.0 kJ/kg.K
-      perspirationRate: 0.0,   // C21: 0 kJ/kg
-      kWallRoof: 0.30,         // C31: 0.3 W/m2K
-      kFloor: 0.28,            // C37: 0.28 W/m2K
-      lightKw: 0.4,            // C42: 0.4 kW
-      lightHrs: 14.0,          // C43: 14 hrs
-      doorKjFactor: 30.0,      // C49: 30 kJ/K (Exact Excel value)
-      humanCount: 2,           // C54: 2 people
-      humanHrs: 5,             // C55: 5 hrs
-      humanKw: 0.27,           // C56: 0.27 kW
-      safetyFactor: 0.10,      // C62: 10%
-      copBase: 1.6,            // C67: 1.6
-      pPeak: 5964.2,           // C73: 5422 * 1.1
-      pStd: 3467.2,            // C74: 3152 * 1.1
-      pOff: 2109.8,            // C75: 1918 * 1.1
-      batSpecKwhKg: 0.087,     // C4 (Case 1): 0.087 kWh/kg
-      batUnitKg: 2.6,          // C7 (Case 1): 2.6 kg/pack
-      batUnitPrice: 140800,    // C10 (Case 1): 128000 * 1.1
-      iotCost: 22000000,       // C12 (Case 1): 20M * 1.1
-      batShipRate: 3000,       // C13 (Case 1): 3000 VND/kg
-      frameCost: 12128600,     // C16 (Case 1): 12,128,600 VND
-      frameShip: 5000000,      // C17 (Case 1): 5,000,000 VND
-      penjicoPct: 0.50,        // C19 (Case 1): 0.5 (Exact Excel value)
-      markupPct: 0.10,         // C24 (Case 1): 0.1
-      includeFrameShip: false, // Exact Excel C23 = SUM(C14,C21)
-      roundUpBat: false        // Exact Excel C7 = C6/2.6
+      pctCooled: 0.15,
+      dTCommodity: 5.0,
+      cpCommodity: 4.0,
+      perspirationRate: 0.0,
+      kWallRoof: 0.30,
+      kFloor: 0.28,
+      lightKw: 0.4,
+      lightHrs: 14.0,
+      doorKjFactor: 30.0,
+      humanCount: 2,
+      humanHrs: 5,
+      humanKw: 0.27,
+      safetyFactor: 0.10,
+      copBase: 1.6,
+      pPeak: 5964.2,
+      pStd: 3467.2,
+      pOff: 2109.8,
+      batSpecKwhKg: 0.087,
+      batUnitKg: 2.6,
+      batUnitPrice: 140800,
+      iotCost: 22000000,
+      batShipRate: 3000,
+      frameCost: 12128600,
+      frameShip: 5000000,
+      penjicoPct: 0.50,
+      markupPct: 0.10,
+      includeFrameShip: true,
+      roundUpBat: true,
+      penjicoBaseMode: 'all_capex' // 'all_capex' hoặc 'mech_only'
     };
 
     const fmtVND = (n) => Math.round(n).toLocaleString('vi-VN');
 
     // =========================================================================
-    // CORE THERMODYNAMIC & FINANCIAL ENGINE (Matches Excel 100%)
+    // CORE THERMODYNAMIC & FINANCIAL ENGINE
     // =========================================================================
     function runEngineeringCalculation(params) {
       const L = params.L;
       const W = params.W;
       const H = params.H;
-      const volume = Math.round(L * W * H);
+      const volume = L * W * H;
       const areaWallsRoof = L * W + 2 * L * H + 2 * W * H;
       const areaFloor = L * W;
       const dT = params.dT;
 
-      // 1 & 2: Commodity heat loss (Hidden formulas for customer)
+      // 1 & 2: Commodity heat loss
       const qComm1 = (params.capacity * params.pctCooled * params.dTCommodity * params.cpCommodity) / 3600;
       const qComm2 = (params.perspirationRate * params.capacity) / 3600;
 
@@ -828,7 +1039,7 @@
 
       // 5, 6, 7: Internal & Door opening loads
       const qLight = 1 * params.lightKw * params.lightHrs;
-      const doorVol = volume * 0.5;
+      const doorVol = Math.round(volume) * 0.5;
       const qDoor = (params.doorOpenings * doorVol * params.doorKjFactor * dT) / 3600;
       const qHuman = params.humanCount * params.humanHrs * params.humanKw;
 
@@ -853,13 +1064,13 @@
       const eDay = qTotal / copEff;
       const eMonth = eDay * 30;
 
-      // Baseline EVN Cost (24 weekdays + 4 Sundays = 28 days/month as in Excel C89)
+      // Baseline EVN Cost
       const costWd = (eDay / 24) * (5 * params.pPeak + 13 * params.pStd + 6 * params.pOff);
       const costSun = (eDay / 24) * (18 * params.pStd + 6 * params.pOff);
       const costBaseMonth = costWd * 24 + costSun * 4;
       const costBaseYear = costBaseMonth * 12;
 
-      // Case I: Peak shifting savings
+      // Peak shifting savings
       const shiftHrs = params.shiftHours;
       const pctDemandMet = shiftHrs / 24;
 
@@ -873,7 +1084,7 @@
       const savingsYear = tariffSavingsWd * 24 * 12 + efficiencyBonusYear;
       const pctSavings = costBaseYear > 0 ? (savingsYear / costBaseYear) : 0;
 
-      // CAPEX Calculation (Sheet Case 1_5 hrs)
+      // CAPEX Calculation (Chi tiết từng khoản mục C1 -> C7)
       const qPcmDay = qTotal * pctDemandMet;
       const batKwhReq = qPcmDay * 1.1;
       const batWeightRaw = batKwhReq / params.batSpecKwhKg;
@@ -881,28 +1092,37 @@
       const batCount = params.roundUpBat ? Math.ceil(batCountRaw) : batCountRaw;
       const batWeight = params.roundUpBat ? (batCount * params.batUnitKg) : batWeightRaw;
 
-      const capexBat = batCount * params.batUnitPrice;
-      const shipBat = batWeight * params.batShipRate;
-      const totalVox = capexBat + params.iotCost + shipBat;
+      const c1_capexBat = batCount * params.batUnitPrice;
+      const c2_iotCost = params.iotCost;
+      const c3_shipBat = batWeight * params.batShipRate;
+      const t1_totalVox = c1_capexBat + c2_iotCost + c3_shipBat;
 
-      const capexPrePenjico = totalVox + params.frameCost + params.frameShip;
-      const penjicoFee = capexPrePenjico * params.penjicoPct;
-      const totalPenjico = params.frameCost + penjicoFee;
+      const c4_frameCost = params.frameCost;
+      const c5_frameShip = params.frameShip;
+      const penjicoBase = (params.penjicoBaseMode === 'mech_only')
+        ? (c4_frameCost + c5_frameShip)
+        : (t1_totalVox + c4_frameCost + c5_frameShip);
+      const c6_penjicoFee = penjicoBase * params.penjicoPct;
+      const t2_totalPenjico = c4_frameCost + c6_penjicoFee + (params.includeFrameShip ? c5_frameShip : 0);
 
-      const quotePreMarkup = totalVox + totalPenjico + (params.includeFrameShip ? params.frameShip : 0);
-      const finalQuote = quotePreMarkup * (1 + params.markupPct);
+      const t3_preMarkup = t1_totalVox + t2_totalPenjico;
+      const c7_markupFee = t3_preMarkup * params.markupPct;
+      const finalQuote = t3_preMarkup + c7_markupFee;
       const paybackYears = savingsYear > 0 ? (finalQuote / savingsYear) : 99;
 
       return {
-        volume, qComm1, qComm2, qWallsRoof, qFloor, qLight, qDoor, qHuman,
+        volume, areaWallsRoof, areaFloor,
+        qComm1, qComm2, qWallsRoof, qFloor, qLight, qDoor, qHuman,
         qSum, qTotal, eDay, eMonth, costBaseMonth, costBaseYear,
-        savingsYear, pctSavings, batKwhReq, batWeight, batCount,
-        totalVox, totalPenjico, finalQuote, paybackYears
+        savingsYear, pctSavings, batKwhReq, batWeight, batCountRaw, batCount,
+        c1_capexBat, c2_iotCost, c3_shipBat, t1_totalVox,
+        c4_frameCost, c5_frameShip, c6_penjicoFee, t2_totalPenjico,
+        t3_preMarkup, c7_markupFee, finalQuote, paybackYears
       };
     }
 
     // =========================================================================
-    // CUSTOMER WIZARD LOGIC
+    // CUSTOMER WIZARD LOGIC (GIỮ NGUYÊN 100%)
     // =========================================================================
     const stepTitles = {
       1: 'Bước 1: Kích thước & Nhiệt độ vận hành kho',
@@ -1008,7 +1228,7 @@
       const W = parseFloat(document.getElementById('cust-width').value) || 2.0;
       const H = parseFloat(document.getElementById('cust-height').value) || 1.6;
       const temp = parseFloat(document.getElementById('cust-temp').value);
-      const dT = isNaN(temp) ? 60 : Math.max(10, 35 - temp + (temp <= -18 ? 7 : 0)); // Matches 60K at -18C
+      const dT = isNaN(temp) ? 60 : Math.max(10, 35 - temp + (temp <= -18 ? 7 : 0));
       const capacity = parseFloat(document.getElementById('cust-capacity').value) || 0;
       const doorOpenings = parseFloat(document.getElementById('cust-door-openings').value) || 10;
       const equip = document.querySelector('input[name="cust-equip"]:checked').value;
@@ -1117,7 +1337,7 @@
       if (tab === 'cashflow') recalcAdmin();
     }
 
-    function resetAdminToExcelDefaults(rawExcelMode) {
+    function resetAdminToPreset(mode) {
       document.getElementById('adm-L').value = 2.5;
       document.getElementById('adm-W').value = 2.0;
       document.getElementById('adm-H').value = 1.6;
@@ -1137,15 +1357,15 @@
       document.getElementById('adm-cop').value = 1.6;
       document.getElementById('adm-shift-hrs').value = 5;
       document.getElementById('adm-door-kj').value = 30;
+      document.getElementById('adm-penjico-pct').value = 50;
+      document.getElementById('adm-markup-pct').value = 10;
 
-      if (rawExcelMode) {
-        document.getElementById('adm-penjico-pct').value = 50;
-        config.includeFrameShip = false;
-        config.roundUpBat = false;
+      if (mode === 'standard') {
+        document.getElementById('chk-include-frameship').checked = true;
+        document.getElementById('chk-round-bat').checked = true;
       } else {
-        document.getElementById('adm-penjico-pct').value = 5;
-        config.includeFrameShip = true;
-        config.roundUpBat = true;
+        document.getElementById('chk-include-frameship').checked = false;
+        document.getElementById('chk-round-bat').checked = false;
       }
       recalcAdmin();
     }
@@ -1178,6 +1398,10 @@
       config.penjicoPct = (parseFloat(document.getElementById('adm-penjico-pct').value) || 0) / 100;
       config.markupPct = (parseFloat(document.getElementById('adm-markup-pct').value) || 0) / 100;
 
+      config.includeFrameShip = document.getElementById('chk-include-frameship').checked;
+      config.roundUpBat = document.getElementById('chk-round-bat').checked;
+      config.penjicoBaseMode = document.getElementById('sel-penjico-base').value;
+
       const L = parseFloat(document.getElementById('adm-L').value) || 2.5;
       const W = parseFloat(document.getElementById('adm-W').value) || 2.0;
       const H = parseFloat(document.getElementById('adm-H').value) || 1.6;
@@ -1192,19 +1416,51 @@
         shiftHours, cop: config.copBase
       });
 
-      document.getElementById('out-q-comm').textContent = (res.qComm1 + res.qComm2).toFixed(2);
-      document.getElementById('out-q-env').textContent = (res.qWallsRoof + res.qFloor).toFixed(2);
-      document.getElementById('out-q-int').textContent = (res.qLight + res.qDoor + res.qHuman).toFixed(2);
-      document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
-      document.getElementById('out-e-month').textContent = res.eMonth.toFixed(1) + ' kWh/tháng';
-      document.getElementById('out-save-year').textContent = `${fmtVND(res.savingsYear)} đ/năm (${(res.pctSavings*100).toFixed(1)}%)`;
+      // Phần 1
+      document.getElementById('out-geo-vol').textContent = res.volume.toFixed(2) + ' m³';
+      document.getElementById('out-geo-wall').textContent = res.areaWallsRoof.toFixed(2) + ' m²';
+      document.getElementById('out-geo-floor').textContent = res.areaFloor.toFixed(2) + ' m²';
 
+      // Phần 2
+      document.getElementById('out-q-comm').textContent = (res.qComm1 + res.qComm2).toFixed(2) + ' kWh/ngày';
+      document.getElementById('out-q-env').textContent = (res.qWallsRoof + res.qFloor).toFixed(2) + ' kWh/ngày';
+      document.getElementById('out-q-int').textContent = (res.qLight + res.qDoor + res.qHuman).toFixed(2) + ' kWh/ngày';
+      document.getElementById('out-q-sum').textContent = res.qSum.toFixed(2) + ' kWh/ngày';
+      document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
+
+      // Phần 3
+      document.getElementById('out-e-month').textContent = res.eMonth.toFixed(1) + ' kWh/tháng';
+      document.getElementById('out-save-year').textContent = `${fmtVND(res.savingsYear)} đ (${(res.pctSavings*100).toFixed(1)}%)`;
+
+      // Phần 4
+      const batDisplay = config.roundUpBat ? `${res.batCount} viên` : `${res.batCount.toFixed(2)} viên`;
       document.getElementById('out-bat-kwh').textContent = res.batKwhReq.toFixed(2) + ' kWh';
       document.getElementById('out-bat-weight').textContent = res.batWeight.toFixed(2) + ' kg';
-      document.getElementById('out-bat-count').textContent = (config.roundUpBat ? res.batCount : res.batCount.toFixed(2)) + ' viên';
+      document.getElementById('out-bat-raw').textContent = res.batCountRaw.toFixed(2);
+      document.getElementById('out-bat-count').textContent = batDisplay;
+      document.getElementById('out-bat-count-box').textContent = batDisplay;
 
-      document.getElementById('out-vox-cost').textContent = fmtVND(res.totalVox) + ' đ';
-      document.getElementById('out-penjico-cost').textContent = fmtVND(res.totalPenjico) + ' đ';
+      // Phần 5 (Bảng chiết tính CAPEX)
+      document.getElementById('tbl-bat-qty').textContent = config.roundUpBat ? res.batCount : res.batCount.toFixed(2);
+      document.getElementById('tbl-bat-unit').textContent = fmtVND(config.batUnitPrice);
+      document.getElementById('tbl-c1').textContent = fmtVND(res.c1_capexBat) + ' đ';
+      document.getElementById('tbl-c2').textContent = fmtVND(res.c2_iotCost) + ' đ';
+      document.getElementById('tbl-c3').textContent = fmtVND(res.c3_shipBat) + ' đ';
+      document.getElementById('out-vox-cost').textContent = fmtVND(res.t1_totalVox) + ' đ';
+
+      document.getElementById('tbl-c4').textContent = fmtVND(res.c4_frameCost) + ' đ';
+      document.getElementById('tbl-c5').textContent = fmtVND(res.c5_frameShip) + ' đ';
+      document.getElementById('lbl-formula-c6').textContent = (config.penjicoBaseMode === 'mech_only')
+        ? 'C6 = (C4 + C5) × %Penjico'
+        : 'C6 = (T1 + C4 + C5) × %Penjico';
+      document.getElementById('tbl-c6').textContent = fmtVND(res.c6_penjicoFee) + ' đ';
+      document.getElementById('lbl-formula-t2').textContent = config.includeFrameShip
+        ? 'T2 = C4 + C5 + C6'
+        : 'T2 = C4 + C6 (Chưa cộng C5)';
+      document.getElementById('out-penjico-cost').textContent = fmtVND(res.t2_totalPenjico) + ' đ';
+
+      document.getElementById('tbl-t3').textContent = fmtVND(res.t3_preMarkup) + ' đ';
+      document.getElementById('tbl-c7').textContent = fmtVND(res.c7_markupFee) + ' đ';
       document.getElementById('out-final-quote').textContent = fmtVND(res.finalQuote) + ' đ';
       document.getElementById('out-adm-payback').textContent = res.paybackYears.toFixed(2) + ' năm';
 
@@ -1295,7 +1551,7 @@
           <td class="p-2.5 text-slate-500">${l.time}</td>
           <td class="p-2.5 font-semibold text-slate-800">${l.name} <span class="block text-[11px] font-normal text-slate-500">${l.company}</span></td>
           <td class="p-2.5">${l.contact}</td>
-          <td class="p-2.5">${l.data.L}m × ${l.data.W}m × ${l.data.H}m (${l.data.res.volume} m³)</td>
+          <td class="p-2.5">${l.data.L}m × ${l.data.W}m × ${l.data.H}m (${l.data.res.volume.toFixed(1)} m³)</td>
           <td class="p-2.5 text-right text-emerald-700 font-bold">${fmtVND(l.data.res.savingsYear)} đ</td>
           <td class="p-2.5 text-right font-bold">${fmtVND(l.data.res.finalQuote)} đ</td>
           <td class="p-2.5 text-center">
@@ -1326,8 +1582,8 @@
       renderLeadsTable();
     }
 
-    // Khởi tạo mặc định giữ nguyên 100% số gốc trong file Excel
-    resetAdminToExcelDefaults(true);
+    // Khởi tạo mặc định chuẩn hóa đủ phí vận chuyển và làm tròn số viên pin
+    resetAdminToPreset('standard');
     renderLeadsTable();
   </script>
 </body>
