@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOX Cool | Cold Storage Energy Savings Estimator & Admin Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
+    .numpad-btn { transition: all 0.1s ease; }
+    .numpad-btn:active { transform: scale(0.95); background-color: #16a34a; color: white; }
+    .step-active { border-left: 4px solid #22c55e; background-color: rgba(34, 197, 94, 0.12); color: #22c55e; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-[#0f172a] text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow">
+          V
+        </div>
+        <div>
+          <span class="font-bold tracking-wider text-lg text-white">VOX COOL</span>
+          <span class="hidden sm:inline-block text-xs text-emerald-400 font-semibold ml-2 uppercase tracking-widest border-l border-slate-700 pl-2">
+            Thermal Energy Storage
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button id="btn-switch-customer" onclick="switchMode('customer')"
+          class="px-3.5 py-1.5 rounded-md text-sm font-semibold bg-emerald-500 text-slate-950 shadow transition">
+          Giao diện Khách hàng
+        </button>
+        <button id="btn-switch-admin" onclick="openAdminModal()"
+          class="px-3.5 py-1.5 rounded-md text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>Admin / R&D</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: CUSTOMER / PARTNER ESTIMATOR (WIZARD UI)                      -->
+  <!-- ===================================================================== -->
+  <main id="view-customer" class="max-w-5xl mx-auto my-8 px-4">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-h-[580px] flex flex-col md:flex-row">
+      
+      <!-- LEFT SIDEBAR STEPPER -->
+      <aside class="w-full md:w-20 bg-[#1e293b] text-slate-400 flex md:flex-col justify-between py-3 md:py-6 px-4 md:px-0 items-center shrink-0">
+        <div class="flex md:flex-col gap-2 md:gap-4 w-full justify-around md:justify-start">
+          <button onclick="goToStep(1)" id="nav-step-1" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition step-active" title="1. Quy mô & Nhiệt độ">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Kho lạnh</span>
+          </button>
+          <button onclick="goToStep(2)" id="nav-step-2" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="2. Hàng hóa & Hoạt động">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Hàng hóa</span>
+          </button>
+          <button onclick="goToStep(3)" id="nav-step-3" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="3. Thiết bị máy lạnh">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Hệ lạnh</span>
+          </button>
+          <button onclick="goToStep(4)" id="nav-step-4" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="4. Cắt tải & Điện mặt trời">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Cắt tải</span>
+          </button>
+          <button onclick="goToStep(5)" id="nav-step-5" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="5. Biểu giá điện EVN">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Giá điện</span>
+          </button>
+          <button onclick="calculateAndShowResult()" id="nav-step-6" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="6. Kết quả ước tính">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Kết quả</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT AREA -->
+      <div class="flex-1 flex flex-col justify-between bg-white">
+        <!-- Top Header inside Card -->
+        <div class="px-8 pt-6 pb-4 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <p class="text-xs font-bold tracking-widest text-sky-600 uppercase">COLD STORAGE ENERGY SAVINGS ESTIMATOR</p>
+            <h1 id="step-title" class="text-xl font-bold text-slate-800 mt-0.5">Bước 1: Kích thước & Nhiệt độ vận hành kho</h1>
+          </div>
+          <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+            RESTART
+          </button>
+        </div>
+
+        <!-- STEP PANELS -->
+        <div class="p-8 flex-1 flex flex-col justify-center">
+          
+          <!-- STEP 1: DIMENSIONS & TEMPERATURE -->
+          <div id="step-1" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-5">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Loại kho lạnh</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" onclick="selectRoomType('freezer')" id="btn-type-freezer"
+                    class="py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between">
+                    <span>Kho đông (Freezer)</span>
+                    <span class="text-xs bg-emerald-200 px-2 py-0.5 rounded">-18°C</span>
+                  </button>
+                  <button type="button" onclick="selectRoomType('chiller')" id="btn-type-chiller"
+                    class="py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between">
+                    <span>Kho mát (Chiller)</span>
+                    <span class="text-xs bg-slate-100 px-2 py-0.5 rounded">+2°C</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Kích thước lọt lòng kho (Dài × Rộng × Cao)</label>
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-length" value="2.5" onfocus="activeInputId='cust-length'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Dài)</span>
+                  </div>
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-width" value="2.0" onfocus="activeInputId='cust-width'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Rộng)</span>
+                  </div>
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-height" value="1.6" onfocus="activeInputId='cust-height'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Cao)</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Thể tích kho ước tính: <strong id="live-volume-display" class="text-slate-800">8.0 m³</strong> (Diện tích sàn: <strong id="live-area-display" class="text-slate-800">5.0 m²</strong>)</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nhiệt độ cài đặt vận hành kho (°C)</label>
+                <div class="relative max-w-xs">
+                  <input type="number" step="1" id="cust-temp" value="-18" onfocus="activeInputId='cust-temp'"
+                    class="w-full px-4 py-3 text-2xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                  <span class="absolute right-4 top-3.5 text-lg font-bold text-slate-600">°C</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KEYPAD -->
+            <div class="lg:col-span-5 flex justify-center">
+              <div class="grid grid-cols-3 gap-2 w-56 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <button type="button" onclick="pressNumpad('1')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">1</button>
+                <button type="button" onclick="pressNumpad('2')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">2</button>
+                <button type="button" onclick="pressNumpad('3')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">3</button>
+                <button type="button" onclick="pressNumpad('4')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">4</button>
+                <button type="button" onclick="pressNumpad('5')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">5</button>
+                <button type="button" onclick="pressNumpad('6')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">6</button>
+                <button type="button" onclick="pressNumpad('7')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">7</button>
+                <button type="button" onclick="pressNumpad('8')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">8</button>
+                <button type="button" onclick="pressNumpad('9')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">9</button>
+                <button type="button" onclick="pressNumpad('.')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">.</button>
+                <button type="button" onclick="pressNumpad('0')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">0</button>
+                <button type="button" onclick="pressNumpad('DEL')" class="numpad-btn h-12 bg-slate-900 hover:bg-slate-800 text-white rounded font-bold text-xs">DEL</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: COMMODITY & DAILY OPERATIONS (Formulas completely hidden from customer) -->
+          <div id="step-2" class="hidden space-y-6 max-w-2xl">
+            <div>
+              <label class="block text-base font-bold text-slate-800 mb-2">1. Sức chứa hàng hóa của kho (Capacity of Cold Room)</label>
+              <p class="text-xs text-slate-500 mb-2">Chỉ cần nhập tổng khối lượng hàng hóa chứa trong kho (kg), hệ thống tự động tính toán phụ tải nhiệt làm lạnh sản phẩm.</p>
+              <div class="relative max-w-sm">
+                <input type="number" id="cust-capacity" value="0" placeholder="Ví dụ: 2000"
+                  class="w-full px-4 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none">
+                <span class="absolute right-4 top-3.5 text-base font-bold text-slate-600">kg</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-slate-800 mb-2">2. Nhóm hàng hóa bảo quản</label>
+                <select id="cust-product-type" class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:border-emerald-500">
+                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
+                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
+                  <option value="produce">Rau củ quả / Nông sản</option>
+                  <option value="unknown" selected>Chưa có thông tin / Hỗn hợp</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold text-slate-800 mb-2">3. Số lần mở cửa kho mỗi ngày</label>
+                <input type="number" id="cust-door-openings" value="10" min="0" max="200"
+                  class="w-full px-4 py-3 text-lg font-bold text-emerald-600 bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: FREEZER EQUIPMENT & CONDENSER -->
+          <div id="step-3" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-base font-bold text-slate-800 mb-3">Hệ thống máy nén lạnh (Freezer Equipment)</h3>
+              <div class="space-y-2.5">
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="hfc_35" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -35°C</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="hfc_25" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -25°C</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="nh3_1stage" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) Trục vít 1 cấp</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="nh3_2stage" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) 2 cấp</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer">
+                  <input type="radio" name="cust-equip" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-bold text-emerald-800">Không rõ (Unknown — Mặc định COP 1.6)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-base font-bold text-slate-800 mb-3">Loại dàn ngưng (Condenser Type)</h3>
+                <div class="space-y-2">
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="water" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Giải nhiệt nước / Bay hơi (Water Condenser)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="air" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Giải nhiệt gió (Air Condenser)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Không rõ (Unknown)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-base font-bold text-slate-800 mb-3">Chế độ xả đá (Defrost Type)</h3>
+                <div class="space-y-2">
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="hotgas" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Gas nóng (Hot Gas Bypass)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="electric" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Điện trở (Electric Defrost)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Không rõ (Unknown)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: PEAK SHIFTING HOURS & SOLAR PV -->
+          <div id="step-4" class="hidden space-y-6 max-w-2xl">
+            <div>
+              <label class="block text-base font-bold text-slate-800 mb-2">1. Số giờ muốn tắt máy nén chạy bằng Pin lạnh VOX Cool mỗi ngày</label>
+              <p class="text-xs text-slate-500 mb-3">Mặc định theo Case I: cắt 5 giờ cao điểm mỗi ngày (17h30 – 22h30).</p>
+              <div class="grid grid-cols-3 gap-3">
+                <button type="button" onclick="selectShiftHours(5)" id="btn-hrs-5" class="hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center">
+                  <div class="text-lg">5 giờ/ngày</div>
+                  <div class="text-xs font-normal text-emerald-700">Case I (Mặc định)</div>
+                </button>
+                <button type="button" onclick="selectShiftHours(8)" id="btn-hrs-8" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
+                  <div class="text-lg">8 giờ/ngày</div>
+                  <div class="text-xs font-normal text-slate-500">Cao điểm + 3h bình thường</div>
+                </button>
+                <button type="button" onclick="selectShiftHours(10)" id="btn-hrs-10" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
+                  <div class="text-lg">10 giờ/ngày</div>
+                  <div class="text-xs font-normal text-slate-500">Tối đa trữ lạnh đêm</div>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-base font-bold text-slate-800 mb-2">2. Kho có hệ thống Điện mặt trời mái nhà (Solar PV) dư công suất không?</label>
+              <div class="grid grid-cols-3 gap-3 max-w-md">
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="yes" class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Có (Yes)</span>
+                </label>
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="no" class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Không (No)</span>
+                </label>
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="unknown" checked class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Không rõ</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: EVN ELECTRICITY TARIFF -->
+          <div id="step-5" class="hidden space-y-6 max-w-2xl">
+            <div>
+              <label class="block text-base font-bold text-slate-800 mb-2">Chọn biểu giá điện đang áp dụng cho kho lạnh (Đã bao gồm 10% VAT)</label>
+              <div class="space-y-3">
+                <label onclick="selectTariffPreset('commercial_lt6')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/40 cursor-pointer">
+                  <input type="radio" name="cust-tariff" value="commercial_lt6" checked class="mt-1 w-4 h-4 accent-emerald-600">
+                  <div class="flex-1">
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Kinh doanh (Cấp điện áp dưới 6kV) — Mặc định Excel</div>
+                    <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
+                      <span>Cao điểm: <strong>5.964,2 đ/kWh</strong></span>
+                      <span>Bình thường: <strong>3.467,2 đ/kWh</strong></span>
+                      <span>Thấp điểm: <strong>2.109,8 đ/kWh</strong></span>
+                    </div>
+                  </div>
+                </label>
+
+                <label onclick="selectTariffPreset('industrial_lt6')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 cursor-pointer">
+                  <input type="radio" name="cust-tariff" value="industrial_lt6" class="mt-1 w-4 h-4 accent-emerald-600">
+                  <div class="flex-1">
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Sản xuất công nghiệp (Cấp điện áp dưới 6kV)</div>
+                    <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
+                      <span>Cao điểm: <strong>3.640 đ/kWh</strong></span>
+                      <span>Bình thường: <strong>1.997 đ/kWh</strong></span>
+                      <span>Thấp điểm: <strong>1.304 đ/kWh</strong></span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: RESULT SCREEN -->
+          <div id="step-6" class="hidden -m-8 bg-[#3bb55d] text-white p-8 md:p-10 flex-1 flex flex-col justify-between">
+            <div>
+              <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Ước tính Tiết kiệm Năng lượng</h2>
+              <p class="text-emerald-100 text-sm mt-1">Giải pháp Pin trữ lạnh thông minh VOX Cool PCM -21</p>
+
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mt-8">
+                <div class="md:col-span-4 flex justify-center">
+                  <div class="w-40 h-40 rounded-full border-[14px] border-white flex flex-col items-center justify-center bg-[#3bb55d] shadow-inner">
+                    <span id="res-pct-circle" class="text-3xl font-extrabold">19.3%</span>
+                    <span class="text-[11px] uppercase tracking-wider text-emerald-100">Tiết kiệm</span>
+                  </div>
+                </div>
+
+                <div class="md:col-span-8 space-y-5">
+                  <div class="flex items-center justify-between border-b border-emerald-400/50 pb-3">
+                    <span class="text-lg font-medium">Giảm chi phí điện vận hành:</span>
+                    <span id="res-pct-text" class="text-3xl font-extrabold">&darr; 19.3%</span>
+                  </div>
+                  <div class="flex items-center justify-between border-b border-emerald-400/50 pb-3">
+                    <div>
+                      <div class="text-lg font-medium">Tiền điện tiết kiệm hàng năm:</div>
+                      <div class="text-xs text-emerald-100">*Dựa trên mức tiêu thụ cơ sở ước tính <strong id="res-base-kwh">798</strong> kWh/tháng</div>
+                    </div>
+                    <span id="res-annual-savings" class="text-3xl font-extrabold">&darr; 6,152,559 đ</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-lg font-medium">Tổng mức đầu tư dự kiến & Hoàn vốn:</span>
+                    <div class="text-right">
+                      <div id="res-total-quote" class="text-xl font-extrabold">69,635,947 đ</div>
+                      <div id="res-payback" class="text-xs text-emerald-100">Hoàn vốn dự kiến: ~11.3 năm</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lead Capture Form -->
+            <div class="mt-8 bg-emerald-800/40 rounded-xl p-5 border border-emerald-300/30">
+              <div class="text-sm font-bold uppercase tracking-wider mb-3">Nhận báo cáo phân tích kỹ thuật chi tiết & Khảo sát miễn phí</div>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input type="text" id="lead-name" placeholder="Họ và tên *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <input type="text" id="lead-company" placeholder="Tên công ty / Kho *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <input type="text" id="lead-contact" placeholder="Số điện thoại / Email *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <button onclick="submitCustomerLead()" class="px-4 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold text-sm rounded transition">
+                  GỬI BÁO CÁO
+                </button>
+              </div>
+              <p id="lead-msg" class="text-xs text-emerald-100 mt-2 hidden"></p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTTOM BACK / NEXT BUTTONS -->
+        <div id="wizard-footer" class="grid grid-cols-2 h-14 border-t border-slate-200">
+          <button id="btn-prev" onclick="prevStep()" class="bg-[#2e6f40] hover:bg-[#255b34] text-white font-bold tracking-widest text-sm uppercase transition">
+            BACK
+          </button>
+          <button id="btn-next" onclick="nextStep()" class="bg-[#43b05c] hover:bg-[#389a4e] text-white font-bold tracking-widest text-sm uppercase transition">
+            NEXT
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: ADMIN / R&D FULL EXCEL MODEL & LEAD MANAGEMENT                -->
+  <!-- ===================================================================== -->
+  <section id="view-admin" class="hidden max-w-7xl mx-auto my-6 px-4 space-y-6">
+    
+    <!-- Admin Header -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 text-xs font-bold uppercase">Confidential — VOX Cool R&D</span>
+          <h1 class="text-xl font-bold text-slate-900">Hệ thống Công thức Kỹ thuật & Tài chính (Admin Engine)</h1>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">Giữ nguyên toàn bộ công thức từ file Excel gốc. Khi bạn chỉnh thông số tại đây, hệ thống tự động cập nhật công thức chạy ngầm cho giao diện Khách hàng.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="resetAdminToExcelDefaults(true)" class="px-3 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm">
+          Khôi phục 100% số gốc Excel
+        </button>
+        <button onclick="resetAdminToExcelDefaults(false)" class="px-3 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-300">
+          Chuyển sang bản hiệu chỉnh (Penjico 5%)
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Sub-Tabs -->
+    <div class="flex border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2 gap-4">
+      <button onclick="switchAdminTab('calc')" id="admin-tab-calc" class="py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700">
+        1. Bảng tính Kỹ thuật & CAPEX (Cold Storage + Case 1_5 hrs)
+      </button>
+      <button onclick="switchAdminTab('cashflow')" id="admin-tab-cashflow" class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800">
+        2. Dòng tiền 10 năm & Bảng độ nhạy (5% – 35%)
+      </button>
+      <button onclick="switchAdminTab('leads')" id="admin-tab-leads" class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
+        <span>3. Khách hàng từ Web (Leads)</span>
+        <span id="lead-count-badge" class="px-2 py-0.5 text-xs bg-emerald-100 text-emerald-800 rounded-full">0</span>
+      </button>
+    </div>
+
+    <!-- ADMIN TAB 1: FULL ENGINEERING & CAPEX SHEET -->
+    <div id="admin-panel-calc" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- LEFT COLUMN: SHEET 'COLD STORAGE' -->
+      <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h2 class="font-bold text-slate-800 text-base">A. Sheet: Cold Storage (Công thức chạy ngầm)</h2>
+          <span class="text-xs text-slate-400">Khách hàng không thấy các hệ số này</span>
+        </div>
+
+        <!-- Kích thước & Nhiệt độ -->
+        <div class="grid grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500">Length (m)</label>
+            <input type="number" step="0.1" id="adm-L" value="2.5" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500">Width (m)</label>
+            <input type="number" step="0.1" id="adm-W" value="2.0" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500">Height (m)</label>
+            <input type="number" step="0.1" id="adm-H" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500">Temp diff ΔT (K)</label>
+            <input type="number" step="1" id="adm-dT" value="60" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1.5 bg-white border border-slate-300 rounded text-sm font-bold">
+          </div>
+        </div>
+
+        <!-- Mục 1 & 2: Cooling of Commodity -->
+        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
+          <div class="text-xs font-bold text-emerald-700 uppercase">1 & 2. Cooling of Commodity (Khách chỉ nhập Capacity)</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div>
+              <label class="block text-[11px] text-slate-500">Capacity (kg)</label>
+              <input type="number" id="adm-cap" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">% to be cooled</label>
+              <input type="number" step="0.01" id="adm-pct-cool" value="0.15" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Temp diff (K)</label>
+              <input type="number" step="0.5" id="adm-dT-comm" value="5" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Specific heat (kJ/kg.K)</label>
+              <input type="number" step="0.1" id="adm-cp-comm" value="4.0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <div>
+              <label class="block text-[11px] text-slate-500">Avg perspiration rate (kJ/kg)</label>
+              <input type="number" step="0.1" id="adm-persp" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold bg-amber-50">
+            </div>
+            <div class="flex items-end justify-end">
+              <span class="text-xs text-slate-600">Heat Loss (I + II): <strong id="out-q-comm" class="text-slate-900">0.00</strong> kWh/ngày</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mục 3 & 4: Vách, trần, nền -->
+        <div class="border border-slate-200 rounded-lg p-3.5 space-y-2.5">
+          <div class="text-xs font-bold text-emerald-700 uppercase">3 & 4. Leakage from Walls, Roof & Floor</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-500">K walls & roof (W/m²K)</label>
+              <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">K floors (W/m²K)</label>
+              <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+          </div>
+          <div class="text-right text-xs text-slate-600">Heat Loss (Walls + Floor): <strong id="out-q-env" class="text-slate-900">10.40</strong> kWh/ngày</div>
+        </div>
+
+        <!-- Mục 5, 6, 7: Đèn, Mở cửa, Người -->
+        <div class="border border-slate-200 rounded-lg p-3.5 space-y-2.5">
+          <div class="text-xs font-bold text-emerald-700 uppercase">5, 6, 7. Electric Load, Door Opening & Humans</div>
+          <div class="grid grid-cols-3 gap-2.5">
+            <div>
+              <label class="block text-[11px] text-slate-500">Lights (kW × hrs)</label>
+              <div class="flex gap-1 mt-0.5">
+                <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
+                <input type="number" step="1" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Door (Lần × Energy gain kJ/K)</label>
+              <div class="flex gap-1 mt-0.5">
+                <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
+                <input type="number" step="0.5" id="adm-door-kj" value="30" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold bg-amber-50">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Humans (Người × Giờ)</label>
+              <div class="flex gap-1 mt-0.5">
+                <input type="number" id="adm-human-cnt" value="2" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
+                <input type="number" id="adm-human-hrs" value="5" oninput="recalcAdmin()" class="w-1/2 px-1.5 py-1 border rounded text-xs font-semibold">
+              </div>
+            </div>
+          </div>
+          <div class="text-right text-xs text-slate-600">Tải nội bộ + Mở cửa: <strong id="out-q-int" class="text-slate-900">28.30</strong> kWh/ngày</div>
+        </div>
+
+        <!-- Tổng tải lạnh, COP, Giá điện -->
+        <div class="bg-slate-900 text-white rounded-lg p-4 space-y-3">
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-400">Factor of safety (%)</label>
+              <input type="number" step="1" id="adm-safety" value="10" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400">COP of chiller</label>
+              <input type="number" step="0.1" id="adm-cop" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-400">Giờ tắt máy nén/ngày</label>
+              <input type="number" step="0.5" id="adm-shift-hrs" value="5" oninput="recalcAdmin()" class="w-full mt-1 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs font-bold text-emerald-400">
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-3 pt-1">
+            <div>
+              <label class="block text-[10px] text-slate-400">Peak tariff (đ/kWh)</label>
+              <input type="number" id="adm-p-peak" value="5964.2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Standard tariff (đ/kWh)</label>
+              <input type="number" id="adm-p-std" value="3467.2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400">Off-peak tariff (đ/kWh)</label>
+              <input type="number" id="adm-p-off" value="2109.8" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 bg-slate-800 border border-slate-700 rounded text-xs">
+            </div>
+          </div>
+          <div class="border-t border-slate-700 pt-2.5 flex justify-between text-xs">
+            <span>Tổng tải lạnh: <strong id="out-q-total" class="text-emerald-400">42.57 kWh/ngày</strong></span>
+            <span>Điện tiêu thụ: <strong id="out-e-month" class="text-emerald-400">798.1 kWh/tháng</strong></span>
+            <span>Tiết kiệm: <strong id="out-save-year" class="text-amber-400">6,152,559 đ/năm</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: SHEET 'CASE 1_5 HRS' -->
+      <div class="lg:col-span-6 bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h2 class="font-bold text-slate-800 text-base">B. Sheet: Case 1_5 hrs (Định lượng Pin & CAPEX)</h2>
+          <span class="text-xs px-2 py-0.5 bg-red-50 text-red-600 font-semibold rounded">Bảo mật nội bộ</span>
+        </div>
+
+        <!-- Định lượng Pin PCM -->
+        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
+          <div class="text-xs font-bold text-sky-700 uppercase">1. Định lượng Pin lạnh PCM -21</div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-500">Thermal spec (kWh/kg)</label>
+              <input type="number" step="0.001" id="adm-bat-spec" value="0.087" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Khối lượng 1 viên (kg)</label>
+              <input type="number" step="0.1" id="adm-bat-kg" value="2.6" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Unit cost (đ/viên + VAT)</label>
+              <input type="number" id="adm-bat-price" value="140800" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+          </div>
+          <div class="bg-sky-50 px-3 py-2 rounded text-xs flex justify-between text-sky-900">
+            <span>Thermal Energy (+10%): <strong id="out-bat-kwh">9.75 kWh</strong></span>
+            <span>Weight: <strong id="out-bat-weight">112.12 kg</strong></span>
+            <span>Số viên pin: <strong id="out-bat-count">43.12 viên</strong></span>
+          </div>
+        </div>
+
+        <!-- Chi phí VOX Cool & Penjico -->
+        <div class="border border-slate-200 rounded-lg p-3.5 space-y-3">
+          <div class="text-xs font-bold text-sky-700 uppercase">2. Cấu thành CAPEX (VOX Cool & Penjico)</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-500">IoT system costs (VND)</label>
+              <input type="number" id="adm-iot-cost" value="22000000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Shipping Pin (đ/kg)</label>
+              <input type="number" id="adm-bat-ship-rate" value="3000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Khung Penjico (VND)</label>
+              <input type="number" id="adm-frame-cost" value="12128600" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Shipping khung (VND)</label>
+              <input type="number" id="adm-frame-ship" value="5000000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-[11px] text-slate-500">Chi phí Penjico (%)</label>
+              <input type="number" step="1" id="adm-penjico-pct" value="50" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold text-amber-700 bg-amber-50">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-500">Chi phí chiết khấu / Markup (%)</label>
+              <input type="number" step="1" id="adm-markup-pct" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold text-emerald-700 bg-emerald-50">
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Financial Box -->
+        <div class="bg-slate-900 text-white rounded-xl p-4 space-y-2.5">
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>Total Chi phí VOX Cool:</span>
+            <strong id="out-vox-cost">28,408,338 đ</strong>
+          </div>
+          <div class="flex justify-between text-xs text-slate-300">
+            <span>Total Chi phí Penjico (đã bao gồm khung):</span>
+            <strong id="out-penjico-cost">34,897,069 đ</strong>
+          </div>
+          <div class="flex justify-between text-sm font-bold text-emerald-400 border-t border-slate-700 pt-2">
+            <span>TOTAL CHI PHÍ BÁO GIÁ KHÁCH HÀNG:</span>
+            <span id="out-final-quote" class="text-lg">69,635,947 đ</span>
+          </div>
+          <div class="flex justify-between text-xs text-amber-300 pt-1">
+            <span>Thời gian hoàn vốn (Payback): <strong id="out-adm-payback">11.32 năm</strong></span>
+            <span>IRR 10 năm: <strong id="out-adm-irr">-1.9%</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 2: 10-YEAR CASH FLOW & SENSITIVITY -->
+    <div id="admin-panel-cashflow" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+      <div class="flex flex-wrap justify-between items-center gap-4">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base">Phân tích Dòng tiền 10 năm & Bảng độ nhạy tiết kiệm (5% – 35%)</h3>
+          <p class="text-xs text-slate-500">Tự động cập nhật theo CAPEX và chi phí điện nền ở Tab 1</p>
+        </div>
+        <div class="flex gap-3">
+          <div>
+            <label class="block text-[10px] text-slate-500">OPEX hàng năm (% CAPEX)</label>
+            <input type="number" step="0.5" id="adm-opex-pct" value="0" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-500">Inflation rate (%/năm)</label>
+            <input type="number" step="0.5" id="adm-inf-pct" value="0" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded text-xs font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-500">Discount rate (%/năm)</label>
+            <input type="number" step="0.5" id="adm-disc-pct" value="0" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded text-xs font-bold">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7">
+          <canvas id="cashflowChart" height="220"></canvas>
+        </div>
+        <div class="lg:col-span-5 overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 border-b">
+                <th class="p-2">Percentage of Savings</th>
+                <th class="p-2 text-right">Savings / Year</th>
+                <th class="p-2 text-right">Payback (Year)</th>
+              </tr>
+            </thead>
+            <tbody id="sensitivity-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 3: CUSTOMER LEADS -->
+    <div id="admin-panel-leads" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-slate-800">Danh sách Khách hàng đã tính toán trên Web</h3>
+        <button onclick="clearAllLeads()" class="text-xs text-red-600 hover:underline">Xóa lịch sử</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 border-b">
+              <th class="p-2.5">Thời gian</th>
+              <th class="p-2.5">Khách hàng / Công ty</th>
+              <th class="p-2.5">Liên hệ</th>
+              <th class="p-2.5">Kích thước kho</th>
+              <th class="p-2.5 text-right">Tiết kiệm/năm</th>
+              <th class="p-2.5 text-right">Báo giá CAPEX</th>
+              <th class="p-2.5 text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody" class="divide-y divide-slate-100">
+            <tr><td colspan="7" class="p-6 text-center text-slate-400">Chưa có khách hàng nào gửi yêu cầu. Hãy thử nhập ở Giao diện Khách hàng!</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+      <h3 class="text-lg font-bold text-slate-900">Đăng nhập Admin / R&D VOX Cool</h3>
+      <p class="text-xs text-slate-500 mt-1">Nhập mật khẩu nội bộ để mở bảng công thức và đơn giá gốc (Mật khẩu: <strong>voxcool2026</strong> hoặc <strong>DUCMANH</strong>)</p>
+      <input type="password" id="admin-pwd-input" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter') verifyAdminLogin()"
+        class="w-full mt-4 px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-emerald-500">
+      <p id="admin-login-err" class="text-xs text-red-600 mt-1.5 hidden">Mật khẩu không chính xác!</p>
+      <div class="mt-5 flex justify-end gap-2">
+        <button onclick="closeAdminModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">Hủy</button>
+        <button onclick="verifyAdminLogin()" class="px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // STATE & GLOBAL CONFIG (Exact Excel defaults by default)
+    // =========================================================================
+    let currentStep = 1;
+    let activeInputId = 'cust-length';
+    let selectedShiftHours = 5;
+    let isAdminAuthenticated = false;
+    let cashflowChartInstance = null;
+
+    let config = {
+      pctCooled: 0.15,         // C15: 15% commodity cooled/day
+      dTCommodity: 5.0,        // C16: 5 K
+      cpCommodity: 4.0,        // C17: 4.0 kJ/kg.K
+      perspirationRate: 0.0,   // C21: 0 kJ/kg
+      kWallRoof: 0.30,         // C31: 0.3 W/m2K
+      kFloor: 0.28,            // C37: 0.28 W/m2K
+      lightKw: 0.4,            // C42: 0.4 kW
+      lightHrs: 14.0,          // C43: 14 hrs
+      doorKjFactor: 30.0,      // C49: 30 kJ/K (Exact Excel value)
+      humanCount: 2,           // C54: 2 people
+      humanHrs: 5,             // C55: 5 hrs
+      humanKw: 0.27,           // C56: 0.27 kW
+      safetyFactor: 0.10,      // C62: 10%
+      copBase: 1.6,            // C67: 1.6
+      pPeak: 5964.2,           // C73: 5422 * 1.1
+      pStd: 3467.2,            // C74: 3152 * 1.1
+      pOff: 2109.8,            // C75: 1918 * 1.1
+      batSpecKwhKg: 0.087,     // C4 (Case 1): 0.087 kWh/kg
+      batUnitKg: 2.6,          // C7 (Case 1): 2.6 kg/pack
+      batUnitPrice: 140800,    // C10 (Case 1): 128000 * 1.1
+      iotCost: 22000000,       // C12 (Case 1): 20M * 1.1
+      batShipRate: 3000,       // C13 (Case 1): 3000 VND/kg
+      frameCost: 12128600,     // C16 (Case 1): 12,128,600 VND
+      frameShip: 5000000,      // C17 (Case 1): 5,000,000 VND
+      penjicoPct: 0.50,        // C19 (Case 1): 0.5 (Exact Excel value)
+      markupPct: 0.10,         // C24 (Case 1): 0.1
+      includeFrameShip: false, // Exact Excel C23 = SUM(C14,C21)
+      roundUpBat: false        // Exact Excel C7 = C6/2.6
+    };
+
+    const fmtVND = (n) => Math.round(n).toLocaleString('vi-VN');
+
+    // =========================================================================
+    // CORE THERMODYNAMIC & FINANCIAL ENGINE (Matches Excel 100%)
+    // =========================================================================
+    function runEngineeringCalculation(params) {
+      const L = params.L;
+      const W = params.W;
+      const H = params.H;
+      const volume = Math.round(L * W * H);
+      const areaWallsRoof = L * W + 2 * L * H + 2 * W * H;
+      const areaFloor = L * W;
+      const dT = params.dT;
+
+      // 1 & 2: Commodity heat loss (Hidden formulas for customer)
+      const qComm1 = (params.capacity * params.pctCooled * params.dTCommodity * params.cpCommodity) / 3600;
+      const qComm2 = (params.perspirationRate * params.capacity) / 3600;
+
+      // 3 & 4: Envelope heat leakage
+      const qWallsRoof = (areaWallsRoof * dT * params.kWallRoof / 1000) * 24;
+      const qFloor = (areaFloor * dT * params.kFloor / 1000) * 24;
+
+      // 5, 6, 7: Internal & Door opening loads
+      const qLight = 1 * params.lightKw * params.lightHrs;
+      const doorVol = volume * 0.5;
+      const qDoor = (params.doorOpenings * doorVol * params.doorKjFactor * dT) / 3600;
+      const qHuman = params.humanCount * params.humanHrs * params.humanKw;
+
+      const qSum = qComm1 + qComm2 + qWallsRoof + qFloor + qLight + qDoor + qHuman;
+      const qTotal = qSum * (1 + params.safetyFactor);
+
+      // Equipment & Efficiency multipliers
+      let copEff = params.cop;
+      if (params.equip === 'hfc_35') copEff *= 0.85;
+      else if (params.equip === 'hfc_25') copEff *= 0.95;
+      else if (params.equip === 'nh3_1stage') copEff *= 1.12;
+      else if (params.equip === 'nh3_2stage') copEff *= 1.30;
+
+      if (params.cond === 'water') copEff *= 1.08;
+      else if (params.cond === 'air') copEff *= 0.94;
+
+      let defrostBonus = 0;
+      if (params.defrost === 'electric') defrostBonus = 0.025;
+      if (params.solar === 'yes') defrostBonus += 0.04;
+
+      // Electrical consumption
+      const eDay = qTotal / copEff;
+      const eMonth = eDay * 30;
+
+      // Baseline EVN Cost (24 weekdays + 4 Sundays = 28 days/month as in Excel C89)
+      const costWd = (eDay / 24) * (5 * params.pPeak + 13 * params.pStd + 6 * params.pOff);
+      const costSun = (eDay / 24) * (18 * params.pStd + 6 * params.pOff);
+      const costBaseMonth = costWd * 24 + costSun * 4;
+      const costBaseYear = costBaseMonth * 12;
+
+      // Case I: Peak shifting savings
+      const shiftHrs = params.shiftHours;
+      const pctDemandMet = shiftHrs / 24;
+
+      const peakHrsShifted = Math.min(shiftHrs, 5);
+      const stdHrsShifted = Math.max(0, shiftHrs - 5);
+      const ePeakShift = eDay * (peakHrsShifted / 24);
+      const eStdShift = eDay * (stdHrsShifted / 24);
+
+      const tariffSavingsWd = ePeakShift * (params.pPeak - params.pOff) + eStdShift * (params.pStd - params.pOff);
+      const efficiencyBonusYear = costBaseYear * defrostBonus;
+      const savingsYear = tariffSavingsWd * 24 * 12 + efficiencyBonusYear;
+      const pctSavings = costBaseYear > 0 ? (savingsYear / costBaseYear) : 0;
+
+      // CAPEX Calculation (Sheet Case 1_5 hrs)
+      const qPcmDay = qTotal * pctDemandMet;
+      const batKwhReq = qPcmDay * 1.1;
+      const batWeightRaw = batKwhReq / params.batSpecKwhKg;
+      const batCountRaw = batWeightRaw / params.batUnitKg;
+      const batCount = params.roundUpBat ? Math.ceil(batCountRaw) : batCountRaw;
+      const batWeight = params.roundUpBat ? (batCount * params.batUnitKg) : batWeightRaw;
+
+      const capexBat = batCount * params.batUnitPrice;
+      const shipBat = batWeight * params.batShipRate;
+      const totalVox = capexBat + params.iotCost + shipBat;
+
+      const capexPrePenjico = totalVox + params.frameCost + params.frameShip;
+      const penjicoFee = capexPrePenjico * params.penjicoPct;
+      const totalPenjico = params.frameCost + penjicoFee;
+
+      const quotePreMarkup = totalVox + totalPenjico + (params.includeFrameShip ? params.frameShip : 0);
+      const finalQuote = quotePreMarkup * (1 + params.markupPct);
+      const paybackYears = savingsYear > 0 ? (finalQuote / savingsYear) : 99;
+
+      return {
+        volume, qComm1, qComm2, qWallsRoof, qFloor, qLight, qDoor, qHuman,
+        qSum, qTotal, eDay, eMonth, costBaseMonth, costBaseYear,
+        savingsYear, pctSavings, batKwhReq, batWeight, batCount,
+        totalVox, totalPenjico, finalQuote, paybackYears
+      };
+    }
+
+    // =========================================================================
+    // CUSTOMER WIZARD LOGIC
+    // =========================================================================
+    const stepTitles = {
+      1: 'Bước 1: Kích thước & Nhiệt độ vận hành kho',
+      2: 'Bước 2: Quy mô hàng hóa & Tần suất mở cửa',
+      3: 'Bước 3: Cấu hình Hệ thống lạnh hiện hữu',
+      4: 'Bước 4: Thời gian cắt tải cao điểm & Điện mặt trời',
+      5: 'Bước 5: Biểu giá điện áp dụng',
+      6: 'Kết quả Ước tính Tiết kiệm Năng lượng'
+    };
+
+    function goToStep(step) {
+      currentStep = step;
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`step-${i}`);
+        if (el) el.classList.toggle('hidden', i !== step);
+        const nav = document.getElementById(`nav-step-${i}`);
+        if (nav) nav.classList.toggle('step-active', i === step);
+      }
+      document.getElementById('step-title').textContent = stepTitles[step] || '';
+      document.getElementById('wizard-footer').classList.toggle('hidden', step === 6);
+      document.getElementById('btn-next').textContent = (step === 5) ? 'CALCULATE SAVINGS' : 'NEXT';
+    }
+
+    function nextStep() {
+      if (currentStep < 5) goToStep(currentStep + 1);
+      else if (currentStep === 5) calculateAndShowResult();
+    }
+
+    function prevStep() {
+      if (currentStep > 1) goToStep(currentStep - 1);
+    }
+
+    function resetCustomerForm() {
+      document.getElementById('cust-length').value = '2.5';
+      document.getElementById('cust-width').value = '2.0';
+      document.getElementById('cust-height').value = '1.6';
+      document.getElementById('cust-temp').value = '-18';
+      document.getElementById('cust-capacity').value = '0';
+      document.getElementById('cust-door-openings').value = '10';
+      selectShiftHours(5);
+      updateLiveVolume();
+      goToStep(1);
+    }
+
+    function selectRoomType(type) {
+      const fBtn = document.getElementById('btn-type-freezer');
+      const cBtn = document.getElementById('btn-type-chiller');
+      if (type === 'freezer') {
+        fBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between';
+        cBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between';
+        document.getElementById('cust-temp').value = '-18';
+      } else {
+        cBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between';
+        fBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between';
+        document.getElementById('cust-temp').value = '2';
+      }
+    }
+
+    function updateLiveVolume() {
+      const L = parseFloat(document.getElementById('cust-length').value) || 0;
+      const W = parseFloat(document.getElementById('cust-width').value) || 0;
+      const H = parseFloat(document.getElementById('cust-height').value) || 0;
+      document.getElementById('live-volume-display').textContent = (L * W * H).toFixed(1) + ' m³';
+      document.getElementById('live-area-display').textContent = (L * W).toFixed(1) + ' m²';
+    }
+
+    function pressNumpad(key) {
+      const input = document.getElementById(activeInputId);
+      if (!input) return;
+      let val = input.value.toString();
+      if (key === 'DEL') {
+        input.value = val.slice(0, -1);
+      } else if (key === '.') {
+        if (!val.includes('.')) input.value = val + '.';
+      } else {
+        input.value = (val === '0' ? '' : val) + key;
+      }
+      updateLiveVolume();
+    }
+
+    function selectShiftHours(hrs) {
+      selectedShiftHours = hrs;
+      [5, 8, 10].forEach(h => {
+        const btn = document.getElementById(`btn-hrs-${h}`);
+        btn.className = (h === hrs)
+          ? 'hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center'
+          : 'hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center';
+      });
+    }
+
+    function selectTariffPreset(preset) {
+      if (preset === 'commercial_lt6') {
+        config.pPeak = 5964.2; config.pStd = 3467.2; config.pOff = 2109.8;
+      } else {
+        config.pPeak = 3640.0; config.pStd = 1997.0; config.pOff = 1304.0;
+      }
+    }
+
+    let lastCustomerResult = null;
+
+    function calculateAndShowResult() {
+      const L = parseFloat(document.getElementById('cust-length').value) || 2.5;
+      const W = parseFloat(document.getElementById('cust-width').value) || 2.0;
+      const H = parseFloat(document.getElementById('cust-height').value) || 1.6;
+      const temp = parseFloat(document.getElementById('cust-temp').value);
+      const dT = isNaN(temp) ? 60 : Math.max(10, 35 - temp + (temp <= -18 ? 7 : 0)); // Matches 60K at -18C
+      const capacity = parseFloat(document.getElementById('cust-capacity').value) || 0;
+      const doorOpenings = parseFloat(document.getElementById('cust-door-openings').value) || 10;
+      const equip = document.querySelector('input[name="cust-equip"]:checked').value;
+      const cond = document.querySelector('input[name="cust-cond"]:checked').value;
+      const defrost = document.querySelector('input[name="cust-defrost"]:checked').value;
+      const solar = document.querySelector('input[name="cust-solar"]:checked').value;
+
+      const res = runEngineeringCalculation({
+        ...config,
+        L, W, H, dT, capacity, doorOpenings,
+        equip, cond, defrost, solar,
+        shiftHours: selectedShiftHours,
+        cop: config.copBase
+      });
+
+      lastCustomerResult = { L, W, H, dT, capacity, doorOpenings, res };
+
+      document.getElementById('res-pct-circle').textContent = (res.pctSavings * 100).toFixed(1) + '%';
+      document.getElementById('res-pct-text').innerHTML = '&darr; ' + (res.pctSavings * 100).toFixed(1) + '%';
+      document.getElementById('res-base-kwh').textContent = Math.round(res.eMonth).toLocaleString('vi-VN');
+      document.getElementById('res-annual-savings').innerHTML = '&darr; ' + fmtVND(res.savingsYear) + ' đ';
+      document.getElementById('res-total-quote').textContent = fmtVND(res.finalQuote) + ' đ';
+      document.getElementById('res-payback').textContent = `Hoàn vốn dự kiến: ~${res.paybackYears.toFixed(1)} năm`;
+
+      goToStep(6);
+    }
+
+    function submitCustomerLead() {
+      const name = document.getElementById('lead-name').value.trim();
+      const company = document.getElementById('lead-company').value.trim();
+      const contact = document.getElementById('lead-contact').value.trim();
+      const msgEl = document.getElementById('lead-msg');
+
+      if (!name || !contact) {
+        msgEl.textContent = 'Vui lòng nhập Họ tên và Số điện thoại / Email để nhận báo cáo.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      const leads = JSON.parse(localStorage.getItem('voxcool_leads') || '[]');
+      leads.unshift({
+        id: Date.now(),
+        time: new Date().toLocaleString('vi-VN'),
+        name, company: company || 'Chưa cung cấp', contact,
+        data: lastCustomerResult
+      });
+      localStorage.setItem('voxcool_leads', JSON.stringify(leads));
+      renderLeadsTable();
+
+      msgEl.textContent = 'Đã ghi nhận thông tin! Đội ngũ kỹ thuật VOX Cool sẽ gửi báo cáo chi tiết cho bạn.';
+      msgEl.classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // ADMIN / R&D PORTAL LOGIC
+    // =========================================================================
+    function openAdminModal() {
+      if (isAdminAuthenticated) {
+        switchMode('admin');
+        return;
+      }
+      document.getElementById('admin-modal').classList.remove('hidden');
+      document.getElementById('admin-pwd-input').focus();
+    }
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').classList.add('hidden');
+      document.getElementById('admin-login-err').classList.add('hidden');
+    }
+
+    function verifyAdminLogin() {
+      const pwd = document.getElementById('admin-pwd-input').value;
+      if (pwd === 'voxcool2026' || pwd === 'DUCMANH') {
+        isAdminAuthenticated = true;
+        closeAdminModal();
+        switchMode('admin');
+        recalcAdmin();
+        renderLeadsTable();
+      } else {
+        document.getElementById('admin-login-err').classList.remove('hidden');
+      }
+    }
+
+    function switchMode(mode) {
+      const isCust = mode === 'customer';
+      document.getElementById('view-customer').classList.toggle('hidden', !isCust);
+      document.getElementById('view-admin').classList.toggle('hidden', isCust);
+
+      document.getElementById('btn-switch-customer').className = isCust
+        ? 'px-3.5 py-1.5 rounded-md text-sm font-semibold bg-emerald-500 text-slate-950 shadow transition'
+        : 'px-3.5 py-1.5 rounded-md text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition';
+
+      document.getElementById('btn-switch-admin').className = !isCust
+        ? 'px-3.5 py-1.5 rounded-md text-sm font-semibold bg-emerald-500 text-slate-950 shadow transition flex items-center gap-1.5'
+        : 'px-3.5 py-1.5 rounded-md text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5';
+    }
+
+    function switchAdminTab(tab) {
+      ['calc', 'cashflow', 'leads'].forEach(t => {
+        document.getElementById(`admin-panel-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`admin-tab-${t}`);
+        btn.className = (t === tab)
+          ? 'py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-1.5'
+          : 'py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
+      });
+      if (tab === 'cashflow') recalcAdmin();
+    }
+
+    function resetAdminToExcelDefaults(rawExcelMode) {
+      document.getElementById('adm-L').value = 2.5;
+      document.getElementById('adm-W').value = 2.0;
+      document.getElementById('adm-H').value = 1.6;
+      document.getElementById('adm-dT').value = 60;
+      document.getElementById('adm-cap').value = 0;
+      document.getElementById('adm-pct-cool').value = 0.15;
+      document.getElementById('adm-dT-comm').value = 5;
+      document.getElementById('adm-cp-comm').value = 4.0;
+      document.getElementById('adm-persp').value = 0;
+      document.getElementById('adm-k-wall').value = 0.30;
+      document.getElementById('adm-k-floor').value = 0.28;
+      document.getElementById('adm-light-kw').value = 0.4;
+      document.getElementById('adm-light-hrs').value = 14;
+      document.getElementById('adm-human-cnt').value = 2;
+      document.getElementById('adm-human-hrs').value = 5;
+      document.getElementById('adm-safety').value = 10;
+      document.getElementById('adm-cop').value = 1.6;
+      document.getElementById('adm-shift-hrs').value = 5;
+      document.getElementById('adm-door-kj').value = 30;
+
+      if (rawExcelMode) {
+        document.getElementById('adm-penjico-pct').value = 50;
+        config.includeFrameShip = false;
+        config.roundUpBat = false;
+      } else {
+        document.getElementById('adm-penjico-pct').value = 5;
+        config.includeFrameShip = true;
+        config.roundUpBat = true;
+      }
+      recalcAdmin();
+    }
+
+    function recalcAdmin() {
+      config.pctCooled = parseFloat(document.getElementById('adm-pct-cool').value) || 0.15;
+      config.dTCommodity = parseFloat(document.getElementById('adm-dT-comm').value) || 5;
+      config.cpCommodity = parseFloat(document.getElementById('adm-cp-comm').value) || 4.0;
+      config.perspirationRate = parseFloat(document.getElementById('adm-persp').value) || 0;
+      config.kWallRoof = parseFloat(document.getElementById('adm-k-wall').value) || 0.30;
+      config.kFloor = parseFloat(document.getElementById('adm-k-floor').value) || 0.28;
+      config.lightKw = parseFloat(document.getElementById('adm-light-kw').value) || 0.4;
+      config.lightHrs = parseFloat(document.getElementById('adm-light-hrs').value) || 14;
+      config.doorKjFactor = parseFloat(document.getElementById('adm-door-kj').value) || 30;
+      config.humanCount = parseFloat(document.getElementById('adm-human-cnt').value) || 0;
+      config.humanHrs = parseFloat(document.getElementById('adm-human-hrs').value) || 0;
+      config.safetyFactor = (parseFloat(document.getElementById('adm-safety').value) || 0) / 100;
+      config.copBase = parseFloat(document.getElementById('adm-cop').value) || 1.6;
+      config.pPeak = parseFloat(document.getElementById('adm-p-peak').value) || 5964.2;
+      config.pStd = parseFloat(document.getElementById('adm-p-std').value) || 3467.2;
+      config.pOff = parseFloat(document.getElementById('adm-p-off').value) || 2109.8;
+
+      config.batSpecKwhKg = parseFloat(document.getElementById('adm-bat-spec').value) || 0.087;
+      config.batUnitKg = parseFloat(document.getElementById('adm-bat-kg').value) || 2.6;
+      config.batUnitPrice = parseFloat(document.getElementById('adm-bat-price').value) || 140800;
+      config.iotCost = parseFloat(document.getElementById('adm-iot-cost').value) || 0;
+      config.batShipRate = parseFloat(document.getElementById('adm-bat-ship-rate').value) || 0;
+      config.frameCost = parseFloat(document.getElementById('adm-frame-cost').value) || 0;
+      config.frameShip = parseFloat(document.getElementById('adm-frame-ship').value) || 0;
+      config.penjicoPct = (parseFloat(document.getElementById('adm-penjico-pct').value) || 0) / 100;
+      config.markupPct = (parseFloat(document.getElementById('adm-markup-pct').value) || 0) / 100;
+
+      const L = parseFloat(document.getElementById('adm-L').value) || 2.5;
+      const W = parseFloat(document.getElementById('adm-W').value) || 2.0;
+      const H = parseFloat(document.getElementById('adm-H').value) || 1.6;
+      const dT = parseFloat(document.getElementById('adm-dT').value) || 60;
+      const capacity = parseFloat(document.getElementById('adm-cap').value) || 0;
+      const doorOpenings = parseFloat(document.getElementById('adm-door-cnt').value) || 10;
+      const shiftHours = parseFloat(document.getElementById('adm-shift-hrs').value) || 5;
+
+      const res = runEngineeringCalculation({
+        ...config, L, W, H, dT, capacity, doorOpenings,
+        equip: 'unknown', cond: 'unknown', defrost: 'unknown', solar: 'unknown',
+        shiftHours, cop: config.copBase
+      });
+
+      document.getElementById('out-q-comm').textContent = (res.qComm1 + res.qComm2).toFixed(2);
+      document.getElementById('out-q-env').textContent = (res.qWallsRoof + res.qFloor).toFixed(2);
+      document.getElementById('out-q-int').textContent = (res.qLight + res.qDoor + res.qHuman).toFixed(2);
+      document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
+      document.getElementById('out-e-month').textContent = res.eMonth.toFixed(1) + ' kWh/tháng';
+      document.getElementById('out-save-year').textContent = `${fmtVND(res.savingsYear)} đ/năm (${(res.pctSavings*100).toFixed(1)}%)`;
+
+      document.getElementById('out-bat-kwh').textContent = res.batKwhReq.toFixed(2) + ' kWh';
+      document.getElementById('out-bat-weight').textContent = res.batWeight.toFixed(2) + ' kg';
+      document.getElementById('out-bat-count').textContent = (config.roundUpBat ? res.batCount : res.batCount.toFixed(2)) + ' viên';
+
+      document.getElementById('out-vox-cost').textContent = fmtVND(res.totalVox) + ' đ';
+      document.getElementById('out-penjico-cost').textContent = fmtVND(res.totalPenjico) + ' đ';
+      document.getElementById('out-final-quote').textContent = fmtVND(res.finalQuote) + ' đ';
+      document.getElementById('out-adm-payback').textContent = res.paybackYears.toFixed(2) + ' năm';
+
+      updateCashflowAndSensitivity(res);
+    }
+
+    function updateCashflowAndSensitivity(res) {
+      const opexPct = (parseFloat(document.getElementById('adm-opex-pct').value) || 0) / 100;
+      const infPct = (parseFloat(document.getElementById('adm-inf-pct').value) || 0) / 100;
+      const discPct = (parseFloat(document.getElementById('adm-disc-pct').value) || 0) / 100;
+
+      const tbody = document.getElementById('sensitivity-tbody');
+      tbody.innerHTML = '';
+      [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35].forEach(pct => {
+        const annSave = res.costBaseYear * pct;
+        const pb = annSave > 0 ? (res.finalQuote / annSave) : 99;
+        tbody.innerHTML += `
+          <tr class="${Math.abs(pct - 0.20) < 0.01 ? 'bg-emerald-50 font-semibold' : ''}">
+            <td class="p-2">${(pct * 100).toFixed(0)}%</td>
+            <td class="p-2 text-right">${fmtVND(annSave)} đ</td>
+            <td class="p-2 text-right text-emerald-700 font-bold">${pb.toFixed(1)} năm</td>
+          </tr>
+        `;
+      });
+
+      const labels = [];
+      const cumData = [];
+      let cum = 0;
+      const cfs = [];
+
+      for (let yr = 1; yr <= 10; yr++) {
+        labels.push('Năm ' + yr);
+        const capexYr = yr === 1 ? res.finalQuote : 0;
+        const opexYr = (res.finalQuote * opexPct) * Math.pow(1 + infPct, yr - 1);
+        const benefitYr = res.savingsYear * Math.pow(1 + infPct, yr - 1);
+        const netCf = benefitYr - capexYr - opexYr;
+        cfs.push(netCf);
+        const discCf = netCf / Math.pow(1 + discPct, yr - 1);
+        cum += discCf;
+        cumData.push(Math.round(cum));
+      }
+
+      let irr = 0.05;
+      for (let i = 0; i < 50; i++) {
+        let npv = 0, dNpv = 0;
+        for (let t = 0; t < cfs.length; t++) {
+          npv += cfs[t] / Math.pow(1 + irr, t);
+          if (t > 0) dNpv -= t * cfs[t] / Math.pow(1 + irr, t + 1);
+        }
+        if (Math.abs(dNpv) < 1e-6) break;
+        irr = irr - npv / dNpv;
+      }
+      document.getElementById('out-adm-irr').textContent = isFinite(irr) ? (irr * 100).toFixed(1) + '%' : 'N/A';
+
+      const ctx = document.getElementById('cashflowChart').getContext('2d');
+      if (cashflowChartInstance) cashflowChartInstance.destroy();
+      cashflowChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Dòng tiền lũy kế chiết khấu (VND)',
+            data: cumData,
+            backgroundColor: cumData.map(v => v >= 0 ? '#10b981' : '#f43f5e'),
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: true } },
+          scales: {
+            y: { ticks: { callback: (v) => (v / 1e6).toFixed(0) + ' Tr' } }
+          }
+        }
+      });
+    }
+
+    function renderLeadsTable() {
+      const leads = JSON.parse(localStorage.getItem('voxcool_leads') || '[]');
+      document.getElementById('lead-count-badge').textContent = leads.length;
+      const tbody = document.getElementById('leads-tbody');
+      if (leads.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400">Chưa có khách hàng nào gửi yêu cầu.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = leads.map((l, idx) => `
+        <tr class="hover:bg-slate-50">
+          <td class="p-2.5 text-slate-500">${l.time}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${l.name} <span class="block text-[11px] font-normal text-slate-500">${l.company}</span></td>
+          <td class="p-2.5">${l.contact}</td>
+          <td class="p-2.5">${l.data.L}m × ${l.data.W}m × ${l.data.H}m (${l.data.res.volume} m³)</td>
+          <td class="p-2.5 text-right text-emerald-700 font-bold">${fmtVND(l.data.res.savingsYear)} đ</td>
+          <td class="p-2.5 text-right font-bold">${fmtVND(l.data.res.finalQuote)} đ</td>
+          <td class="p-2.5 text-center">
+            <button onclick="loadLeadIntoAdmin(${idx})" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded text-[11px] font-semibold">
+              Nạp vào bảng tính
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadLeadIntoAdmin(idx) {
+      const leads = JSON.parse(localStorage.getItem('voxcool_leads') || '[]');
+      const l = leads[idx];
+      if (!l) return;
+      document.getElementById('adm-L').value = l.data.L;
+      document.getElementById('adm-W').value = l.data.W;
+      document.getElementById('adm-H').value = l.data.H;
+      document.getElementById('adm-dT').value = l.data.dT;
+      document.getElementById('adm-cap').value = l.data.capacity;
+      document.getElementById('adm-door-cnt').value = l.data.doorOpenings;
+      switchAdminTab('calc');
+      recalcAdmin();
+    }
+
+    function clearAllLeads() {
+      localStorage.removeItem('voxcool_leads');
+      renderLeadsTable();
+    }
+
+    // Khởi tạo mặc định giữ nguyên 100% số gốc trong file Excel
+    resetAdminToExcelDefaults(true);
+    renderLeadsTable();
+  </script>
+</body>
+</html>
