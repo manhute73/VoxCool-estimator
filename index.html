@@ -3,365 +3,409 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VOX Cool — Nền tảng Tính toán Tiết kiệm Năng lượng & Báo giá Kho lạnh PCM</title>
+  <title>VOX Cool | Cold Storage Energy Savings Estimator & Admin Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .formula-box { font-family: 'JetBrains Mono', monospace; }
-    .step-active { background-color: #10b981; color: #ffffff; border-color: #10b981; }
-    .field-locked { background-color: #f1f5f9 !important; color: #475569 !important; border-color: #cbd5e1 !important; cursor: not-allowed; }
-    .formula-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+    body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
+    .numpad-btn { transition: all 0.1s ease; }
+    .numpad-btn:active { transform: scale(0.95); background-color: #16a34a; color: white; }
+    .step-active { border-left: 4px solid #22c55e; background-color: rgba(34, 197, 94, 0.12); color: #22c55e; }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .formula-box { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .fixed-locked { background-color: #e2e8f0 !important; color: #334155 !important; border-color: #cbd5e1 !important; cursor: not-allowed; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+<body class="text-slate-800 antialiased">
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow">
+  <header class="bg-[#0f172a] text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow">
           V
         </div>
         <div>
-          <span class="font-bold text-lg tracking-tight">VOX <span class="text-emerald-400">Cool</span></span>
-          <span class="hidden sm:inline-block text-xs text-slate-400 ml-2 border-l border-slate-700 pl-2">PCM Cold Battery Engineering & ROI Portal</span>
+          <span class="font-bold tracking-wider text-lg text-white">VOX COOL</span>
+          <span class="hidden sm:inline-block text-xs text-emerald-400 font-semibold ml-2 uppercase tracking-widest border-l border-slate-700 pl-2">
+            Thermal Energy Storage
+          </span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center space-x-3">
         <button id="btn-switch-customer" onclick="switchMode('customer')"
           class="px-3.5 py-1.5 rounded-md text-sm font-semibold bg-emerald-500 text-slate-950 shadow transition">
           Giao diện Khách hàng
         </button>
         <button id="btn-switch-admin" onclick="openAdminModal()"
           class="px-3.5 py-1.5 rounded-md text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          Admin / R&D
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>Admin / R&D</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ===================================================================== -->
-  <!-- VIEW 1: CUSTOMER WIZARD                                               -->
+  <!-- VIEW 1: CUSTOMER / PARTNER ESTIMATOR (CHẠY THEO CÔNG THỨC ADMIN LƯU)  -->
   <!-- ===================================================================== -->
-  <main id="view-customer" class="flex-1 max-w-5xl w-full mx-auto px-4 py-8">
-    <div class="text-center mb-6">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Công cụ Ước tính Tiết kiệm Điện & Báo giá Pin lạnh PCM</h1>
-      <p class="text-slate-500 text-sm mt-1">Chuyển dịch phụ tải điện lạnh từ giờ cao điểm sang giờ thấp điểm — Tiết kiệm chi phí vận hành kho lạnh</p>
-    </div>
+  <main id="view-customer" class="max-w-5xl mx-auto my-8 px-4">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-h-[580px] flex flex-col md:flex-row">
+      
+      <!-- LEFT SIDEBAR STEPPER -->
+      <aside class="w-full md:w-20 bg-[#1e293b] text-slate-400 flex md:flex-col justify-between py-3 md:py-6 px-4 md:px-0 items-center shrink-0">
+        <div class="flex md:flex-col gap-2 md:gap-4 w-full justify-around md:justify-start">
+          <button onclick="goToStep(1)" id="nav-step-1" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition step-active" title="1. Quy mô & Nhiệt độ">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Kho lạnh</span>
+          </button>
+          <button onclick="goToStep(2)" id="nav-step-2" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="2. Hàng hóa & Hoạt động">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Hàng hóa</span>
+          </button>
+          <button onclick="goToStep(3)" id="nav-step-3" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="3. Thiết bị máy lạnh">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Hệ lạnh</span>
+          </button>
+          <button onclick="goToStep(4)" id="nav-step-4" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="4. Cắt tải & Điện mặt trời">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Cắt tải</span>
+          </button>
+          <button onclick="goToStep(5)" id="nav-step-5" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="5. Biểu giá điện EVN">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Giá điện</span>
+          </button>
+          <button onclick="calculateAndShowResult()" id="nav-step-6" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition" title="6. Kết quả ước tính">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-[10px] mt-1 font-medium">Kết quả</span>
+          </button>
+        </div>
+      </aside>
 
-    <!-- Step Progress -->
-    <div class="flex items-center justify-between max-w-2xl mx-auto mb-8">
-      <div id="nav-step-1" class="step-active w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-sm transition">1</div>
-      <div class="flex-1 h-1 bg-slate-300 mx-2"></div>
-      <div id="nav-step-2" class="w-9 h-9 rounded-full border-2 border-slate-300 bg-white text-slate-500 flex items-center justify-center font-bold text-sm transition">2</div>
-      <div class="flex-1 h-1 bg-slate-300 mx-2"></div>
-      <div id="nav-step-3" class="w-9 h-9 rounded-full border-2 border-slate-300 bg-white text-slate-500 flex items-center justify-center font-bold text-sm transition">3</div>
-      <div class="flex-1 h-1 bg-slate-300 mx-2"></div>
-      <div id="nav-step-4" class="w-9 h-9 rounded-full border-2 border-slate-300 bg-white text-slate-500 flex items-center justify-center font-bold text-sm transition">4</div>
-      <div class="flex-1 h-1 bg-slate-300 mx-2"></div>
-      <div id="nav-step-5" class="w-9 h-9 rounded-full border-2 border-slate-300 bg-white text-slate-500 flex items-center justify-center font-bold text-sm transition">5</div>
-      <div class="flex-1 h-1 bg-slate-300 mx-2"></div>
-      <div id="nav-step-6" class="w-9 h-9 rounded-full border-2 border-slate-300 bg-white text-slate-500 flex items-center justify-center font-bold text-sm transition">✓</div>
-    </div>
+      <!-- MAIN CONTENT AREA -->
+      <div class="flex-1 flex flex-col justify-between bg-white">
+        <!-- Top Header inside Card -->
+        <div class="px-8 pt-6 pb-4 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <p class="text-xs font-bold tracking-widest text-sky-600 uppercase">COLD STORAGE ENERGY SAVINGS ESTIMATOR</p>
+            <h1 id="step-title" class="text-xl font-bold text-slate-800 mt-0.5">Bước 1: Kích thước & Nhiệt độ vận hành kho</h1>
+          </div>
+          <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+            RESTART
+          </button>
+        </div>
 
-    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-      <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <span id="step-title" class="font-bold text-slate-800 text-base">Bước 1: Kích thước & Nhiệt độ vận hành kho</span>
-        <button onclick="resetCustomerForm()" class="text-xs font-semibold text-slate-500 hover:text-emerald-600">Làm mới mặc định</button>
-      </div>
+        <!-- STEP PANELS -->
+        <div class="p-8 flex-1 flex flex-col justify-center">
+          
+          <!-- STEP 1: DIMENSIONS & TEMPERATURE -->
+          <div id="step-1" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-5">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Loại kho lạnh</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" onclick="selectRoomType('freezer')" id="btn-type-freezer"
+                    class="py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between">
+                    <span>Kho đông (Freezer)</span>
+                    <span class="text-xs bg-emerald-200 px-2 py-0.5 rounded">-18°C</span>
+                  </button>
+                  <button type="button" onclick="selectRoomType('chiller')" id="btn-type-chiller"
+                    class="py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between">
+                    <span>Kho mát (Chiller)</span>
+                    <span class="text-xs bg-slate-100 px-2 py-0.5 rounded">+2°C</span>
+                  </button>
+                </div>
+              </div>
 
-      <div class="p-6 sm:p-8">
-        <!-- STEP 1 -->
-        <div id="step-1" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div class="lg:col-span-7 space-y-5">
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Kích thước lọt lòng kho (Dài × Rộng × Cao)</label>
+                <div class="grid grid-cols-3 gap-3">
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-length" value="2.5" onfocus="activeInputId='cust-length'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Dài)</span>
+                  </div>
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-width" value="2.0" onfocus="activeInputId='cust-width'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Rộng)</span>
+                  </div>
+                  <div class="relative">
+                    <input type="number" step="0.1" id="cust-height" value="1.6" onfocus="activeInputId='cust-height'" oninput="updateLiveVolume()"
+                      class="w-full px-3 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                    <span class="absolute right-3 top-3.5 text-sm font-semibold text-slate-500">m (Cao)</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Thể tích kho ước tính: <strong id="live-volume-display" class="text-slate-800">8.0 m³</strong> (Diện tích sàn: <strong id="live-area-display" class="text-slate-800">5.0 m²</strong>)</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nhiệt độ cài đặt vận hành kho (°C)</label>
+                <div class="relative max-w-xs">
+                  <input type="number" step="1" id="cust-temp" value="-18" onfocus="activeInputId='cust-temp'"
+                    class="w-full px-4 py-3 text-2xl font-bold text-emerald-600 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                  <span class="absolute right-4 top-3.5 text-lg font-bold text-slate-600">°C</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- KEYPAD -->
+            <div class="lg:col-span-5 flex justify-center">
+              <div class="grid grid-cols-3 gap-2 w-56 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <button type="button" onclick="pressNumpad('1')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">1</button>
+                <button type="button" onclick="pressNumpad('2')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">2</button>
+                <button type="button" onclick="pressNumpad('3')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">3</button>
+                <button type="button" onclick="pressNumpad('4')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">4</button>
+                <button type="button" onclick="pressNumpad('5')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">5</button>
+                <button type="button" onclick="pressNumpad('6')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">6</button>
+                <button type="button" onclick="pressNumpad('7')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">7</button>
+                <button type="button" onclick="pressNumpad('8')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">8</button>
+                <button type="button" onclick="pressNumpad('9')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">9</button>
+                <button type="button" onclick="pressNumpad('.')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">.</button>
+                <button type="button" onclick="pressNumpad('0')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">0</button>
+                <button type="button" onclick="pressNumpad('DEL')" class="numpad-btn h-12 bg-slate-900 hover:bg-slate-800 text-white rounded font-bold text-xs">DEL</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: COMMODITY & DAILY OPERATIONS -->
+          <div id="step-2" class="hidden space-y-6 max-w-2xl">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Loại hình kho lạnh</label>
-              <div class="grid grid-cols-2 gap-3">
-                <button type="button" onclick="selectRoomType('freezer')" id="btn-type-freezer"
-                  class="py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between">
-                  <span>Kho đông (Freezer)</span>
-                  <span class="text-xs bg-emerald-200 px-2 py-0.5 rounded">-18°C</span>
+              <label class="block text-base font-bold text-slate-800 mb-2">1. Sức chứa hàng hóa của kho (Capacity of Cold Room)</label>
+              <p class="text-xs text-slate-500 mb-2">Chỉ cần nhập tổng khối lượng hàng hóa chứa trong kho (kg), hệ thống tự động tính toán phụ tải nhiệt làm lạnh sản phẩm.</p>
+              <div class="relative max-w-sm">
+                <input type="number" id="cust-capacity" value="0" placeholder="Ví dụ: 2000"
+                  class="w-full px-4 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none">
+                <span class="absolute right-4 top-3.5 text-base font-bold text-slate-600">kg</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-slate-800 mb-2">2. Nhóm hàng hóa bảo quản</label>
+                <select id="cust-product-type" class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:border-emerald-500">
+                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
+                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
+                  <option value="produce">Rau củ quả / Nông sản</option>
+                  <option value="unknown" selected>Chưa có thông tin / Hỗn hợp</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold text-slate-800 mb-2">3. Số lần mở cửa kho mỗi ngày</label>
+                <input type="number" id="cust-door-openings" value="10" min="0" max="200"
+                  class="w-full px-4 py-3 text-lg font-bold text-emerald-600 bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: FREEZER EQUIPMENT & CONDENSER -->
+          <div id="step-3" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="text-base font-bold text-slate-800 mb-3">Hệ thống máy nén lạnh (Freezer Equipment)</h3>
+              <div class="space-y-2.5">
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="hfc_35" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -35°C</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="hfc_25" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -25°C</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="nh3_1stage" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) Trục vít 1 cấp</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="nh3_2stage" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) 2 cấp</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer">
+                  <input type="radio" name="cust-equip" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-bold text-emerald-800">Không rõ (Unknown — Mặc định theo Admin)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-base font-bold text-slate-800 mb-3">Loại dàn ngưng (Condenser Type)</h3>
+                <div class="space-y-2">
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="water" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Giải nhiệt nước / Bay hơi (Water Condenser)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="air" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Giải nhiệt gió (Air Condenser)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-cond" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Không rõ (Unknown)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-base font-bold text-slate-800 mb-3">Chế độ xả đá (Defrost Type)</h3>
+                <div class="space-y-2">
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="hotgas" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Gas nóng (Hot Gas Bypass)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="electric" class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Điện trở (Electric Defrost)</span>
+                  </label>
+                  <label class="flex items-center space-x-3 p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                    <input type="radio" name="cust-defrost" value="unknown" checked class="w-4 h-4 accent-emerald-600">
+                    <span class="text-sm font-medium text-slate-700">Không rõ (Unknown)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: PEAK SHIFTING HOURS & SOLAR PV -->
+          <div id="step-4" class="hidden space-y-6 max-w-2xl">
+            <div>
+              <label class="block text-base font-bold text-slate-800 mb-2">1. Số giờ muốn tắt máy nén chạy bằng Pin lạnh VOX Cool mỗi ngày</label>
+              <p class="text-xs text-slate-500 mb-3">Mặc định theo Case I: cắt 5 giờ cao điểm mỗi ngày (17h30 – 22h30).</p>
+              <div class="grid grid-cols-3 gap-3">
+                <button type="button" onclick="selectShiftHours(5)" id="btn-hrs-5" class="hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center">
+                  <div class="text-lg">5 giờ/ngày</div>
+                  <div class="text-xs font-normal text-emerald-700">Case I (Mặc định)</div>
                 </button>
-                <button type="button" onclick="selectRoomType('chiller')" id="btn-type-chiller"
-                  class="py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between">
-                  <span>Kho mát (Chiller)</span>
-                  <span class="text-xs bg-slate-100 px-2 py-0.5 rounded">+2°C</span>
+                <button type="button" onclick="selectShiftHours(8)" id="btn-hrs-8" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
+                  <div class="text-lg">8 giờ/ngày</div>
+                  <div class="text-xs font-normal text-slate-500">Cao điểm + 3h bình thường</div>
+                </button>
+                <button type="button" onclick="selectShiftHours(10)" id="btn-hrs-10" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
+                  <div class="text-lg">10 giờ/ngày</div>
+                  <div class="text-xs font-normal text-slate-500">Tối đa trữ lạnh đêm</div>
                 </button>
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-3">
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Chiều dài L (m)</label>
-                <input type="number" step="0.1" id="cust-length" value="2.5" onfocus="activeInputId=this.id" oninput="updateLiveVolume()"
-                  class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-lg font-bold text-slate-800 focus:border-emerald-500 focus:outline-none">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Chiều rộng W (m)</label>
-                <input type="number" step="0.1" id="cust-width" value="2.0" onfocus="activeInputId=this.id" oninput="updateLiveVolume()"
-                  class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-lg font-bold text-slate-800 focus:border-emerald-500 focus:outline-none">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Chiều cao H (m)</label>
-                <input type="number" step="0.1" id="cust-height" value="1.6" onfocus="activeInputId=this.id" oninput="updateLiveVolume()"
-                  class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-lg font-bold text-slate-800 focus:border-emerald-500 focus:outline-none">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 items-end">
-              <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Nhiệt độ cài đặt kho (°C)</label>
-                <input type="number" step="0.5" id="cust-temp" value="-18" onfocus="activeInputId=this.id"
-                  class="w-full px-3 py-2.5 border-2 border-slate-200 rounded-lg font-bold text-slate-800 focus:border-emerald-500 focus:outline-none">
-              </div>
-              <div class="bg-slate-900 text-white rounded-lg p-3 flex items-center justify-between">
-                <div>
-                  <div class="text-[11px] text-slate-400">Thể tích kho (V)</div>
-                  <div id="live-volume-display" class="text-lg font-extrabold text-emerald-400">8.0 m³</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-[11px] text-slate-400">Diện tích sàn</div>
-                  <div id="live-area-display" class="text-sm font-semibold text-slate-200">5.0 m²</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lg:col-span-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div class="text-xs font-semibold text-slate-500 mb-2 text-center">Bàn phím nhập nhanh</div>
-            <div class="grid grid-cols-3 gap-2">
-              <button type="button" onclick="pressNumpad('7')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">7</button>
-              <button type="button" onclick="pressNumpad('8')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">8</button>
-              <button type="button" onclick="pressNumpad('9')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">9</button>
-              <button type="button" onclick="pressNumpad('4')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">4</button>
-              <button type="button" onclick="pressNumpad('5')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">5</button>
-              <button type="button" onclick="pressNumpad('6')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">6</button>
-              <button type="button" onclick="pressNumpad('1')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">1</button>
-              <button type="button" onclick="pressNumpad('2')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">2</button>
-              <button type="button" onclick="pressNumpad('3')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">3</button>
-              <button type="button" onclick="pressNumpad('-')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">+/-</button>
-              <button type="button" onclick="pressNumpad('0')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">0</button>
-              <button type="button" onclick="pressNumpad('.')" class="py-3 bg-white hover:bg-emerald-50 border border-slate-200 rounded-lg font-bold text-lg shadow-sm">.</button>
-              <button type="button" onclick="pressNumpad('DEL')" class="col-span-3 py-2.5 bg-slate-200 hover:bg-red-100 hover:text-red-700 rounded-lg font-bold text-sm">Xóa ký tự (DEL)</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 2 -->
-        <div id="step-2" class="hidden space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1">Khối lượng hàng hóa lưu trữ trung bình (kg)</label>
-              <p class="text-xs text-slate-500 mb-2">Nhập 0 nếu muốn tính theo chế độ kho duy trì nhiệt độ tĩnh (chưa có hàng luân chuyển).</p>
-              <input type="number" id="cust-capacity" value="0"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl font-bold text-lg focus:border-emerald-500 focus:outline-none">
+              <label class="block text-base font-bold text-slate-800 mb-2">2. Kho có hệ thống Điện mặt trời mái nhà (Solar PV) dư công suất không?</label>
+              <div class="grid grid-cols-3 gap-3 max-w-md">
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="yes" class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Có (Yes)</span>
+                </label>
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="no" class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Không (No)</span>
+                </label>
+                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
+                  <input type="radio" name="cust-solar" value="unknown" checked class="mr-2 accent-emerald-600">
+                  <span class="text-sm font-semibold">Không rõ</span>
+                </label>
+              </div>
             </div>
+          </div>
+
+          <!-- STEP 5: EVN ELECTRICITY TARIFF -->
+          <div id="step-5" class="hidden space-y-6 max-w-2xl">
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-1">Số lần mở cửa kho xuất/nhập hàng mỗi ngày</label>
-              <p class="text-xs text-slate-500 mb-2">Mỗi lần mở cửa làm thất thoát khoảng 50% thể tích không khí lạnh trong phòng.</p>
-              <input type="number" id="cust-door-openings" value="10"
-                class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl font-bold text-lg focus:border-emerald-500 focus:outline-none">
+              <label class="block text-base font-bold text-slate-800 mb-2">Chọn biểu giá điện đang áp dụng cho kho lạnh (Đã bao gồm 10% VAT)</label>
+              <div class="space-y-3">
+                <label onclick="selectTariffPreset('admin_default')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/40 cursor-pointer">
+                  <input type="radio" name="cust-tariff" value="admin_default" checked class="mt-1 w-4 h-4 accent-emerald-600">
+                  <div class="flex-1">
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Kinh doanh (Mặc định theo cấu hình VOX Cool)</div>
+                    <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
+                      <span>Cao điểm: <strong id="lbl-cust-peak">5.964,2 đ/kWh</strong></span>
+                      <span>Bình thường: <strong id="lbl-cust-std">3.467,2 đ/kWh</strong></span>
+                      <span>Thấp điểm: <strong id="lbl-cust-off">2.109,8 đ/kWh</strong></span>
+                    </div>
+                  </div>
+                </label>
+
+                <label onclick="selectTariffPreset('industrial_lt6')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 cursor-pointer">
+                  <input type="radio" name="cust-tariff" value="industrial_lt6" class="mt-1 w-4 h-4 accent-emerald-600">
+                  <div class="flex-1">
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Sản xuất công nghiệp (Cấp điện áp dưới 6kV)</div>
+                    <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
+                      <span>Cao điểm: <strong>3.640 đ/kWh</strong></span>
+                      <span>Bình thường: <strong>1.997 đ/kWh</strong></span>
+                      <span>Thấp điểm: <strong>1.304 đ/kWh</strong></span>
+                    </div>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- STEP 3 -->
-        <div id="step-3" class="hidden space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- STEP 6: RESULT SCREEN -->
+          <div id="step-6" class="hidden -m-8 bg-[#3bb55d] text-white p-8 md:p-10 flex-1 flex flex-col justify-between">
             <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Loại môi chất & máy nén</label>
-              <div class="space-y-2 text-sm">
-                <label class="flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="unknown" checked class="accent-emerald-600">
-                  <span>Không rõ / Tiêu chuẩn mặc định</span>
-                </label>
-                <label class="flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="hfc_35" class="accent-emerald-600">
-                  <span>HFC / Freon (Nhiệt độ bay hơi -35°C)</span>
-                </label>
-                <label class="flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="hfc_25" class="accent-emerald-600">
-                  <span>HFC / Freon (Nhiệt độ bay hơi -25°C)</span>
-                </label>
-                <label class="flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="nh3_1stage" class="accent-emerald-600">
-                  <span>Amoniac (NH3) 1 cấp</span>
-                </label>
-                <label class="flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="nh3_2stage" class="accent-emerald-600">
-                  <span>Amoniac (NH3) 2 cấp</span>
-                </label>
+              <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Ước tính Tiết kiệm Năng lượng</h2>
+              <p class="text-emerald-100 text-sm mt-1">Giải pháp Pin trữ lạnh thông minh VOX Cool PCM -21</p>
+
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mt-8">
+                <div class="md:col-span-4 flex justify-center">
+                  <div class="w-40 h-40 rounded-full border-[14px] border-white flex flex-col items-center justify-center bg-[#3bb55d] shadow-inner">
+                    <span id="res-pct-circle" class="text-3xl font-extrabold">19.3%</span>
+                    <span class="text-[11px] uppercase tracking-wider text-emerald-100">Tiết kiệm</span>
+                  </div>
+                </div>
+
+                <div class="md:col-span-8 space-y-5">
+                  <div class="flex items-center justify-between border-b border-emerald-400/50 pb-3">
+                    <span class="text-lg font-medium">Giảm chi phí điện vận hành:</span>
+                    <span id="res-pct-text" class="text-3xl font-extrabold">&darr; 19.3%</span>
+                  </div>
+                  <div class="flex items-center justify-between border-b border-emerald-400/50 pb-3">
+                    <div>
+                      <div class="text-lg font-medium">Tiền điện tiết kiệm hàng năm:</div>
+                      <div class="text-xs text-emerald-100">*Dựa trên mức tiêu thụ cơ sở ước tính <strong id="res-base-kwh">798</strong> kWh/tháng</div>
+                    </div>
+                    <span id="res-annual-savings" class="text-3xl font-extrabold">&darr; 6,152,559 đ</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-lg font-medium">Tổng mức đầu tư dự kiến & Hoàn vốn:</span>
+                    <div class="text-right">
+                      <div id="res-total-quote" class="text-xl font-extrabold">75,350,550 đ</div>
+                      <div id="res-payback" class="text-xs text-emerald-100">Hoàn vốn dự kiến: ~12.2 năm</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="space-y-4">
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Kiểu giải nhiệt dàn ngưng</label>
-                <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-cond" value="unknown" checked class="accent-emerald-600 block mx-auto mb-1">Không rõ
-                  </label>
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-cond" value="water" class="accent-emerald-600 block mx-auto mb-1">Giải nhiệt nước
-                  </label>
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-cond" value="air" class="accent-emerald-600 block mx-auto mb-1">Giải nhiệt gió
-                  </label>
-                </div>
+            <!-- Lead Capture Form -->
+            <div class="mt-8 bg-emerald-800/40 rounded-xl p-5 border border-emerald-300/30">
+              <div class="text-sm font-bold uppercase tracking-wider mb-3">Nhận báo cáo phân tích kỹ thuật chi tiết & Khảo sát miễn phí</div>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input type="text" id="lead-name" placeholder="Họ và tên *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <input type="text" id="lead-company" placeholder="Tên công ty / Kho *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <input type="text" id="lead-contact" placeholder="Số điện thoại / Email *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
+                <button onclick="submitCustomerLead()" class="px-4 py-2 bg-slate-900 hover:bg-slate-950 text-white font-bold text-sm rounded transition">
+                  GỬI BÁO CÁO
+                </button>
               </div>
-
-              <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Phương pháp xả đá dàn lạnh</label>
-                <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-defrost" value="unknown" checked class="accent-emerald-600 block mx-auto mb-1">Không rõ
-                  </label>
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-defrost" value="electric" class="accent-emerald-600 block mx-auto mb-1">Điện trở
-                  </label>
-                  <label class="p-2.5 border rounded-lg text-center cursor-pointer hover:bg-slate-50">
-                    <input type="radio" name="cust-defrost" value="hotgas" class="accent-emerald-600 block mx-auto mb-1">Gas nóng
-                  </label>
-                </div>
-              </div>
+              <p id="lead-msg" class="text-xs text-emerald-100 mt-2 hidden"></p>
             </div>
           </div>
+
         </div>
 
-        <!-- STEP 4 -->
-        <div id="step-4" class="hidden space-y-6">
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">Số giờ muốn tắt máy nén (cắt tải cao điểm) mỗi ngày</label>
-            <p class="text-xs text-slate-500 mb-3">EVN áp dụng 5 giờ cao điểm/ngày (09:30–11:30 và 17:00–20:00). Pin PCM sẽ xả lạnh thay thế máy nén trong khung giờ này.</p>
-            <div class="grid grid-cols-3 gap-3 max-w-md">
-              <button type="button" onclick="selectShiftHours(5)" id="btn-hrs-5" class="hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center">
-                5 giờ / ngày
-              </button>
-              <button type="button" onclick="selectShiftHours(8)" id="btn-hrs-8" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
-                8 giờ / ngày
-              </button>
-              <button type="button" onclick="selectShiftHours(10)" id="btn-hrs-10" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
-                10 giờ / ngày
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">Kho lạnh có kết hợp điện mặt trời mái nhà không?</label>
-            <div class="flex gap-4 text-sm">
-              <label class="flex items-center gap-2 px-4 py-2.5 border rounded-lg cursor-pointer">
-                <input type="radio" name="cust-solar" value="unknown" checked class="accent-emerald-600"> Chưa lắp / Không rõ
-              </label>
-              <label class="flex items-center gap-2 px-4 py-2.5 border rounded-lg cursor-pointer">
-                <input type="radio" name="cust-solar" value="yes" class="accent-emerald-600"> Có điện mặt trời
-              </label>
-            </div>
-          </div>
+        <!-- BOTTOM BACK / NEXT BUTTONS -->
+        <div id="wizard-footer" class="grid grid-cols-2 h-14 border-t border-slate-200">
+          <button id="btn-prev" onclick="prevStep()" class="bg-[#2e6f40] hover:bg-[#255b34] text-white font-bold tracking-widest text-sm uppercase transition">
+            BACK
+          </button>
+          <button id="btn-next" onclick="nextStep()" class="bg-[#43b05c] hover:bg-[#389a4e] text-white font-bold tracking-widest text-sm uppercase transition">
+            NEXT
+          </button>
         </div>
-
-        <!-- STEP 5 -->
-        <div id="step-5" class="hidden space-y-5">
-          <div>
-            <label class="block text-sm font-bold text-slate-700 mb-2">Biểu giá điện 3 khung giờ (EVN)</label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label class="p-4 border-2 border-emerald-500 bg-emerald-50/50 rounded-xl cursor-pointer block" onclick="selectTariffPreset('admin_default')">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-bold text-slate-800 text-sm">Biểu giá chuẩn hệ thống đã cấu hình</span>
-                  <input type="radio" name="cust-tariff" value="admin_default" checked class="accent-emerald-600">
-                </div>
-                <div class="text-xs text-slate-600 space-y-1">
-                  <div>• Giờ cao điểm (5h/ngày): <strong id="lbl-cust-peak">5.964,2 đ/kWh</strong></div>
-                  <div>• Giờ bình thường (13h/ngày): <strong id="lbl-cust-std">3.467,2 đ/kWh</strong></div>
-                  <div>• Giờ thấp điểm (6h/ngày): <strong id="lbl-cust-off">2.109,8 đ/kWh</strong></div>
-                </div>
-              </label>
-
-              <label class="p-4 border-2 border-slate-200 hover:border-slate-300 rounded-xl cursor-pointer block" onclick="selectTariffPreset('industrial_lt6')">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="font-bold text-slate-800 text-sm">Sản xuất cấp điện áp dưới 6 kV</span>
-                  <input type="radio" name="cust-tariff" value="industrial_lt6" class="accent-emerald-600">
-                </div>
-                <div class="text-xs text-slate-600 space-y-1">
-                  <div>• Giờ cao điểm (5h/ngày): <strong>3.640,0 đ/kWh</strong></div>
-                  <div>• Giờ bình thường (13h/ngày): <strong>1.997,0 đ/kWh</strong></div>
-                  <div>• Giờ thấp điểm (6h/ngày): <strong>1.304,0 đ/kWh</strong></div>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 6: RESULTS -->
-        <div id="step-6" class="hidden space-y-8">
-          <div class="flex flex-wrap items-center justify-between gap-2 bg-sky-50 border border-sky-200 rounded-xl px-4 py-2.5 text-xs">
-            <span class="font-semibold text-sky-900">Cấu hình kỹ thuật đề xuất tự động theo nhiệt độ kho:</span>
-            <span id="res-pcm-badge" class="font-extrabold text-sky-700 bg-white px-3 py-1 rounded-full border border-sky-200">Pin lạnh VOX Cool PCM -18</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div class="flex flex-col items-center justify-center p-6 bg-emerald-50 rounded-2xl border border-emerald-200">
-              <div class="w-32 h-32 rounded-full border-8 border-emerald-500 flex flex-col items-center justify-center bg-white shadow-inner">
-                <span id="res-pct-circle" class="text-2xl font-extrabold text-emerald-700">19.3%</span>
-                <span class="text-[11px] font-semibold text-slate-500">Tiết kiệm điện</span>
-              </div>
-              <p class="text-xs text-center text-slate-600 mt-3">Giảm chi phí tiền điện hàng năm nhờ dịch chuyển phụ tải cao điểm</p>
-            </div>
-
-            <div class="md:col-span-2 grid grid-cols-2 gap-4">
-              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div class="text-xs text-slate-500">Điện tiêu thụ nền / tháng</div>
-                <div id="res-base-kwh" class="text-2xl font-extrabold text-slate-800 mt-1">798</div>
-                <div class="text-xs text-slate-400">kWh / tháng</div>
-              </div>
-              <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div class="text-xs text-slate-500">Mức giảm hóa đơn điện</div>
-                <div id="res-pct-text" class="text-2xl font-extrabold text-emerald-600 mt-1">&darr; 19.3%</div>
-                <div class="text-xs text-slate-400">So với vận hành thông thường</div>
-              </div>
-              <div class="p-4 bg-emerald-600 text-white rounded-xl shadow">
-                <div class="text-xs text-emerald-100">Tiền điện tiết kiệm / năm</div>
-                <div id="res-annual-savings" class="text-xl sm:text-2xl font-extrabold mt-1">&darr; 6.152.559 đ</div>
-                <div class="text-xs text-emerald-200">Lợi ích trực tiếp hàng năm</div>
-              </div>
-              <div class="p-4 bg-slate-900 text-white rounded-xl shadow">
-                <div class="text-xs text-slate-400">Tổng chi phí đầu tư trọn gói</div>
-                <div id="res-total-quote" class="text-xl sm:text-2xl font-extrabold text-amber-400 mt-1">75.350.550 đ</div>
-                <div id="res-payback" class="text-xs text-slate-300">Hoàn vốn dự kiến: ~12.2 năm</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-            <h3 class="font-bold text-slate-800 text-base mb-1">Nhận báo cáo kỹ thuật chi tiết & Phương án lắp đặt PCM</h3>
-            <p class="text-xs text-slate-500 mb-4">Để lại thông tin để đội ngũ kỹ sư R&D của VOX Cool gửi bản thuyết minh thông số và phương án khung giá đỡ.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input type="text" id="lead-name" placeholder="Họ và tên *" class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm">
-              <input type="text" id="lead-company" placeholder="Tên doanh nghiệp / Kho lạnh" class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm">
-              <input type="text" id="lead-contact" placeholder="Số điện thoại hoặc Email *" class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm">
-            </div>
-            <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <button onclick="goToStep(1)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">&larr; Tính lại thông số khác</button>
-              <button onclick="submitCustomerLead()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow">
-                Gửi yêu cầu nhận báo cáo chi tiết
-              </button>
-            </div>
-            <p id="lead-msg" class="text-xs font-semibold text-emerald-700 mt-2 hidden"></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Wizard Footer -->
-      <div id="wizard-footer" class="bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-between">
-        <button id="btn-prev" onclick="prevStep()" class="px-5 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-700 font-semibold text-sm hover:bg-slate-100">
-          PREVIOUS
-        </button>
-        <button id="btn-next" onclick="nextStep()" class="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow">
-          NEXT
-        </button>
       </div>
     </div>
   </main>
