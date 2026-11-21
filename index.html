@@ -17,6 +17,11 @@
     .formula-box { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
     .fixed-locked, .field-locked { background-color: #e2e8f0 !important; color: #334155 !important; border-color: #cbd5e1 !important; cursor: not-allowed; }
     .formula-error { border-color: #ef4444 !important; background-color: #fef2f2 !important; color: #b91c1c !important; }
+    @media print {
+      header, #wizard-footer, #admin-modal, #toast-banner, .no-print { display: none !important; }
+      body { background-color: #fff !important; }
+      #view-customer, #view-admin { display: block !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    }
   </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -59,7 +64,7 @@
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-h-[580px] flex flex-col md:flex-row">
       
       <!-- LEFT SIDEBAR STEPPER -->
-      <aside class="w-full md:w-20 bg-[#1e293b] text-slate-400 flex md:flex-col justify-between py-3 md:py-6 px-4 md:px-0 items-center shrink-0">
+      <aside class="w-full md:w-20 bg-[#1e293b] text-slate-400 flex md:flex-col justify-between py-3 md:py-6 px-4 md:px-0 items-center shrink-0 no-print">
         <div class="flex md:flex-col gap-2 md:gap-4 w-full justify-around md:justify-start">
           <button onclick="goToStep(1)" id="nav-step-1" class="step-nav p-3 flex flex-col items-center justify-center hover:text-white transition step-active" title="1. Quy mô & Nhiệt độ">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
@@ -96,9 +101,14 @@
             <p class="text-xs font-bold tracking-widest text-sky-600 uppercase">COLD STORAGE ENERGY SAVINGS ESTIMATOR</p>
             <h1 id="step-title" class="text-xl font-bold text-slate-800 mt-0.5">Bước 1: Kích thước & Nhiệt độ vận hành kho</h1>
           </div>
-          <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
-            RESTART
-          </button>
+          <div class="flex items-center gap-2 no-print">
+            <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+              IN / PDF
+            </button>
+            <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+              RESTART
+            </button>
+          </div>
         </div>
 
         <!-- STEP PANELS -->
@@ -156,7 +166,7 @@
             </div>
 
             <!-- KEYPAD -->
-            <div class="lg:col-span-5 flex justify-center">
+            <div class="lg:col-span-5 flex justify-center no-print">
               <div class="grid grid-cols-3 gap-2 w-56 bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <button type="button" onclick="pressNumpad('1')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">1</button>
                 <button type="button" onclick="pressNumpad('2')" class="numpad-btn h-12 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">2</button>
@@ -389,7 +399,7 @@
             </div>
 
             <!-- Lead Capture Form -->
-            <div class="mt-8 bg-emerald-800/40 rounded-xl p-5 border border-emerald-300/30">
+            <div class="mt-8 bg-emerald-800/40 rounded-xl p-5 border border-emerald-300/30 no-print">
               <div class="text-sm font-bold uppercase tracking-wider mb-3">Nhận báo cáo phân tích kỹ thuật chi tiết & Khảo sát miễn phí</div>
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <input type="text" id="lead-name" placeholder="Họ và tên *" class="px-3 py-2 rounded bg-white text-slate-800 text-sm focus:outline-none">
@@ -406,7 +416,7 @@
         </div>
 
         <!-- BOTTOM BACK / NEXT BUTTONS -->
-        <div id="wizard-footer" class="grid grid-cols-2 h-14 border-t border-slate-200">
+        <div id="wizard-footer" class="grid grid-cols-2 h-14 border-t border-slate-200 no-print">
           <button id="btn-prev" onclick="prevStep()" class="bg-[#2e6f40] hover:bg-[#255b34] text-white font-bold tracking-widest text-sm uppercase transition">
             BACK
           </button>
@@ -424,7 +434,7 @@
   <section id="view-admin" class="hidden min-h-screen max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
 
     <!-- Admin Top Banner -->
-    <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg flex flex-wrap items-center justify-between gap-4">
+    <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg flex flex-wrap items-center justify-between gap-4 no-print">
       <div>
         <div class="flex items-center gap-2">
           <span class="px-2 py-0.5 text-[11px] font-bold uppercase bg-amber-400 text-slate-950 rounded">Admin / R&D Console</span>
@@ -433,7 +443,19 @@
         <p class="text-xs text-slate-400 mt-1" id="admin-save-timestamp">Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.</p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="exportConfigJson()"
+          class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-sm">
+          Xuất JSON
+        </button>
+        <label class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-bold shadow-sm cursor-pointer">
+          Nhập JSON
+          <input type="file" id="import-json-input" accept=".json" onchange="importConfigJson(event)" class="hidden">
+        </label>
+        <button onclick="window.print()"
+          class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold">
+          In bảng tính
+        </button>
         <button onclick="resetAdminInputsToZero()"
           class="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-sm">
           RESTART
@@ -451,7 +473,7 @@
     </div>
 
     <!-- Admin Sub-Tabs -->
-    <div class="flex border-b border-slate-300 gap-2">
+    <div class="flex border-b border-slate-300 gap-2 no-print">
       <button onclick="switchAdminTab('calc')" id="admin-tab-calc"
         class="py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-1.5">
 1. Bảng Tính Kỹ Thuật & Chiết Tính Báo Giá
@@ -533,7 +555,7 @@
         </div>
       </div>
 
-      <!-- BẢNG QUY ĐỊNH RIÊNG (DO ADMIN QUY ĐỊNH ĐỂ TIỆN THAY ĐỔI, CÔNG THỨC GIỮ NGUYÊN) -->
+      <!-- BẢNG QUY ĐỊNH RIÊNG -->
       <div class="bg-white rounded-xl shadow-sm border border-indigo-200 p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100 pb-3">
           <div class="flex items-center gap-2.5">
@@ -750,6 +772,41 @@
             </div>
           </div>
         </div>
+
+        <!-- Chi tiết từng thành phần Q1 -> Q7 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+          <div class="text-[11px] font-bold text-slate-600 uppercase mb-2">Chi tiết thành phần tải nhiệt thô (kWh/ngày)</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q1 (Làm lạnh)</div>
+              <div id="out-q1" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q2 (Hô hấp)</div>
+              <div id="out-q2" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q3 (Vách+Trần)</div>
+              <div id="out-q3" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q4 (Nền)</div>
+              <div id="out-q4" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q5 (Đèn)</div>
+              <div id="out-q5" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q6 (Mở cửa)</div>
+              <div id="out-q6" class="font-bold text-slate-800">0.00</div>
+            </div>
+            <div class="bg-white p-2 rounded border">
+              <div class="text-[10px] text-slate-500">Q7 (Người)</div>
+              <div id="out-q7" class="font-bold text-slate-800">0.00</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- PHẦN 3: ĐIỆN NĂNG TIÊU THỤ & BÀI TOÁN TIẾT KIỆM EVN -->
@@ -822,10 +879,12 @@
             <div class="bg-white p-2.5 rounded border">
               <div class="text-slate-500">Điện tiêu thụ nền:</div>
               <div id="out-e-month" class="font-bold text-slate-900 text-sm">798.1 kWh/tháng</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Tiền điện nền: <strong id="out-cost-base-year">31,880,000 đ/năm</strong></div>
             </div>
             <div class="bg-emerald-600 text-white p-2.5 rounded">
               <div class="text-emerald-100">Tiết kiệm hàng năm:</div>
               <div id="out-save-year" class="font-extrabold text-sm">6,152,559 đ (19.3%)</div>
+              <div class="text-[10px] text-emerald-100 mt-0.5">Sau tiết kiệm: <strong id="out-cost-after-year">25,727,441 đ/năm</strong></div>
             </div>
           </div>
         </div>
@@ -1013,7 +1072,6 @@
                       <span class="ml-1 text-[11px] font-semibold text-slate-600">đ/kg</span>
                     </div>
                   </div>
-                  <!-- Giữ input ẩn đồng bộ công thức chuỗi cho tương thích ngược -->
                   <input type="hidden" id="adm-frame-formula" value="M_bat * 106019">
                 </td>
                 <td class="p-3 text-right font-bold text-slate-800" id="tbl-c4">12,128,600 đ</td>
@@ -1197,9 +1255,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // DEFAULT & SAVED FIXED CONFIGURATION
-    // =========================================================================
     const STORAGE_KEY_CONFIG = 'voxcool_saved_fixed_config_v2';
 
     const DEFAULT_PCM_CATALOG = [
@@ -1212,74 +1267,25 @@
     ];
 
     const DEFAULT_LOCKED_FIELDS = {
-      'adm-L': false,
-      'adm-W': false,
-      'adm-H': false,
-      'adm-room-temp': false,
-      'adm-dT': false,
-      'adm-cap': false,
-      'adm-pct-cool': true,
-      'adm-dT-comm': true,
-      'adm-cp-comm': true,
-      'adm-persp': true,
-      'adm-k-wall': true,
-      'adm-k-floor': true,
-      'adm-light-kw': true,
-      'adm-light-hrs': true,
-      'adm-door-kj': true,
-      'adm-human-cnt': true,
-      'adm-human-hrs': true,
-      'adm-safety': true,
-      'adm-cop': true,
-      'adm-shift-hrs': false,
-      'adm-p-peak': true,
-      'adm-p-std': true,
-      'adm-p-off': true,
-      'adm-iot-cost': true,
-      'adm-bat-ship-rate': true,
-      'adm-frame-price-kg': false,
-      'adm-frame-formula': false,
-      'adm-frameship-formula': false,
-      'adm-penjico-pct': true,
-      'adm-markup-pct': true
+      'adm-L': false, 'adm-W': false, 'adm-H': false, 'adm-room-temp': false, 'adm-dT': false,
+      'adm-cap': false, 'adm-pct-cool': true, 'adm-dT-comm': true, 'adm-cp-comm': true, 'adm-persp': true,
+      'adm-k-wall': true, 'adm-k-floor': true, 'adm-light-kw': true, 'adm-light-hrs': true, 'adm-door-kj': true,
+      'adm-human-cnt': true, 'adm-human-hrs': true, 'adm-safety': true, 'adm-cop': true, 'adm-shift-hrs': false,
+      'adm-p-peak': true, 'adm-p-std': true, 'adm-p-off': true, 'adm-iot-cost': true, 'adm-bat-ship-rate': true,
+      'adm-frame-price-kg': false, 'adm-frame-formula': false, 'adm-frameship-formula': false,
+      'adm-penjico-pct': true, 'adm-markup-pct': true
     };
 
     const DEFAULT_FIXED_CONFIG = {
-      pctCooled: 0.15,
-      dTCommodity: 5.0,
-      cpCommodity: 4.0,
-      perspirationRate: 0.0,
-      kWallRoof: 0.30,
-      kFloor: 0.28,
-      lightKw: 0.4,
-      lightHrs: 14.0,
-      doorKjFactor: 30.0,
-      humanCount: 2,
-      humanHrs: 5,
-      humanKw: 0.27,
-      safetyFactor: 0.10,
-      copBase: 1.6,
-      useCustomRules: false,
-      ruleM2PerLight: 10.0,
-      ruleM3PerHuman: 20.0,
-      ruleLightHrs: 14.0,
-      ruleHumanHrs: 5.0,
-      ruleDoorKj: 30.0,
-      ruleHumanKw: 0.27,
-      tariffPreset: 'business',
-      pPeak: 5964.2,
-      pStd: 3467.2,
-      pOff: 2109.8,
-      iotCost: 22000000,
-      batShipRate: 3000,
-      framePricePerKg: 106019.23076923077,
-      frameFormula: 'M_bat * 106019.23076923077',
-      frameShipFormula: '5000000',
-      penjicoPct: 0.50,
-      markupPct: 0.10,
-      includeFrameShip: true,
-      roundUpBat: true,
-      penjicoBaseMode: 'all_capex',
+      pctCooled: 0.15, dTCommodity: 5.0, cpCommodity: 4.0, perspirationRate: 0.0,
+      kWallRoof: 0.30, kFloor: 0.28, lightKw: 0.4, lightHrs: 14.0, doorKjFactor: 30.0,
+      humanCount: 2, humanHrs: 5, humanKw: 0.27, safetyFactor: 0.10, copBase: 1.6,
+      useCustomRules: false, ruleM2PerLight: 10.0, ruleM3PerHuman: 20.0, ruleLightHrs: 14.0,
+      ruleHumanHrs: 5.0, ruleDoorKj: 30.0, ruleHumanKw: 0.27, tariffPreset: 'business',
+      pPeak: 5964.2, pStd: 3467.2, pOff: 2109.8, iotCost: 22000000, batShipRate: 3000,
+      framePricePerKg: 106019.23076923077, frameFormula: 'M_bat * 106019.23076923077',
+      frameShipFormula: '5000000', penjicoPct: 0.50, markupPct: 0.10,
+      includeFrameShip: true, roundUpBat: true, penjicoBaseMode: 'all_capex',
       pcmCatalog: JSON.parse(JSON.stringify(DEFAULT_PCM_CATALOG)),
       lockedFields: { ...DEFAULT_LOCKED_FIELDS },
       savedAt: null
@@ -1301,30 +1307,83 @@
       setTimeout(() => el.classList.add('hidden'), 3500);
     }
 
-    // =========================================================================
-    // THUẬT TOÁN CHỌN LOẠI PCM PHÙ HỢP (T_PCM >= T_kho, LẤY SÁT NHẤT PHÍA TRÊN)
-    // =========================================================================
+    function exportConfigJson() {
+      recalcAdmin();
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        config,
+        geometry: {
+          L: parseFloat(document.getElementById('adm-L').value) || 0,
+          W: parseFloat(document.getElementById('adm-W').value) || 0,
+          H: parseFloat(document.getElementById('adm-H').value) || 0,
+          roomTemp: parseFloat(document.getElementById('adm-room-temp').value) || 0,
+          dT: parseFloat(document.getElementById('adm-dT').value) || 0,
+          capacity: parseFloat(document.getElementById('adm-cap').value) || 0,
+          doorOpenings: parseFloat(document.getElementById('adm-door-cnt').value) || 0,
+          shiftHours: parseFloat(document.getElementById('adm-shift-hrs').value) || 0
+        }
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `voxcool-config-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Đã xuất file cấu hình JSON.');
+    }
+
+    function importConfigJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const nextCfg = parsed.config ? parsed.config : parsed;
+          config = {
+            ...DEFAULT_FIXED_CONFIG,
+            ...nextCfg,
+            lockedFields: { ...DEFAULT_LOCKED_FIELDS, ...(nextCfg.lockedFields || {}) },
+            pcmCatalog: (nextCfg.pcmCatalog && nextCfg.pcmCatalog.length > 0) ? nextCfg.pcmCatalog : JSON.parse(JSON.stringify(DEFAULT_PCM_CATALOG))
+          };
+          if (parsed.geometry) {
+            if (parsed.geometry.L !== undefined) document.getElementById('adm-L').value = parsed.geometry.L;
+            if (parsed.geometry.W !== undefined) document.getElementById('adm-W').value = parsed.geometry.W;
+            if (parsed.geometry.H !== undefined) document.getElementById('adm-H').value = parsed.geometry.H;
+            if (parsed.geometry.roomTemp !== undefined) document.getElementById('adm-room-temp').value = parsed.geometry.roomTemp;
+            if (parsed.geometry.dT !== undefined) document.getElementById('adm-dT').value = parsed.geometry.dT;
+            if (parsed.geometry.capacity !== undefined) document.getElementById('adm-cap').value = parsed.geometry.capacity;
+            if (parsed.geometry.doorOpenings !== undefined) document.getElementById('adm-door-cnt').value = parsed.geometry.doorOpenings;
+            if (parsed.geometry.shiftHours !== undefined) document.getElementById('adm-shift-hrs').value = parsed.geometry.shiftHours;
+          }
+          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
+          applyConfigToAdminInputs();
+          renderPcmCatalogTable();
+          applyAllFieldLocks();
+          syncTariffLabelsToCustomer();
+          recalcAdmin();
+          showToast('Đã nhập và áp dụng cấu hình JSON thành công!');
+        } catch (err) {
+          showToast('File JSON không hợp lệ!');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
     function selectMatchingPcm(roomTemp, catalog) {
       const list = (catalog && catalog.length > 0) ? catalog : DEFAULT_PCM_CATALOG;
       const sorted = [...list].sort((a, b) => Number(a.temp) - Number(b.temp));
       const valid = sorted.filter(item => Number(item.temp) >= Number(roomTemp));
-      if (valid.length > 0) {
-        return valid[0];
-      }
-      return sorted[sorted.length - 1];
+      return valid.length > 0 ? valid[0] : sorted[sorted.length - 1];
     }
 
-    // =========================================================================
-    // BỘ GIẢI CÔNG THỨC ĐỘNG CHO C4 & C5 (HỖ TRỢ BIẾN KỸ THUẬT)
-    // =========================================================================
     function evaluateDynamicFormula(exprStr, vars, fallbackValue = 0) {
       if (exprStr === null || exprStr === undefined) return { value: fallbackValue, error: false };
       const raw = String(exprStr).trim();
       if (raw === '') return { value: 0, error: false };
-
-      if (/^-?\d+(\.\d+)?$/.test(raw)) {
-        return { value: parseFloat(raw), error: false };
-      }
+      if (/^-?\d+(\.\d+)?$/.test(raw)) return { value: parseFloat(raw), error: false };
 
       try {
         let parsed = raw
@@ -1341,23 +1400,16 @@
           .replace(/\bMIN\b/gi, 'Math.min');
 
         const sanitized = parsed.replace(/Math\.(ceil|round|max|min)/g, '');
-        if (!/^[0-9+\-*/().,\s]+$/.test(sanitized)) {
-          return { value: fallbackValue, error: true };
-        }
+        if (!/^[0-9+\-*/().,\s]+$/.test(sanitized)) return { value: fallbackValue, error: true };
 
         const result = Function(`"use strict"; return (${parsed});`)();
-        if (typeof result !== 'number' || !isFinite(result) || isNaN(result)) {
-          return { value: fallbackValue, error: true };
-        }
+        if (typeof result !== 'number' || !isFinite(result) || isNaN(result)) return { value: fallbackValue, error: true };
         return { value: result, error: false };
       } catch (e) {
         return { value: fallbackValue, error: true };
       }
     }
 
-    // =========================================================================
-    // QUẢN LÝ KHÓA TỪNG Ô & BẢNG DANH MỤC PCM
-    // =========================================================================
     function toggleSingleLock(inputId) {
       const current = !!config.lockedFields[inputId];
       config.lockedFields[inputId] = !current;
@@ -1431,11 +1483,7 @@
     }
 
     function updatePcmField(idx, field, val) {
-      if (field === 'name') {
-        config.pcmCatalog[idx][field] = val;
-      } else {
-        config.pcmCatalog[idx][field] = parseFloat(val) || 0;
-      }
+      config.pcmCatalog[idx][field] = (field === 'name') ? val : (parseFloat(val) || 0);
       recalcAdmin();
     }
 
@@ -1446,13 +1494,8 @@
 
     function addPcmRow() {
       config.pcmCatalog.push({
-        id: 'pcm_' + Date.now(),
-        temp: -19,
-        name: 'PCM -19',
-        density: 0.089,
-        weight: 2.6,
-        price: 140000,
-        locked: false
+        id: 'pcm_' + Date.now(), temp: -19, name: 'PCM -19',
+        density: 0.089, weight: 2.6, price: 140000, locked: false
       });
       renderPcmCatalogTable();
       recalcAdmin();
@@ -1468,9 +1511,6 @@
       recalcAdmin();
     }
 
-    // =========================================================================
-    // CHỌN 2 BIỂU GIÁ ĐIỆN TRONG ADMIN PHẦN 3
-    // =========================================================================
     function updateAdminTariffButtonsUI(preset) {
       const btnBus = document.getElementById('btn-adm-tariff-business');
       const btnInd = document.getElementById('btn-adm-tariff-industrial');
@@ -1499,9 +1539,6 @@
       recalcAdmin();
     }
 
-    // =========================================================================
-    // LOAD & SAVE FIXED CONFIG (PERSISTENT FOR CUSTOMER VIEW)
-    // =========================================================================
     function loadSavedFixedConfig() {
       const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
       if (raw) {
@@ -1565,11 +1602,9 @@
       document.getElementById('sel-penjico-base').value = config.penjicoBaseMode;
 
       const tsEl = document.getElementById('admin-save-timestamp');
-      if (config.savedAt) {
-        tsEl.textContent = `Lần lưu công thức gần nhất: ${config.savedAt} — Đang áp dụng đồng bộ cho Giao diện Khách hàng.`;
-      } else {
-        tsEl.textContent = 'Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.';
-      }
+      tsEl.textContent = config.savedAt
+        ? `Lần lưu công thức gần nhất: ${config.savedAt} — Đang áp dụng đồng bộ cho Giao diện Khách hàng.`
+        : 'Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.';
     }
 
     function syncTariffLabelsToCustomer() {
@@ -1630,15 +1665,11 @@
       }
       const t = parseFloat(rawT);
       if (!isNaN(t) && !config.lockedFields['adm-dT']) {
-        const dT = Math.max(10, 35 - t + (t <= -18 ? 7 : 0));
-        document.getElementById('adm-dT').value = dT;
+        document.getElementById('adm-dT').value = Math.max(10, 35 - t + (t <= -18 ? 7 : 0));
       }
       recalcAdmin();
     }
 
-    // =========================================================================
-    // CORE THERMODYNAMIC & FINANCIAL ENGINE (GIỮ NGUYÊN CÔNG THỨC CỐT LÕI)
-    // =========================================================================
     function runEngineeringCalculation(params) {
       const L = Number(params.L) || 0;
       const W = Number(params.W) || 0;
@@ -1726,18 +1757,12 @@
       const t1_totalVox = c1_capexBat + c2_iotCost + c3_shipBat;
 
       const formulaVars = {
-        N_bat: batCount,
-        M_bat: batWeight,
-        V: volume,
-        A_floor: areaFloor,
-        A_wall: areaWallsRoof,
-        Q_total: qTotal,
-        C1: c1_capexBat
+        N_bat: batCount, M_bat: batWeight, V: volume,
+        A_floor: areaFloor, A_wall: areaWallsRoof, Q_total: qTotal, C1: c1_capexBat
       };
 
       const framePriceKg = (params.framePricePerKg !== undefined && params.framePricePerKg !== null && params.framePricePerKg !== '')
-        ? (Number(params.framePricePerKg) || 0)
-        : null;
+        ? (Number(params.framePricePerKg) || 0) : null;
       const c4_frameCost = (framePriceKg !== null)
         ? (batWeight * framePriceKg)
         : evaluateDynamicFormula(params.frameFormula, formulaVars, 12128600).value;
@@ -1757,8 +1782,7 @@
       const paybackYears = savingsYear > 0 ? (finalQuote / savingsYear) : 99;
 
       return {
-        volume, areaWallsRoof, areaFloor,
-        ruleLights, ruleHumans,
+        volume, areaWallsRoof, areaFloor, ruleLights, ruleHumans,
         qComm1, qComm2, qWallsRoof, qFloor, qLight, qDoor, qHuman,
         qSum, qTotal, eDay, eMonth, costBaseMonth, costBaseYear,
         savingsYear, pctSavings, selectedPcm,
@@ -1770,9 +1794,6 @@
       };
     }
 
-    // =========================================================================
-    // CUSTOMER WIZARD LOGIC
-    // =========================================================================
     const stepTitles = {
       1: 'Bước 1: Kích thước & Nhiệt độ vận hành kho',
       2: 'Bước 2: Quy mô hàng hóa & Tần suất mở cửa',
@@ -1805,20 +1826,14 @@
     }
 
     function resetCustomerForm() {
-      document.getElementById('cust-length').value = '';
-      document.getElementById('cust-width').value = '';
-      document.getElementById('cust-height').value = '';
-      document.getElementById('cust-temp').value = '';
-      document.getElementById('cust-capacity').value = '';
-      document.getElementById('cust-door-openings').value = '';
-      const eqUnknown = document.querySelector('input[name="cust-equip"][value="unknown"]');
-      if (eqUnknown) eqUnknown.checked = true;
-      const condUnknown = document.querySelector('input[name="cust-cond"][value="unknown"]');
-      if (condUnknown) condUnknown.checked = true;
-      const defUnknown = document.querySelector('input[name="cust-defrost"][value="unknown"]');
-      if (defUnknown) defUnknown.checked = true;
-      const solUnknown = document.querySelector('input[name="cust-solar"][value="unknown"]');
-      if (solUnknown) solUnknown.checked = true;
+      ['cust-length', 'cust-width', 'cust-height', 'cust-temp', 'cust-capacity', 'cust-door-openings'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      ['cust-equip', 'cust-cond', 'cust-defrost', 'cust-solar'].forEach(name => {
+        const el = document.querySelector(`input[name="${name}"][value="unknown"]`);
+        if (el) el.checked = true;
+      });
       const tarDefault = document.querySelector('input[name="cust-tariff"][value="admin_default"]');
       if (tarDefault) tarDefault.checked = true;
       custTariffMode = 'admin_default';
@@ -1857,11 +1872,9 @@
       const input = document.getElementById(activeInputId);
       if (!input || input.readOnly) return;
       let val = input.value.toString();
-      if (key === 'DEL') {
-        input.value = val.slice(0, -1);
-      } else if (key === '-') {
-        input.value = val.startsWith('-') ? val.slice(1) : ('-' + val);
-      } else {
+      if (key === 'DEL') input.value = val.slice(0, -1);
+      else if (key === '-') input.value = val.startsWith('-') ? val.slice(1) : ('-' + val);
+      else {
         if (key === '.' && val.includes('.')) return;
         input.value = (val === '0' && key !== '.' ? '' : val) + key;
       }
@@ -1895,27 +1908,18 @@
       const capacity = parseFloat(document.getElementById('cust-capacity').value) || 0;
       const doorOpenings = parseFloat(document.getElementById('cust-door-openings').value) || 0;
 
-      const equipEl = document.querySelector('input[name="cust-equip"]:checked');
-      const condEl = document.querySelector('input[name="cust-cond"]:checked');
-      const defrostEl = document.querySelector('input[name="cust-defrost"]:checked');
-      const solarEl = document.querySelector('input[name="cust-solar"]:checked');
-
-      const equip = equipEl ? equipEl.value : 'unknown';
-      const cond = condEl ? condEl.value : 'unknown';
-      const defrost = defrostEl ? defrostEl.value : 'unknown';
-      const solar = solarEl ? solarEl.value : 'unknown';
+      const equip = (document.querySelector('input[name="cust-equip"]:checked') || { value: 'unknown' }).value;
+      const cond = (document.querySelector('input[name="cust-cond"]:checked') || { value: 'unknown' }).value;
+      const defrost = (document.querySelector('input[name="cust-defrost"]:checked') || { value: 'unknown' }).value;
+      const solar = (document.querySelector('input[name="cust-solar"]:checked') || { value: 'unknown' }).value;
 
       const tariffOverride = (custTariffMode === 'industrial_lt6')
         ? { pPeak: 3640.0, pStd: 1997.0, pOff: 1304.0 }
         : { pPeak: config.pPeak, pStd: config.pStd, pOff: config.pOff };
 
       const res = runEngineeringCalculation({
-        ...config,
-        ...tariffOverride,
-        L, W, H, roomTemp, dT, capacity, doorOpenings,
-        equip, cond, defrost, solar,
-        shiftHours: selectedShiftHours,
-        cop: config.copBase
+        ...config, ...tariffOverride, L, W, H, roomTemp, dT, capacity, doorOpenings,
+        equip, cond, defrost, solar, shiftHours: selectedShiftHours, cop: config.copBase
       });
 
       lastCustomerResult = { L, W, H, roomTemp, dT, capacity, doorOpenings, shiftHours: selectedShiftHours, res };
@@ -1944,16 +1948,12 @@
         return;
       }
 
-      if (!lastCustomerResult) {
-        calculateAndShowResult();
-      }
+      if (!lastCustomerResult) calculateAndShowResult();
 
       const leads = JSON.parse(localStorage.getItem('voxcool_leads') || '[]');
       leads.unshift({
-        id: Date.now(),
-        time: new Date().toLocaleString('vi-VN'),
-        name, company: company || 'Chưa cung cấp', contact,
-        data: lastCustomerResult
+        id: Date.now(), time: new Date().toLocaleString('vi-VN'),
+        name, company: company || 'Chưa cung cấp', contact, data: lastCustomerResult
       });
       localStorage.setItem('voxcool_leads', JSON.stringify(leads));
       renderLeadsTable();
@@ -1962,9 +1962,6 @@
       msgEl.classList.remove('hidden');
     }
 
-    // =========================================================================
-    // ADMIN / R&D PORTAL LOGIC
-    // =========================================================================
     function openAdminModal() {
       if (isAdminAuthenticated) {
         switchMode('admin');
@@ -2082,6 +2079,14 @@
       document.getElementById('out-geo-wall').textContent = res.areaWallsRoof.toFixed(2) + ' m²';
       document.getElementById('out-geo-floor').textContent = res.areaFloor.toFixed(2) + ' m²';
 
+      document.getElementById('out-q1').textContent = res.qComm1.toFixed(2);
+      document.getElementById('out-q2').textContent = res.qComm2.toFixed(2);
+      document.getElementById('out-q3').textContent = res.qWallsRoof.toFixed(2);
+      document.getElementById('out-q4').textContent = res.qFloor.toFixed(2);
+      document.getElementById('out-q5').textContent = res.qLight.toFixed(2);
+      document.getElementById('out-q6').textContent = res.qDoor.toFixed(2);
+      document.getElementById('out-q7').textContent = res.qHuman.toFixed(2);
+
       document.getElementById('out-q-comm').textContent = (res.qComm1 + res.qComm2).toFixed(2) + ' kWh/ngày';
       document.getElementById('out-q-env').textContent = (res.qWallsRoof + res.qFloor).toFixed(2) + ' kWh/ngày';
       document.getElementById('out-q-int').textContent = (res.qLight + res.qDoor + res.qHuman).toFixed(2) + ' kWh/ngày';
@@ -2089,7 +2094,9 @@
       document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
 
       document.getElementById('out-e-month').textContent = res.eMonth.toFixed(1) + ' kWh/tháng';
+      document.getElementById('out-cost-base-year').textContent = fmtVND(res.costBaseYear) + ' đ/năm';
       document.getElementById('out-save-year').textContent = `${fmtVND(res.savingsYear)} đ (${(res.pctSavings*100).toFixed(1)}%)`;
+      document.getElementById('out-cost-after-year').textContent = fmtVND(Math.max(0, res.costBaseYear - res.savingsYear)) + ' đ/năm';
 
       document.getElementById('out-pcm-room-t').textContent = roomTemp + '°C';
       document.getElementById('out-pcm-selected-name').textContent = `${res.selectedPcm.name} (${res.selectedPcm.temp}°C)`;
@@ -2195,9 +2202,7 @@
         options: {
           responsive: true,
           plugins: { legend: { display: true } },
-          scales: {
-            y: { ticks: { callback: (v) => (v / 1e6).toFixed(0) + ' Tr' } }
-          }
+          scales: { y: { ticks: { callback: (v) => (v / 1e6).toFixed(0) + ' Tr' } } }
         }
       });
     }
@@ -2248,9 +2253,6 @@
       renderLeadsTable();
     }
 
-    // =========================================================================
-    // BOOTSTRAP
-    // =========================================================================
     loadSavedFixedConfig();
     recalcAdmin();
     renderLeadsTable();
