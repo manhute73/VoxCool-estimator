@@ -555,7 +555,7 @@
         </div>
       </div>
 
-      <!-- BẢNG QUY ĐỊNH RIÊNG -->
+<!-- BẢNG QUY ĐỊNH RIÊNG -->
       <div class="bg-white rounded-xl shadow-sm border border-indigo-200 p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100 pb-3">
           <div class="flex items-center gap-2.5">
@@ -611,6 +611,76 @@
               <input type="number" step="0.01" id="rule-human-kw" value="0.27" oninput="recalcAdmin()" class="w-16 px-1.5 py-1 border rounded font-bold bg-white">
             </div>
             <div class="text-[11px] text-slate-600">Nhịp mở cửa chuẩn: <strong id="out-rule-door-ref" class="text-indigo-800">10 lần/ngày</strong></div>
+          </div>
+        </div>
+
+        <!-- BẢNG QUY ĐỊNH 3 THÔNG SỐ THEO NHÓM HÀNG HÓA -->
+        <div class="border border-indigo-100 rounded-lg overflow-hidden text-xs">
+          <div class="bg-indigo-50/70 px-3.5 py-2 font-bold text-indigo-950 flex flex-wrap items-center justify-between gap-2">
+            <span>Quy định theo Nhóm hàng hóa bảo quản</span>
+            <span class="text-[11px] font-normal text-slate-600">Áp dụng khi khách chọn nhóm hàng hóa ở Bước 2</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-700 border-b border-indigo-100">
+                  <th class="p-2.5">Nhóm hàng hóa</th>
+                  <th class="p-2.5 w-48">Temp difference for cooling (K)</th>
+                  <th class="p-2.5 w-48">Avg specific heat of commodity (kJ/kg·K)</th>
+                  <th class="p-2.5 w-48">Avg perspiration rate (kJ/kg·ngày)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr>
+                  <td class="p-2.5 font-semibold text-slate-800">Thủy hải sản / Thịt cấp đông</td>
+                  <td class="p-2">
+                    <input type="number" step="0.5" id="rule-prod-frozen_meat-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-frozen_meat-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-frozen_meat-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-semibold text-slate-800">Thực phẩm chế biến / Kem / Sữa</td>
+                  <td class="p-2">
+                    <input type="number" step="0.5" id="rule-prod-processed-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-processed-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-processed-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-semibold text-slate-800">Rau củ quả / Nông sản</td>
+                  <td class="p-2">
+                    <input type="number" step="0.5" id="rule-prod-produce-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-produce-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-produce-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-semibold text-slate-800">Chưa có thông tin / Hỗn hợp</td>
+                  <td class="p-2">
+                    <input type="number" step="0.5" id="rule-prod-unknown-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-unknown-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                  <td class="p-2">
+                    <input type="number" step="0.1" id="rule-prod-unknown-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
