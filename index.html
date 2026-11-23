@@ -1720,17 +1720,10 @@
     }
 
     function applyConfigToAdminInputs() {
-      const elPctCool = document.getElementById('adm-pct-cool');
-    if (elPctCool) elPctCool.value = config.pctCooled;
-
-    const elDtComm = document.getElementById('adm-dT-comm');
-    if (elDtComm) elDtComm.value = config.dTCommodity;
-
-    const elCpComm = document.getElementById('adm-cp-comm');
-    if (elCpComm) elCpComm.value = config.cpCommodity;
-
-    const elPersp = document.getElementById('adm-persp');
-    if (elPersp) elPersp.value = config.perspirationRate;
+      document.getElementById('adm-pct-cool').value = config.pctCooled;
+      document.getElementById('adm-dT-comm').value = config.dTCommodity;
+      document.getElementById('adm-cp-comm').value = config.cpCommodity;
+      document.getElementById('adm-persp').value = config.perspirationRate;
       document.getElementById('adm-k-wall').value = config.kWallRoof;
       document.getElementById('adm-k-floor').value = config.kFloor;
       document.getElementById('adm-light-kw').value = config.lightKw;
@@ -2174,25 +2167,12 @@
         document.getElementById(`admin-panel-${t}`).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById(`admin-tab-${t}`);
         btn.className = (t === tab)
-         const elPctCoolCalc = document.getElementById('adm-pct-cool');
-      config.pctCooled = elPctCoolCalc ? (parseFloat(elPctCoolCalc.value) || 0) : (config.pctCooled || 0);
-
-      const prodType = document.getElementById('adm-q1-product-type')?.value || 'unknown';
-      const elDtRule = document.getElementById(`rule-prod-${prodType}-dt`);
-      const elCpRule = document.getElementById(`rule-prod-${prodType}-cp`);
-      const elDtCommCalc = document.getElementById('adm-dT-comm');
-      const elCpCommCalc = document.getElementById('adm-cp-comm');
-
-      config.dTCommodity = elDtRule
-        ? (parseFloat(elDtRule.value) || 0)
-        : (elDtCommCalc ? (parseFloat(elDtCommCalc.value) || 0) : (config.dTCommodity || 0));
-
-      config.cpCommodity = elCpRule
-        ? (parseFloat(elCpRule.value) || 0)
-        : (elCpCommCalc ? (parseFloat(elCpCommCalc.value) || 0) : (config.cpCommodity || 0));
-
-      const elPerspCalc = document.getElementById('adm-persp');
-      config.perspirationRate = elPerspCalc ? (parseFloat(elPerspCalc.value) || 0) : (config.perspirationRate || 0);
+          const btn = document.getElementById(`admin-tab-${t}`);
+        btn.className = (t === tab)
+          ? 'py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-1.5'
+          : 'py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
+      });
+      if (tab === 'cashflow') recalcAdmin();
     }
 
     function recalcAdmin() {
@@ -2433,90 +2413,9 @@
       localStorage.removeItem('voxcool_leads');
       renderLeadsTable();
     }
-
     loadSavedFixedConfig();
     recalcAdmin();
     renderLeadsTable();
-    loadSavedFixedConfig();
-    recalcAdmin();
-    renderLeadsTable();
-
-    (function initQ1AutoCalc() {
-      const Q1_IDS = [
-        'adm-cap',
-        'adm-pct-cool',
-        'adm-q1-product-type',
-        'rule-prod-frozen_meat-dt',
-        'rule-prod-frozen_meat-cp',
-        'rule-prod-processed-dt',
-        'rule-prod-processed-cp',
-        'rule-prod-produce-dt',
-        'rule-prod-produce-cp',
-        'rule-prod-unknown-dt',
-        'rule-prod-unknown-cp'
-      ];
-
-      function calcAndRenderQ1() {
-        const capEl = document.getElementById('adm-cap');
-        const pctEl = document.getElementById('adm-pct-cool');
-        const prodEl = document.getElementById('adm-q1-product-type');
-
-        const cap = parseFloat(capEl?.value) || 0;
-        const pct = parseFloat(pctEl?.value) || 0;
-        const prodType = prodEl?.value || 'unknown';
-
-        const dtInput = document.getElementById(`rule-prod-${prodType}-dt`);
-        const cpInput = document.getElementById(`rule-prod-${prodType}-cp`);
-
-        const dt = parseFloat(dtInput?.value) || 0;
-        const cp = parseFloat(cpInput?.value) || 0;
-
-        const q1 = (cap * pct * dt * cp) / 3600;
-        const formatted = `${q1.toFixed(2)} kWh/ngày`;
-
-        const cardEl = document.getElementById('out-q1-card');
-        const liveEl = document.getElementById('out-q1-live-calc');
-        const detailEl = document.getElementById('out-q1');
-
-        if (cardEl) cardEl.textContent = formatted;
-        if (liveEl) {
-          liveEl.textContent = `Q1 = (${cap} × ${pct} × ${dt} × ${cp}) / 3600 = ${formatted}`;
-        }
-        if (detailEl) detailEl.textContent = q1.toFixed(2);
-
-        return q1;
-      }
-
-      window.calcAndRenderQ1 = calcAndRenderQ1;
-
-      function bindEvents() {
-        Q1_IDS.forEach((id) => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.addEventListener('input', calcAndRenderQ1);
-          el.addEventListener('change', calcAndRenderQ1);
-        });
-
-        if (typeof window.recalcAdmin === 'function' && !window.recalcAdmin._wrappedForQ1) {
-          const prevRecalc = window.recalcAdmin;
-          const nextRecalc = function (...args) {
-            const result = prevRecalc.apply(this, args);
-            calcAndRenderQ1();
-            return result;
-          };
-          nextRecalc._wrappedForQ1 = true;
-          window.recalcAdmin = nextRecalc;
-        }
-
-        calcAndRenderQ1();
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bindEvents);
-      } else {
-        bindEvents();
-      }
-    })();
   </script>
 </body>
 </html>
