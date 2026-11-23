@@ -792,13 +792,13 @@
                 <input type="number" step="0.1" id="adm-persp" value="2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
               </div>
               <div>
-                <label class="block text-[10px] text-indigo-800 font-bold">Nhóm hàng hóa bảo quản</label>
-                <select id="adm-q2-product-type" onchange="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-indigo-200 bg-indigo-50/40 rounded text-xs font-semibold text-slate-800">
-                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
-                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
-                  <option value="produce" selected>Rau củ quả / Nông sản</option>
-                  <option value="unknown">Chưa có thông tin / Hỗn hợp</option>
-                </select>
+                <label class="block text-[10px] text-slate-500 font-bold">Nhóm hàng hóa (Theo Q1)</label>
+                  <select id="adm-q2-product-type" disabled class="w-full mt-0.5 px-2 py-1 border border-slate-200 bg-slate-100 rounded text-xs font-semibold text-slate-600 cursor-not-allowed">
+                    <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
+                    <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
+                    <option value="produce" selected>Rau củ quả / Nông sản</option>
+                    <option value="unknown">Chưa có thông tin / Hỗn hợp</option>
+                  </select>
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
