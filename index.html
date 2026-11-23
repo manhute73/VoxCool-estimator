@@ -1720,10 +1720,17 @@
     }
 
     function applyConfigToAdminInputs() {
-      document.getElementById('adm-pct-cool').value = config.pctCooled;
-      document.getElementById('adm-dT-comm').value = config.dTCommodity;
-      document.getElementById('adm-cp-comm').value = config.cpCommodity;
-      document.getElementById('adm-persp').value = config.perspirationRate;
+      const elPctCool = document.getElementById('adm-pct-cool');
+    if (elPctCool) elPctCool.value = config.pctCooled;
+
+    const elDtComm = document.getElementById('adm-dT-comm');
+    if (elDtComm) elDtComm.value = config.dTCommodity;
+
+    const elCpComm = document.getElementById('adm-cp-comm');
+    if (elCpComm) elCpComm.value = config.cpCommodity;
+
+    const elPersp = document.getElementById('adm-persp');
+    if (elPersp) elPersp.value = config.perspirationRate;
       document.getElementById('adm-k-wall').value = config.kWallRoof;
       document.getElementById('adm-k-floor').value = config.kFloor;
       document.getElementById('adm-light-kw').value = config.lightKw;
@@ -2167,10 +2174,25 @@
         document.getElementById(`admin-panel-${t}`).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById(`admin-tab-${t}`);
         btn.className = (t === tab)
-          ? 'py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-1.5'
-          : 'py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
-      });
-      if (tab === 'cashflow') recalcAdmin();
+         const elPctCoolCalc = document.getElementById('adm-pct-cool');
+      config.pctCooled = elPctCoolCalc ? (parseFloat(elPctCoolCalc.value) || 0) : (config.pctCooled || 0);
+
+      const prodType = document.getElementById('adm-q1-product-type')?.value || 'unknown';
+      const elDtRule = document.getElementById(`rule-prod-${prodType}-dt`);
+      const elCpRule = document.getElementById(`rule-prod-${prodType}-cp`);
+      const elDtCommCalc = document.getElementById('adm-dT-comm');
+      const elCpCommCalc = document.getElementById('adm-cp-comm');
+
+      config.dTCommodity = elDtRule
+        ? (parseFloat(elDtRule.value) || 0)
+        : (elDtCommCalc ? (parseFloat(elDtCommCalc.value) || 0) : (config.dTCommodity || 0));
+
+      config.cpCommodity = elCpRule
+        ? (parseFloat(elCpRule.value) || 0)
+        : (elCpCommCalc ? (parseFloat(elCpCommCalc.value) || 0) : (config.cpCommodity || 0));
+
+      const elPerspCalc = document.getElementById('adm-persp');
+      config.perspirationRate = elPerspCalc ? (parseFloat(elPerspCalc.value) || 0) : (config.perspirationRate || 0);
     }
 
     function recalcAdmin() {
