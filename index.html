@@ -618,65 +618,101 @@
         <div class="border border-indigo-100 rounded-lg overflow-hidden text-xs">
           <div class="bg-indigo-50/70 px-3.5 py-2 font-bold text-indigo-950 flex flex-wrap items-center justify-between gap-2">
             <span>Quy định theo Nhóm hàng hóa bảo quản</span>
-            <span class="text-[11px] font-normal text-slate-600">Áp dụng khi khách chọn nhóm hàng hóa ở Bước 2</span>
+            <span class="text-[11px] font-normal text-slate-600">Áp dụng khi khách chọn nhóm hàng hóa ở Bước 2 • Bấm 🔒/🔓 để khóa hoặc mở từng ô</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-50 text-slate-700 border-b border-indigo-100">
                   <th class="p-2.5">Nhóm hàng hóa</th>
-                  <th class="p-2.5 w-48">Temp difference for cooling (K)</th>
-                  <th class="p-2.5 w-48">Avg specific heat of commodity (kJ/kg·K)</th>
-                  <th class="p-2.5 w-48">Avg perspiration rate (kJ/kg·ngày)</th>
+                  <th class="p-2.5 w-52">Temp difference for cooling (K)</th>
+                  <th class="p-2.5 w-52">Avg specific heat of commodity (kJ/kg·K)</th>
+                  <th class="p-2.5 w-52">Avg perspiration rate (kJ/kg·ngày)</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 bg-white">
                 <tr>
                   <td class="p-2.5 font-semibold text-slate-800">Thủy hải sản / Thịt cấp đông</td>
                   <td class="p-2">
-                    <input type="number" step="0.5" id="rule-prod-frozen_meat-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.5" id="rule-prod-frozen_meat-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-frozen_meat-dt')" id="lock-btn-rule-prod-frozen_meat-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-frozen_meat-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-frozen_meat-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-frozen_meat-cp')" id="lock-btn-rule-prod-frozen_meat-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-frozen_meat-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-frozen_meat-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-frozen_meat-persp')" id="lock-btn-rule-prod-frozen_meat-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="p-2.5 font-semibold text-slate-800">Thực phẩm chế biến / Kem / Sữa</td>
                   <td class="p-2">
-                    <input type="number" step="0.5" id="rule-prod-processed-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.5" id="rule-prod-processed-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-processed-dt')" id="lock-btn-rule-prod-processed-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-processed-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-processed-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-processed-cp')" id="lock-btn-rule-prod-processed-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-processed-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-processed-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-processed-persp')" id="lock-btn-rule-prod-processed-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="p-2.5 font-semibold text-slate-800">Rau củ quả / Nông sản</td>
                   <td class="p-2">
-                    <input type="number" step="0.5" id="rule-prod-produce-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.5" id="rule-prod-produce-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-produce-dt')" id="lock-btn-rule-prod-produce-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-produce-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-produce-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-produce-cp')" id="lock-btn-rule-prod-produce-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-produce-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-produce-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-produce-persp')" id="lock-btn-rule-prod-produce-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="p-2.5 font-semibold text-slate-800">Chưa có thông tin / Hỗn hợp</td>
                   <td class="p-2">
-                    <input type="number" step="0.5" id="rule-prod-unknown-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.5" id="rule-prod-unknown-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-unknown-dt')" id="lock-btn-rule-prod-unknown-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-unknown-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-unknown-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-unknown-cp')" id="lock-btn-rule-prod-unknown-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                   <td class="p-2">
-                    <input type="number" step="0.1" id="rule-prod-unknown-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                    <div class="flex items-center gap-1.5">
+                      <input type="number" step="0.1" id="rule-prod-unknown-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <button type="button" onclick="toggleSingleLock('rule-prod-unknown-persp')" id="lock-btn-rule-prod-unknown-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -684,7 +720,6 @@
           </div>
         </div>
       </div>
-
       <!-- PHẦN 2: PHỤ TẢI NHIỆT LẠNH NGÀY (HEAT LOAD) -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
