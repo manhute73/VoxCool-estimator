@@ -738,46 +738,7 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-          <!-- 2.1: Q1 Làm lạnh hàng hóa -->
-          <div class="border border-slate-200 rounded-lg p-4 space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-emerald-700 uppercase">2.1. Nhiệt làm lạnh hàng hóa (Q1)</span>
-              <span class="text-xs font-bold text-slate-900" id="out-q1-card">0.00 kWh/ngày</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <div class="flex items-center justify-between">
-                  <label class="text-[10px] text-sky-700 font-bold">Capacity (kg)</label>
-                  <button type="button" onclick="toggleSingleLock('adm-cap')" id="lock-btn-adm-cap" class="text-[11px]">🔓</button>
-                </div>
-                <input type="number" id="adm-cap" value="5000" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-sky-300 bg-sky-50/40 rounded text-xs font-bold">
-              </div>
-              <div>
-                <div class="flex items-center justify-between">
-                  <label class="text-[10px] text-slate-600 font-bold">% of commodity to be cooled</label>
-                  <button type="button" onclick="toggleSingleLock('adm-pct-cool')" id="lock-btn-adm-pct-cool" class="text-[11px]">🔒</button>
-                </div>
-                <input type="number" step="0.01" id="adm-pct-cool" value="0.15" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
-              </div>
-              <div>
-                <label class="block text-[10px] text-indigo-800 font-bold">Nhóm hàng hóa bảo quản</label>
-                <select id="adm-q1-product-type" onchange="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-indigo-200 bg-indigo-50/40 rounded text-xs font-semibold text-slate-800">
-                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
-                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
-                  <option value="produce" selected>Rau củ quả / Nông sản</option>
-                  <option value="unknown">Chưa có thông tin / Hỗn hợp</option>
-                </select>
-              </div>
-            </div>
-            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-- Q1 (Làm lạnh) = (M × p × ΔT_hàng × Cp) / 3600
-            </div>
-            <div id="out-q1-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
-              Q1 = (5000 × 0.15 × 15 × 3.7) / 3600 = 11.56 kWh/ngày
-            </div>
-          </div>
-
-          <!-- 2.2: Q2 Hô hấp hàng hóa -->
+         <!-- 2.2: Q2 Hô hấp hàng hóa -->
           <div class="border border-slate-200 rounded-lg p-4 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-emerald-700 uppercase">2.2. Nhiệt hô hấp hàng hóa (Q2)</span>
@@ -786,17 +747,26 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <div class="flex items-center justify-between">
-                  <label class="text-[10px] text-slate-500">Hô hấp q_h (kJ/kg·ngày)</label>
+                  <label class="text-[10px] text-slate-600 font-bold">Hô hấp q_h (kJ/kg·ngày)</label>
                   <button type="button" onclick="toggleSingleLock('adm-persp')" id="lock-btn-adm-persp" class="text-[11px]">🔒</button>
                 </div>
                 <input type="number" step="0.1" id="adm-persp" value="0" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
               </div>
-              <div class="flex flex-col justify-end">
-                <span class="text-[10px] text-slate-500">Khối lượng M lấy từ ô Capacity (kg) ở mục 2.1</span>
+              <div>
+                <label class="block text-[10px] text-indigo-800 font-bold">Nhóm hàng hóa bảo quản</label>
+                <select id="adm-q2-product-type" onchange="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-indigo-200 bg-indigo-50/40 rounded text-xs font-semibold text-slate-800">
+                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
+                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
+                  <option value="produce" selected>Rau củ quả / Nông sản</option>
+                  <option value="unknown">Chưa có thông tin / Hỗn hợp</option>
+                </select>
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
 - Q2 (Hô hấp) = (M × q_h) / 3600
+            </div>
+            <div id="out-q2-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q2 = (5000 × 2) / 3600 = 2.78 kWh/ngày
             </div>
           </div>
 
@@ -806,15 +776,28 @@
               <span class="text-xs font-bold text-emerald-700 uppercase">2.3. Tổn thất truyền nhiệt Vách & Trần (Q3)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q3-card">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <div class="flex items-center justify-between">
-                <label class="text-[11px] text-slate-500">Hệ số K vách & trần (W/m²K)</label>
-                <button type="button" onclick="toggleSingleLock('adm-k-wall')" id="lock-btn-adm-k-wall" class="text-xs">🔒</button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Diện tích A_wall (m²)</label>
+                <input type="text" id="adm-q3-awall-disp" value="19.40" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
               </div>
-              <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Chênh lệch ΔT (K)</label>
+                <input type="text" id="adm-q3-dt-disp" value="60" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
+              </div>
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Hệ số K_wall (W/m²K)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-k-wall')" id="lock-btn-adm-k-wall" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+              </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
 - Q3 (Vách+Trần) = (A_wall × ΔT × K_wall / 1000) × 24h
+            </div>
+            <div id="out-q3-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q3 = (19.40 × 60 × 0.30 / 1000) × 24 = 8.38 kWh/ngày
             </div>
           </div>
 
@@ -824,15 +807,28 @@
               <span class="text-xs font-bold text-emerald-700 uppercase">2.4. Tổn thất truyền nhiệt Nền (Q4)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q4-card">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <div class="flex items-center justify-between">
-                <label class="text-[11px] text-slate-500">Hệ số K nền (W/m²K)</label>
-                <button type="button" onclick="toggleSingleLock('adm-k-floor')" id="lock-btn-adm-k-floor" class="text-xs">🔒</button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Diện tích nền A_floor (m²)</label>
+                <input type="text" id="adm-q4-afloor-disp" value="5.00" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
               </div>
-              <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Chênh lệch ΔT (K)</label>
+                <input type="text" id="adm-q4-dt-disp" value="60" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
+              </div>
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Hệ số K_floor (W/m²K)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-k-floor')" id="lock-btn-adm-k-floor" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+              </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
 - Q4 (Nền) = (A_floor × ΔT × K_floor / 1000) × 24h
+            </div>
+            <div id="out-q4-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q4 = (5.00 × 60 × 0.28 / 1000) × 24 = 2.02 kWh/ngày
             </div>
           </div>
 
@@ -842,18 +838,27 @@
               <span class="text-xs font-bold text-emerald-700 uppercase">2.5. Nhiệt đèn chiếu sáng (Q5)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q5-card">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <div class="flex items-center justify-between">
-                <label class="text-[10px] text-slate-500">Đèn (kW × giờ)</label>
-                <button type="button" onclick="toggleSingleLock('adm-light-kw'); toggleSingleLock('adm-light-hrs');" id="lock-btn-adm-light-kw" class="text-[11px]">🔒</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Công suất đèn P_đèn (kW)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-light-kw')" id="lock-btn-adm-light-kw" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
               </div>
-              <div class="flex gap-1.5 mt-0.5">
-                <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border rounded text-xs font-bold">
-                <input type="number" step="1" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border rounded text-xs font-bold">
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Thời gian bật đèn t_đèn (giờ/ngày)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-light-hrs')" id="lock-btn-adm-light-hrs" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.5" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
 - Q5 (Đèn) = P_đèn × t_đèn
+            </div>
+            <div id="out-q5-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q5 = 0.40 × 14 = 5.60 kWh/ngày
             </div>
           </div>
 
@@ -863,18 +868,28 @@
               <span class="text-xs font-bold text-emerald-700 uppercase">2.6. Nhiệt thông gió / Mở cửa (Q6)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q6-card">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <div class="flex items-center justify-between">
-                <label class="text-[10px] text-slate-500"><span class="text-sky-700 font-bold">Mở cửa (lần)</span> × kJ/m³K</label>
-                <button type="button" onclick="toggleSingleLock('adm-door-kj')" id="lock-btn-adm-door-kj" class="text-[11px]">🔒</button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[10px] text-sky-700 font-bold">Số lần mở cửa (lần/ngày)</label>
+                <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-sky-300 bg-sky-50/40 rounded text-xs font-bold">
               </div>
-              <div class="flex gap-1.5 mt-0.5">
-                <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border border-sky-300 bg-sky-50/40 rounded text-xs font-bold">
-                <input type="number" step="0.5" id="adm-door-kj" value="30" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border rounded text-xs font-semibold">
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Thể tích 0.5×V (m³)</label>
+                <input type="text" id="adm-q6-vdoor-disp" value="4.0" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
+              </div>
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Hệ số kJ (kJ/m³K)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-door-kj')" id="lock-btn-adm-door-kj" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.5" id="adm-door-kj" value="30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-semibold">
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
 - Q6 (Mở cửa) = (Số lần × 0.5×V × Hệ số kJ × ΔT) / 3600
+            </div>
+            <div id="out-q6-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q6 = (10 × 4.0 × 30 × 60) / 3600 = 20.00 kWh/ngày
             </div>
           </div>
 
@@ -884,41 +899,33 @@
               <span class="text-xs font-bold text-emerald-700 uppercase">2.7. Nhiệt người thao tác (Q7)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q7-card">0.00 kWh/ngày</span>
             </div>
-            <div>
-              <div class="flex items-center justify-between">
-                <label class="text-[10px] text-slate-500">Người (SL × giờ)</label>
-                <button type="button" onclick="toggleSingleLock('adm-human-cnt'); toggleSingleLock('adm-human-hrs');" id="lock-btn-adm-human-cnt" class="text-[11px]">🔒</button>
-              </div>
-              <div class="flex gap-1.5 mt-0.5">
-                <input type="number" id="adm-human-cnt" value="2" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border rounded text-xs font-bold">
-                <input type="number" step="1" id="adm-human-hrs" value="5" oninput="recalcAdmin()" class="w-1/2 px-2 py-1 border rounded text-xs font-bold">
-              </div>
-            </div>
-            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-- Q7 (Người) = N_người × t_người × 0.27 kW
-            </div>
-          </div>
-
-          <!-- 2.8: Hệ số an toàn & Tổng tải lạnh -->
-          <div class="border-2 border-emerald-500/40 bg-emerald-50/30 rounded-lg p-4 flex flex-col justify-between space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-xs font-bold text-emerald-800 uppercase">2.8. Tổng hợp Phụ tải Lạnh có Hệ số An toàn</span>
-              <span class="text-sm font-extrabold text-emerald-700" id="out-q-total">42.57 kWh/ngày</span>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label class="block text-[11px] text-slate-600">Tổng tải nhiệt thô Q_sum</label>
-                <div id="out-q-sum" class="mt-0.5 px-2.5 py-1.5 bg-white border rounded text-xs font-bold text-slate-700">38.70 kWh/ngày</div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Số người N_người</label>
+                  <button type="button" onclick="toggleSingleLock('adm-human-cnt')" id="lock-btn-adm-human-cnt" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" id="adm-human-cnt" value="2" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
               </div>
               <div>
                 <div class="flex items-center justify-between">
-                  <label class="text-[11px] text-slate-600">Hệ số an toàn Safety (%)</label>
-                  <button type="button" onclick="toggleSingleLock('adm-safety')" id="lock-btn-adm-safety" class="text-xs">🔒</button>
+                  <label class="text-[10px] text-slate-600 font-bold">Thời gian t_người (giờ/ngày)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-human-hrs')" id="lock-btn-adm-human-hrs" class="text-[11px]">🔒</button>
                 </div>
-                <input type="number" step="1" id="adm-safety" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
+                <input type="number" step="0.5" id="adm-human-hrs" value="5" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold">Nhiệt tỏa (kW/người)</label>
+                <input type="text" id="adm-q7-kw-disp" value="0.27" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
               </div>
             </div>
-            <div class="formula-box text-[11px] bg-white p-2 rounded border border-emerald-200 text-slate-700">
+            <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
+- Q7 (Người) = N_người × t_người × q_người (kW)
+            </div>
+            <div id="out-q7-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
+              Q7 = 2 × 5 × 0.27 = 2.70 kWh/ngày
+            </div>
+          </div>
 - Q_sum = Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7<br>
 - <strong>Q_total = Q_sum × (1 + Safety_Factor%)</strong>
             </div>
