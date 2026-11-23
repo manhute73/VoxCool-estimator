@@ -555,7 +555,7 @@
         </div>
       </div>
 
-<!-- BẢNG QUY ĐỊNH RIÊNG -->
+      <!-- BẢNG QUY ĐỊNH RIÊNG -->
       <div class="bg-white rounded-xl shadow-sm border border-indigo-200 p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100 pb-3">
           <div class="flex items-center gap-2.5">
@@ -727,7 +727,6 @@
         </div>
       </div>
 
-      
       <!-- PHẦN 2: PHỤ TẢI NHIỆT LẠNH NGÀY (HEAT LOAD) -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
@@ -739,8 +738,7 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-          
-<!-- 2.1: Q1 Làm lạnh hàng hóa -->
+          <!-- 2.1: Q1 Làm lạnh hàng hóa -->
           <div class="border border-slate-200 rounded-lg p-4 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-emerald-700 uppercase">2.1. Nhiệt làm lạnh hàng hóa (Q1)</span>
@@ -772,15 +770,13 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q1 (Làm lạnh) = (M × p × ΔT_hàng × Cp) / 3600
+- Q1 (Làm lạnh) = (M × p × ΔT_hàng × Cp) / 3600
             </div>
             <div id="out-q1-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
               Q1 = (5000 × 0.15 × 15 × 3.7) / 3600 = 11.56 kWh/ngày
             </div>
           </div>
 
-
-          
           <!-- 2.2: Q2 Hô hấp hàng hóa -->
           <div class="border border-slate-200 rounded-lg p-4 space-y-3">
             <div class="flex justify-between items-center">
@@ -800,7 +796,7 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q2 (Hô hấp) = (M × q_h) / 3600
+- Q2 (Hô hấp) = (M × q_h) / 3600
             </div>
           </div>
 
@@ -818,7 +814,7 @@
               <input type="number" step="0.01" id="adm-k-wall" value="0.30" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q3 (Vách+Trần) = (A_wall × ΔT × K_wall / 1000) × 24h
+- Q3 (Vách+Trần) = (A_wall × ΔT × K_wall / 1000) × 24h
             </div>
           </div>
 
@@ -836,7 +832,7 @@
               <input type="number" step="0.01" id="adm-k-floor" value="0.28" oninput="recalcAdmin()" class="w-full mt-0.5 px-2.5 py-1 border rounded text-xs font-bold">
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q4 (Nền) = (A_floor × ΔT × K_floor / 1000) × 24h
+- Q4 (Nền) = (A_floor × ΔT × K_floor / 1000) × 24h
             </div>
           </div>
 
@@ -857,7 +853,7 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q5 (Đèn) = P_đèn × t_đèn
+- Q5 (Đèn) = P_đèn × t_đèn
             </div>
           </div>
 
@@ -878,7 +874,7 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q6 (Mở cửa) = (Số lần × 0.5×V × Hệ số kJ × ΔT) / 3600
+- Q6 (Mở cửa) = (Số lần × 0.5×V × Hệ số kJ × ΔT) / 3600
             </div>
           </div>
 
@@ -899,7 +895,7 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-              - Q7 (Người) = N_người × t_người × 0.27 kW
+- Q7 (Người) = N_người × t_người × 0.27 kW
             </div>
           </div>
 
@@ -923,8 +919,8 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-white p-2 rounded border border-emerald-200 text-slate-700">
-              - Q_sum = Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7<br>
-              - <strong>Q_total = Q_sum × (1 + Safety_Factor%)</strong>
+- Q_sum = Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7<br>
+- <strong>Q_total = Q_sum × (1 + Safety_Factor%)</strong>
             </div>
           </div>
         </div>
@@ -965,9 +961,6 @@
         </div>
       </div>
 
-
-
-      
       <!-- PHẦN 3: ĐIỆN NĂNG TIÊU THỤ & BÀI TOÁN TIẾT KIỆM EVN -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
@@ -1459,6 +1452,18 @@
 
     const fmtVND = (n) => Math.round(n).toLocaleString('vi-VN');
 
+    function setValSafe(id, val) {
+      const el = document.getElementById(id);
+      if (el && val !== undefined) el.value = val;
+    }
+
+    function getNumSafe(id, fallback = 0) {
+      const el = document.getElementById(id);
+      if (!el || el.value === '') return fallback;
+      const n = parseFloat(el.value);
+      return isNaN(n) ? fallback : n;
+    }
+
     function showToast(msg) {
       const el = document.getElementById('toast-banner');
       document.getElementById('toast-text').textContent = msg;
@@ -1472,14 +1477,14 @@
         exportedAt: new Date().toISOString(),
         config,
         geometry: {
-          L: parseFloat(document.getElementById('adm-L').value) || 0,
-          W: parseFloat(document.getElementById('adm-W').value) || 0,
-          H: parseFloat(document.getElementById('adm-H').value) || 0,
-          roomTemp: parseFloat(document.getElementById('adm-room-temp').value) || 0,
-          dT: parseFloat(document.getElementById('adm-dT').value) || 0,
-          capacity: parseFloat(document.getElementById('adm-cap').value) || 0,
-          doorOpenings: parseFloat(document.getElementById('adm-door-cnt').value) || 0,
-          shiftHours: parseFloat(document.getElementById('adm-shift-hrs').value) || 0
+          L: getNumSafe('adm-L', 0),
+          W: getNumSafe('adm-W', 0),
+          H: getNumSafe('adm-H', 0),
+          roomTemp: getNumSafe('adm-room-temp', 0),
+          dT: getNumSafe('adm-dT', 0),
+          capacity: getNumSafe('adm-cap', 0),
+          doorOpenings: getNumSafe('adm-door-cnt', 0),
+          shiftHours: getNumSafe('adm-shift-hrs', 0)
         }
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1507,14 +1512,14 @@
             pcmCatalog: (nextCfg.pcmCatalog && nextCfg.pcmCatalog.length > 0) ? nextCfg.pcmCatalog : JSON.parse(JSON.stringify(DEFAULT_PCM_CATALOG))
           };
           if (parsed.geometry) {
-            if (parsed.geometry.L !== undefined) document.getElementById('adm-L').value = parsed.geometry.L;
-            if (parsed.geometry.W !== undefined) document.getElementById('adm-W').value = parsed.geometry.W;
-            if (parsed.geometry.H !== undefined) document.getElementById('adm-H').value = parsed.geometry.H;
-            if (parsed.geometry.roomTemp !== undefined) document.getElementById('adm-room-temp').value = parsed.geometry.roomTemp;
-            if (parsed.geometry.dT !== undefined) document.getElementById('adm-dT').value = parsed.geometry.dT;
-            if (parsed.geometry.capacity !== undefined) document.getElementById('adm-cap').value = parsed.geometry.capacity;
-            if (parsed.geometry.doorOpenings !== undefined) document.getElementById('adm-door-cnt').value = parsed.geometry.doorOpenings;
-            if (parsed.geometry.shiftHours !== undefined) document.getElementById('adm-shift-hrs').value = parsed.geometry.shiftHours;
+            setValSafe('adm-L', parsed.geometry.L);
+            setValSafe('adm-W', parsed.geometry.W);
+            setValSafe('adm-H', parsed.geometry.H);
+            setValSafe('adm-room-temp', parsed.geometry.roomTemp);
+            setValSafe('adm-dT', parsed.geometry.dT);
+            setValSafe('adm-cap', parsed.geometry.capacity);
+            setValSafe('adm-door-cnt', parsed.geometry.doorOpenings);
+            setValSafe('adm-shift-hrs', parsed.geometry.shiftHours);
           }
           localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
           applyConfigToAdminInputs();
@@ -1686,13 +1691,13 @@
     function applyAdminTariffPreset(preset) {
       config.tariffPreset = preset;
       if (preset === 'industrial_lt6') {
-        document.getElementById('adm-p-peak').value = 3640;
-        document.getElementById('adm-p-std').value = 1997;
-        document.getElementById('adm-p-off').value = 1304;
+        setValSafe('adm-p-peak', 3640);
+        setValSafe('adm-p-std', 1997);
+        setValSafe('adm-p-off', 1304);
       } else {
-        document.getElementById('adm-p-peak').value = 5964.2;
-        document.getElementById('adm-p-std').value = 3467.2;
-        document.getElementById('adm-p-off').value = 2109.8;
+        setValSafe('adm-p-peak', 5964.2);
+        setValSafe('adm-p-std', 3467.2);
+        setValSafe('adm-p-off', 2109.8);
       }
       updateAdminTariffButtonsUI(preset);
       recalcAdmin();
@@ -1720,50 +1725,56 @@
     }
 
     function applyConfigToAdminInputs() {
-      document.getElementById('adm-pct-cool').value = config.pctCooled;
-      document.getElementById('adm-dT-comm').value = config.dTCommodity;
-      document.getElementById('adm-cp-comm').value = config.cpCommodity;
-      document.getElementById('adm-persp').value = config.perspirationRate;
-      document.getElementById('adm-k-wall').value = config.kWallRoof;
-      document.getElementById('adm-k-floor').value = config.kFloor;
-      document.getElementById('adm-light-kw').value = config.lightKw;
-      document.getElementById('adm-light-hrs').value = config.lightHrs;
-      document.getElementById('adm-door-kj').value = config.doorKjFactor;
-      document.getElementById('adm-human-cnt').value = config.humanCount;
-      document.getElementById('adm-human-hrs').value = config.humanHrs;
-      document.getElementById('adm-safety').value = Math.round(config.safetyFactor * 10000) / 100;
-      document.getElementById('adm-cop').value = config.copBase;
+      setValSafe('adm-pct-cool', config.pctCooled);
+      setValSafe('adm-dT-comm', config.dTCommodity);
+      setValSafe('adm-cp-comm', config.cpCommodity);
+      setValSafe('adm-persp', config.perspirationRate);
+      setValSafe('adm-k-wall', config.kWallRoof);
+      setValSafe('adm-k-floor', config.kFloor);
+      setValSafe('adm-light-kw', config.lightKw);
+      setValSafe('adm-light-hrs', config.lightHrs);
+      setValSafe('adm-door-kj', config.doorKjFactor);
+      setValSafe('adm-human-cnt', config.humanCount);
+      setValSafe('adm-human-hrs', config.humanHrs);
+      setValSafe('adm-safety', Math.round(config.safetyFactor * 10000) / 100);
+      setValSafe('adm-cop', config.copBase);
 
-      document.getElementById('chk-use-custom-rules').checked = !!config.useCustomRules;
-      document.getElementById('rule-m2-per-light').value = config.ruleM2PerLight ?? 10;
-      document.getElementById('rule-m3-per-human').value = config.ruleM3PerHuman ?? 20;
-      document.getElementById('rule-light-hrs').value = config.ruleLightHrs ?? 14;
-      document.getElementById('rule-human-hrs').value = config.ruleHumanHrs ?? 5;
-      document.getElementById('rule-door-kj').value = config.ruleDoorKj ?? 30;
-      document.getElementById('rule-human-kw').value = config.ruleHumanKw ?? 0.27;
+      const chkRules = document.getElementById('chk-use-custom-rules');
+      if (chkRules) chkRules.checked = !!config.useCustomRules;
+      setValSafe('rule-m2-per-light', config.ruleM2PerLight ?? 10);
+      setValSafe('rule-m3-per-human', config.ruleM3PerHuman ?? 20);
+      setValSafe('rule-light-hrs', config.ruleLightHrs ?? 14);
+      setValSafe('rule-human-hrs', config.ruleHumanHrs ?? 5);
+      setValSafe('rule-door-kj', config.ruleDoorKj ?? 30);
+      setValSafe('rule-human-kw', config.ruleHumanKw ?? 0.27);
 
-      document.getElementById('adm-p-peak').value = config.pPeak;
-      document.getElementById('adm-p-std').value = config.pStd;
-      document.getElementById('adm-p-off').value = config.pOff;
+      setValSafe('adm-p-peak', config.pPeak);
+      setValSafe('adm-p-std', config.pStd);
+      setValSafe('adm-p-off', config.pOff);
       updateAdminTariffButtonsUI(config.tariffPreset || 'business');
 
-      document.getElementById('adm-iot-cost').value = config.iotCost;
-      document.getElementById('adm-bat-ship-rate').value = config.batShipRate;
+      setValSafe('adm-iot-cost', config.iotCost);
+      setValSafe('adm-bat-ship-rate', config.batShipRate);
       const priceKgVal = (config.framePricePerKg !== undefined) ? config.framePricePerKg : 106019;
-      document.getElementById('adm-frame-price-kg').value = priceKgVal;
-      document.getElementById('adm-frame-formula').value = config.frameFormula || (`M_bat * ${priceKgVal}`);
-      document.getElementById('adm-frameship-formula').value = config.frameShipFormula;
-      document.getElementById('adm-penjico-pct').value = Math.round(config.penjicoPct * 10000) / 100;
-      document.getElementById('adm-markup-pct').value = Math.round(config.markupPct * 10000) / 100;
+      setValSafe('adm-frame-price-kg', priceKgVal);
+      setValSafe('adm-frame-formula', config.frameFormula || (`M_bat * ${priceKgVal}`));
+      setValSafe('adm-frameship-formula', config.frameShipFormula);
+      setValSafe('adm-penjico-pct', Math.round(config.penjicoPct * 10000) / 100);
+      setValSafe('adm-markup-pct', Math.round(config.markupPct * 10000) / 100);
 
-      document.getElementById('chk-include-frameship').checked = config.includeFrameShip;
-      document.getElementById('chk-round-bat').checked = config.roundUpBat;
-      document.getElementById('sel-penjico-base').value = config.penjicoBaseMode;
+      const chkShip = document.getElementById('chk-include-frameship');
+      if (chkShip) chkShip.checked = config.includeFrameShip;
+      const chkRound = document.getElementById('chk-round-bat');
+      if (chkRound) chkRound.checked = config.roundUpBat;
+      const selPenjico = document.getElementById('sel-penjico-base');
+      if (selPenjico) selPenjico.value = config.penjicoBaseMode;
 
       const tsEl = document.getElementById('admin-save-timestamp');
-      tsEl.textContent = config.savedAt
-        ? `Lần lưu công thức gần nhất: ${config.savedAt} — Đang áp dụng đồng bộ cho Giao diện Khách hàng.`
-        : 'Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.';
+      if (tsEl) {
+        tsEl.textContent = config.savedAt
+          ? `Lần lưu công thức gần nhất: ${config.savedAt} — Đang áp dụng đồng bộ cho Giao diện Khách hàng.`
+          : 'Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.';
+      }
     }
 
     function syncTariffLabelsToCustomer() {
@@ -1798,8 +1809,8 @@
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
-      document.getElementById('adm-frame-formula').value = 'M_bat * 0';
-      document.getElementById('adm-frameship-formula').value = '';
+      setValSafe('adm-frame-formula', 'M_bat * 0');
+      setValSafe('adm-frameship-formula', '');
       recalcAdmin();
       showToast('Đã đưa các thông số về trống/0 để chờ bạn nhập vào.');
     }
@@ -1818,13 +1829,13 @@
     function syncAdminTempToDeltaT() {
       const rawT = document.getElementById('adm-room-temp').value;
       if (rawT === '') {
-        if (!config.lockedFields['adm-dT']) document.getElementById('adm-dT').value = '';
+        if (!config.lockedFields['adm-dT']) setValSafe('adm-dT', '');
         recalcAdmin();
         return;
       }
       const t = parseFloat(rawT);
       if (!isNaN(t) && !config.lockedFields['adm-dT']) {
-        document.getElementById('adm-dT').value = Math.max(10, 35 - t + (t <= -18 ? 7 : 0));
+        setValSafe('adm-dT', Math.max(10, 35 - t + (t <= -18 ? 7 : 0)));
       }
       recalcAdmin();
     }
@@ -2011,18 +2022,18 @@
       if (type === 'freezer') {
         fBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between';
         cBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between';
-        document.getElementById('cust-temp').value = '-18';
+        setValSafe('cust-temp', '-18');
       } else {
         cBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between';
         fBtn.className = 'py-2.5 px-4 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-sm text-left flex items-center justify-between';
-        document.getElementById('cust-temp').value = '2';
+        setValSafe('cust-temp', '2');
       }
     }
 
     function updateLiveVolume() {
-      const L = parseFloat(document.getElementById('cust-length').value) || 0;
-      const W = parseFloat(document.getElementById('cust-width').value) || 0;
-      const H = parseFloat(document.getElementById('cust-height').value) || 0;
+      const L = getNumSafe('cust-length', 0);
+      const W = getNumSafe('cust-width', 0);
+      const H = getNumSafe('cust-height', 0);
       document.getElementById('live-volume-display').textContent = (L * W * H).toFixed(1) + ' m³';
       document.getElementById('live-area-display').textContent = (L * W).toFixed(1) + ' m²';
     }
@@ -2058,14 +2069,17 @@
     let lastCustomerResult = null;
 
     function calculateAndShowResult() {
-      const L = parseFloat(document.getElementById('cust-length').value) || 0;
-      const W = parseFloat(document.getElementById('cust-width').value) || 0;
-      const H = parseFloat(document.getElementById('cust-height').value) || 0;
-      const tempVal = parseFloat(document.getElementById('cust-temp').value);
-      const roomTemp = isNaN(tempVal) ? 0 : tempVal;
+      const L = getNumSafe('cust-length', 0);
+      const W = getNumSafe('cust-width', 0);
+      const H = getNumSafe('cust-height', 0);
+      const roomTemp = getNumSafe('cust-temp', 0);
       const dT = roomTemp !== 0 ? Math.max(10, 35 - roomTemp + (roomTemp <= -18 ? 7 : 0)) : 0;
-      const capacity = parseFloat(document.getElementById('cust-capacity').value) || 0;
-      const doorOpenings = parseFloat(document.getElementById('cust-door-openings').value) || 0;
+      const capacity = getNumSafe('cust-capacity', 0);
+      const doorOpenings = getNumSafe('cust-door-openings', 0);
+      const prodType = document.getElementById('cust-product-type')?.value || 'unknown';
+      const dTCommodity = getNumSafe(`rule-prod-${prodType}-dt`, config.dTCommodity);
+      const cpCommodity = getNumSafe(`rule-prod-${prodType}-cp`, config.cpCommodity);
+      const perspirationRate = getNumSafe(`rule-prod-${prodType}-persp`, config.perspirationRate);
 
       const equip = (document.querySelector('input[name="cust-equip"]:checked') || { value: 'unknown' }).value;
       const cond = (document.querySelector('input[name="cust-cond"]:checked') || { value: 'unknown' }).value;
@@ -2077,7 +2091,8 @@
         : { pPeak: config.pPeak, pStd: config.pStd, pOff: config.pOff };
 
       const res = runEngineeringCalculation({
-        ...config, ...tariffOverride, L, W, H, roomTemp, dT, capacity, doorOpenings,
+        ...config, ...tariffOverride, dTCommodity, cpCommodity, perspirationRate,
+        L, W, H, roomTemp, dT, capacity, doorOpenings,
         equip, cond, defrost, solar, shiftHours: selectedShiftHours, cop: config.copBase
       });
 
@@ -2167,8 +2182,6 @@
         document.getElementById(`admin-panel-${t}`).classList.toggle('hidden', t !== tab);
         const btn = document.getElementById(`admin-tab-${t}`);
         btn.className = (t === tab)
-          const btn = document.getElementById(`admin-tab-${t}`);
-        btn.className = (t === tab)
           ? 'py-3 px-4 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-1.5'
           : 'py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5';
       });
@@ -2176,54 +2189,61 @@
     }
 
     function recalcAdmin() {
-      config.pctCooled = parseFloat(document.getElementById('adm-pct-cool').value) || 0;
-      config.dTCommodity = parseFloat(document.getElementById('adm-dT-comm').value) || 0;
-      config.cpCommodity = parseFloat(document.getElementById('adm-cp-comm').value) || 0;
-      config.perspirationRate = parseFloat(document.getElementById('adm-persp').value) || 0;
-      config.kWallRoof = parseFloat(document.getElementById('adm-k-wall').value) || 0;
-      config.kFloor = parseFloat(document.getElementById('adm-k-floor').value) || 0;
-      config.lightKw = parseFloat(document.getElementById('adm-light-kw').value) || 0;
-      config.lightHrs = parseFloat(document.getElementById('adm-light-hrs').value) || 0;
-      config.doorKjFactor = parseFloat(document.getElementById('adm-door-kj').value) || 0;
-      config.humanCount = parseFloat(document.getElementById('adm-human-cnt').value) || 0;
-      config.humanHrs = parseFloat(document.getElementById('adm-human-hrs').value) || 0;
-      config.safetyFactor = (parseFloat(document.getElementById('adm-safety').value) || 0) / 100;
-      config.copBase = parseFloat(document.getElementById('adm-cop').value) || 0;
+      const prodType = document.getElementById('adm-q1-product-type')?.value || 'unknown';
+      const elDtRule = document.getElementById(`rule-prod-${prodType}-dt`);
+      const elCpRule = document.getElementById(`rule-prod-${prodType}-cp`);
 
-      config.useCustomRules = document.getElementById('chk-use-custom-rules').checked;
-      config.ruleM2PerLight = parseFloat(document.getElementById('rule-m2-per-light').value) || 10;
-      config.ruleM3PerHuman = parseFloat(document.getElementById('rule-m3-per-human').value) || 20;
-      config.ruleLightHrs = parseFloat(document.getElementById('rule-light-hrs').value) || 0;
-      config.ruleHumanHrs = parseFloat(document.getElementById('rule-human-hrs').value) || 0;
-      config.ruleDoorKj = parseFloat(document.getElementById('rule-door-kj').value) || 0;
-      config.ruleHumanKw = parseFloat(document.getElementById('rule-human-kw').value) || 0.27;
+      config.pctCooled = getNumSafe('adm-pct-cool', config.pctCooled || 0);
+      config.dTCommodity = elDtRule
+        ? getNumSafe(`rule-prod-${prodType}-dt`, 0)
+        : getNumSafe('adm-dT-comm', config.dTCommodity || 0);
+      config.cpCommodity = elCpRule
+        ? getNumSafe(`rule-prod-${prodType}-cp`, 0)
+        : getNumSafe('adm-cp-comm', config.cpCommodity || 0);
+      config.perspirationRate = getNumSafe('adm-persp', config.perspirationRate || 0);
+      config.kWallRoof = getNumSafe('adm-k-wall', 0);
+      config.kFloor = getNumSafe('adm-k-floor', 0);
+      config.lightKw = getNumSafe('adm-light-kw', 0);
+      config.lightHrs = getNumSafe('adm-light-hrs', 0);
+      config.doorKjFactor = getNumSafe('adm-door-kj', 0);
+      config.humanCount = getNumSafe('adm-human-cnt', 0);
+      config.humanHrs = getNumSafe('adm-human-hrs', 0);
+      config.safetyFactor = getNumSafe('adm-safety', 0) / 100;
+      config.copBase = getNumSafe('adm-cop', 0);
 
-      config.pPeak = parseFloat(document.getElementById('adm-p-peak').value) || 0;
-      config.pStd = parseFloat(document.getElementById('adm-p-std').value) || 0;
-      config.pOff = parseFloat(document.getElementById('adm-p-off').value) || 0;
+      config.useCustomRules = !!document.getElementById('chk-use-custom-rules')?.checked;
+      config.ruleM2PerLight = getNumSafe('rule-m2-per-light', 10) || 10;
+      config.ruleM3PerHuman = getNumSafe('rule-m3-per-human', 20) || 20;
+      config.ruleLightHrs = getNumSafe('rule-light-hrs', 0);
+      config.ruleHumanHrs = getNumSafe('rule-human-hrs', 0);
+      config.ruleDoorKj = getNumSafe('rule-door-kj', 0);
+      config.ruleHumanKw = getNumSafe('rule-human-kw', 0.27);
 
-      config.iotCost = parseFloat(document.getElementById('adm-iot-cost').value) || 0;
-      config.batShipRate = parseFloat(document.getElementById('adm-bat-ship-rate').value) || 0;
-      config.framePricePerKg = parseFloat(document.getElementById('adm-frame-price-kg').value) || 0;
+      config.pPeak = getNumSafe('adm-p-peak', 0);
+      config.pStd = getNumSafe('adm-p-std', 0);
+      config.pOff = getNumSafe('adm-p-off', 0);
+
+      config.iotCost = getNumSafe('adm-iot-cost', 0);
+      config.batShipRate = getNumSafe('adm-bat-ship-rate', 0);
+      config.framePricePerKg = getNumSafe('adm-frame-price-kg', 0);
       config.frameFormula = `M_bat * ${config.framePricePerKg}`;
-      document.getElementById('adm-frame-formula').value = config.frameFormula;
-      config.frameShipFormula = document.getElementById('adm-frameship-formula').value;
-      config.penjicoPct = (parseFloat(document.getElementById('adm-penjico-pct').value) || 0) / 100;
-      config.markupPct = (parseFloat(document.getElementById('adm-markup-pct').value) || 0) / 100;
+      setValSafe('adm-frame-formula', config.frameFormula);
+      config.frameShipFormula = document.getElementById('adm-frameship-formula')?.value ?? '';
+      config.penjicoPct = getNumSafe('adm-penjico-pct', 0) / 100;
+      config.markupPct = getNumSafe('adm-markup-pct', 0) / 100;
 
-      config.includeFrameShip = document.getElementById('chk-include-frameship').checked;
-      config.roundUpBat = document.getElementById('chk-round-bat').checked;
-      config.penjicoBaseMode = document.getElementById('sel-penjico-base').value;
+      config.includeFrameShip = !!document.getElementById('chk-include-frameship')?.checked;
+      config.roundUpBat = !!document.getElementById('chk-round-bat')?.checked;
+      config.penjicoBaseMode = document.getElementById('sel-penjico-base')?.value || 'all_capex';
 
-      const L = parseFloat(document.getElementById('adm-L').value) || 0;
-      const W = parseFloat(document.getElementById('adm-W').value) || 0;
-      const H = parseFloat(document.getElementById('adm-H').value) || 0;
-      const roomTempVal = parseFloat(document.getElementById('adm-room-temp').value);
-      const roomTemp = isNaN(roomTempVal) ? 0 : roomTempVal;
-      const dT = parseFloat(document.getElementById('adm-dT').value) || 0;
-      const capacity = parseFloat(document.getElementById('adm-cap').value) || 0;
-      const doorOpenings = parseFloat(document.getElementById('adm-door-cnt').value) || 0;
-      const shiftHours = parseFloat(document.getElementById('adm-shift-hrs').value) || 0;
+      const L = getNumSafe('adm-L', 0);
+      const W = getNumSafe('adm-W', 0);
+      const H = getNumSafe('adm-H', 0);
+      const roomTemp = getNumSafe('adm-room-temp', 0);
+      const dT = getNumSafe('adm-dT', 0);
+      const capacity = getNumSafe('adm-cap', 0);
+      const doorOpenings = getNumSafe('adm-door-cnt', 0);
+      const shiftHours = getNumSafe('adm-shift-hrs', 0);
 
       const res = runEngineeringCalculation({
         ...config, L, W, H, roomTemp, dT, capacity, doorOpenings,
@@ -2248,9 +2268,26 @@
       document.getElementById('out-q6').textContent = res.qDoor.toFixed(2);
       document.getElementById('out-q7').textContent = res.qHuman.toFixed(2);
 
-      document.getElementById('out-q-comm').textContent = (res.qComm1 + res.qComm2).toFixed(2) + ' kWh/ngày';
-      document.getElementById('out-q-env').textContent = (res.qWallsRoof + res.qFloor).toFixed(2) + ' kWh/ngày';
-      document.getElementById('out-q-int').textContent = (res.qLight + res.qDoor + res.qHuman).toFixed(2) + ' kWh/ngày';
+      const q1CardEl = document.getElementById('out-q1-card');
+      if (q1CardEl) q1CardEl.textContent = res.qComm1.toFixed(2) + ' kWh/ngày';
+      const q1LiveEl = document.getElementById('out-q1-live-calc');
+      if (q1LiveEl) {
+        q1LiveEl.textContent = `Q1 = (${capacity} × ${config.pctCooled} × ${config.dTCommodity} × ${config.cpCommodity}) / 3600 = ${res.qComm1.toFixed(2)} kWh/ngày`;
+      }
+
+      const q2CardEl = document.getElementById('out-q2-card');
+      if (q2CardEl) q2CardEl.textContent = res.qComm2.toFixed(2) + ' kWh/ngày';
+      const q3CardEl = document.getElementById('out-q3-card');
+      if (q3CardEl) q3CardEl.textContent = res.qWallsRoof.toFixed(2) + ' kWh/ngày';
+      const q4CardEl = document.getElementById('out-q4-card');
+      if (q4CardEl) q4CardEl.textContent = res.qFloor.toFixed(2) + ' kWh/ngày';
+      const q5CardEl = document.getElementById('out-q5-card');
+      if (q5CardEl) q5CardEl.textContent = res.qLight.toFixed(2) + ' kWh/ngày';
+      const q6CardEl = document.getElementById('out-q6-card');
+      if (q6CardEl) q6CardEl.textContent = res.qDoor.toFixed(2) + ' kWh/ngày';
+      const q7CardEl = document.getElementById('out-q7-card');
+      if (q7CardEl) q7CardEl.textContent = res.qHuman.toFixed(2) + ' kWh/ngày';
+
       document.getElementById('out-q-sum').textContent = res.qSum.toFixed(2) + ' kWh/ngày';
       document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
 
@@ -2278,7 +2315,7 @@
       document.getElementById('tbl-c3').textContent = fmtVND(res.c3_shipBat) + ' đ';
       document.getElementById('out-vox-cost').textContent = fmtVND(res.t1_totalVox) + ' đ';
 
-      document.getElementById('adm-frame-pcm-kg').value = res.batWeight.toFixed(2);
+      setValSafe('adm-frame-pcm-kg', res.batWeight.toFixed(2));
       document.getElementById('adm-frameship-formula').classList.toggle('formula-error', res.c5Error);
       document.getElementById('tbl-c4').textContent = fmtVND(res.c4_frameCost) + ' đ';
       document.getElementById('tbl-c5').textContent = fmtVND(res.c5_frameShip) + ' đ';
@@ -2300,9 +2337,9 @@
     }
 
     function updateCashflowAndSensitivity(res) {
-      const opexPct = (parseFloat(document.getElementById('adm-opex-pct').value) || 0) / 100;
-      const infPct = (parseFloat(document.getElementById('adm-inf-pct').value) || 0) / 100;
-      const discPct = (parseFloat(document.getElementById('adm-disc-pct').value) || 0) / 100;
+      const opexPct = getNumSafe('adm-opex-pct', 0) / 100;
+      const infPct = getNumSafe('adm-inf-pct', 0) / 100;
+      const discPct = getNumSafe('adm-disc-pct', 0) / 100;
 
       const tbody = document.getElementById('sensitivity-tbody');
       tbody.innerHTML = '';
@@ -2397,14 +2434,14 @@
       const leads = JSON.parse(localStorage.getItem('voxcool_leads') || '[]');
       const l = leads[idx];
       if (!l) return;
-      document.getElementById('adm-L').value = l.data.L;
-      document.getElementById('adm-W').value = l.data.W;
-      document.getElementById('adm-H').value = l.data.H;
-      if (l.data.roomTemp !== undefined) document.getElementById('adm-room-temp').value = l.data.roomTemp;
-      document.getElementById('adm-dT').value = l.data.dT;
-      document.getElementById('adm-cap').value = l.data.capacity;
-      document.getElementById('adm-door-cnt').value = l.data.doorOpenings;
-      if (l.data.shiftHours !== undefined) document.getElementById('adm-shift-hrs').value = l.data.shiftHours;
+      setValSafe('adm-L', l.data.L);
+      setValSafe('adm-W', l.data.W);
+      setValSafe('adm-H', l.data.H);
+      if (l.data.roomTemp !== undefined) setValSafe('adm-room-temp', l.data.roomTemp);
+      setValSafe('adm-dT', l.data.dT);
+      setValSafe('adm-cap', l.data.capacity);
+      setValSafe('adm-door-cnt', l.data.doorOpenings);
+      if (l.data.shiftHours !== undefined) setValSafe('adm-shift-hrs', l.data.shiftHours);
       switchAdminTab('calc');
       recalcAdmin();
     }
@@ -2413,6 +2450,7 @@
       localStorage.removeItem('voxcool_leads');
       renderLeadsTable();
     }
+
     loadSavedFixedConfig();
     recalcAdmin();
     renderLeadsTable();
