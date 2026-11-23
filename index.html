@@ -574,29 +574,33 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <div class="bg-indigo-50/40 border border-indigo-100 rounded-lg p-3 space-y-1.5">
             <div class="font-bold text-indigo-900">Quy định Đèn theo diện tích sàn</div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
               <input type="number" step="0.5" min="0.1" id="rule-m2-per-light" value="10" oninput="recalcAdmin()" class="w-20 px-2 py-1 border rounded font-bold bg-white">
               <span class="text-slate-600">m² / 1 đèn</span>
+              <button type="button" onclick="toggleSingleLock('rule-m2-per-light')" id="lock-btn-rule-m2-per-light" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
             </div>
             <div class="text-[11px] text-slate-600">Số đèn quy ra: <strong id="out-rule-lights" class="text-indigo-800">1 đèn</strong></div>
           </div>
 
           <div class="bg-indigo-50/40 border border-indigo-100 rounded-lg p-3 space-y-1.5">
             <div class="font-bold text-indigo-900">Quy định Người theo thể tích kho</div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
               <input type="number" step="1" min="1" id="rule-m3-per-human" value="20" oninput="recalcAdmin()" class="w-20 px-2 py-1 border rounded font-bold bg-white">
               <span class="text-slate-600">m³ / 1 người</span>
+              <button type="button" onclick="toggleSingleLock('rule-m3-per-human')" id="lock-btn-rule-m3-per-human" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
             </div>
             <div class="text-[11px] text-slate-600">Số người quy ra: <strong id="out-rule-humans" class="text-indigo-800">1 người</strong></div>
           </div>
 
           <div class="bg-indigo-50/40 border border-indigo-100 rounded-lg p-3 space-y-1.5">
             <div class="font-bold text-indigo-900">Giờ vận hành đèn & người / ngày</div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center flex-wrap gap-1.5">
               <span class="text-[11px] text-slate-500">Đèn:</span>
-              <input type="number" step="0.5" id="rule-light-hrs" value="14" oninput="recalcAdmin()" class="w-16 px-1.5 py-1 border rounded font-bold bg-white">
+              <input type="number" step="0.5" id="rule-light-hrs" value="14" oninput="recalcAdmin()" class="w-14 px-1.5 py-1 border rounded font-bold bg-white">
+              <button type="button" onclick="toggleSingleLock('rule-light-hrs')" id="lock-btn-rule-light-hrs" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
               <span class="text-[11px] text-slate-500">Người:</span>
-              <input type="number" step="0.5" id="rule-human-hrs" value="5" oninput="recalcAdmin()" class="w-16 px-1.5 py-1 border rounded font-bold bg-white">
+              <input type="number" step="0.5" id="rule-human-hrs" value="5" oninput="recalcAdmin()" class="w-14 px-1.5 py-1 border rounded font-bold bg-white">
+              <button type="button" onclick="toggleSingleLock('rule-human-hrs')" id="lock-btn-rule-human-hrs" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
               <span class="text-[11px] text-slate-500">h</span>
             </div>
             <div class="text-[11px] text-slate-600">Công suất đèn: <strong id="out-rule-light-kw" class="text-indigo-800">0.4 kW</strong></div>
@@ -604,11 +608,13 @@
 
           <div class="bg-indigo-50/40 border border-indigo-100 rounded-lg p-3 space-y-1.5">
             <div class="font-bold text-indigo-900">Hệ số mở cửa & Nhiệt người</div>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center flex-wrap gap-1.5">
               <span class="text-[11px] text-slate-500">kJ:</span>
-              <input type="number" step="0.5" id="rule-door-kj" value="30" oninput="recalcAdmin()" class="w-16 px-1.5 py-1 border rounded font-bold bg-white">
+              <input type="number" step="0.5" id="rule-door-kj" value="30" oninput="recalcAdmin()" class="w-14 px-1.5 py-1 border rounded font-bold bg-white">
+              <button type="button" onclick="toggleSingleLock('rule-door-kj')" id="lock-btn-rule-door-kj" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
               <span class="text-[11px] text-slate-500">kW/ng:</span>
-              <input type="number" step="0.01" id="rule-human-kw" value="0.27" oninput="recalcAdmin()" class="w-16 px-1.5 py-1 border rounded font-bold bg-white">
+              <input type="number" step="0.01" id="rule-human-kw" value="0.27" oninput="recalcAdmin()" class="w-14 px-1.5 py-1 border rounded font-bold bg-white">
+              <button type="button" onclick="toggleSingleLock('rule-human-kw')" id="lock-btn-rule-human-kw" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
             </div>
             <div class="text-[11px] text-slate-600">Nhịp mở cửa chuẩn: <strong id="out-rule-door-ref" class="text-indigo-800">10 lần/ngày</strong></div>
           </div>
@@ -635,13 +641,13 @@
                   <td class="p-2.5 font-semibold text-slate-800">Thủy hải sản / Thịt cấp đông</td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.5" id="rule-prod-frozen_meat-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.5" id="rule-prod-frozen_meat-dt" value="8" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-frozen_meat-dt')" id="lock-btn-rule-prod-frozen_meat-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-frozen_meat-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-frozen_meat-cp" value="1.7" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-frozen_meat-cp')" id="lock-btn-rule-prod-frozen_meat-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
@@ -656,13 +662,13 @@
                   <td class="p-2.5 font-semibold text-slate-800">Thực phẩm chế biến / Kem / Sữa</td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.5" id="rule-prod-processed-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.5" id="rule-prod-processed-dt" value="6" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-processed-dt')" id="lock-btn-rule-prod-processed-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-processed-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-processed-cp" value="3.3" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-processed-cp')" id="lock-btn-rule-prod-processed-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
@@ -677,19 +683,19 @@
                   <td class="p-2.5 font-semibold text-slate-800">Rau củ quả / Nông sản</td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.5" id="rule-prod-produce-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.5" id="rule-prod-produce-dt" value="15" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-produce-dt')" id="lock-btn-rule-prod-produce-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-produce-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-produce-cp" value="3.7" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-produce-cp')" id="lock-btn-rule-prod-produce-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-produce-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-produce-persp" value="2" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-produce-persp')" id="lock-btn-rule-prod-produce-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
@@ -698,19 +704,19 @@
                   <td class="p-2.5 font-semibold text-slate-800">Chưa có thông tin / Hỗn hợp</td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.5" id="rule-prod-unknown-dt" value="5" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.5" id="rule-prod-unknown-dt" value="8" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-unknown-dt')" id="lock-btn-rule-prod-unknown-dt" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-unknown-cp" value="4.0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-unknown-cp" value="3.2" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-unknown-cp')" id="lock-btn-rule-prod-unknown-cp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
                   <td class="p-2">
                     <div class="flex items-center gap-1.5">
-                      <input type="number" step="0.1" id="rule-prod-unknown-persp" value="0" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
+                      <input type="number" step="0.1" id="rule-prod-unknown-persp" value="1" oninput="recalcAdmin()" class="w-28 px-2 py-1 border rounded font-bold bg-white">
                       <button type="button" onclick="toggleSingleLock('rule-prod-unknown-persp')" id="lock-btn-rule-prod-unknown-persp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                     </div>
                   </td>
