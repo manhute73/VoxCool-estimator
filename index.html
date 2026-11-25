@@ -2342,18 +2342,53 @@
         q1LiveEl.textContent = `Q1 = (${capacity} × ${config.pctCooled} × ${config.dTCommodity} × ${config.cpCommodity}) / 3600 = ${res.qComm1.toFixed(2)} kWh/ngày`;
       }
 
-      const q2CardEl = document.getElementById('out-q2-card');
-      if (q2CardEl) q2CardEl.textContent = res.qComm2.toFixed(2) + ' kWh/ngày';
-      const q3CardEl = document.getElementById('out-q3-card');
-      if (q3CardEl) q3CardEl.textContent = res.qWallsRoof.toFixed(2) + ' kWh/ngày';
-      const q4CardEl = document.getElementById('out-q4-card');
-      if (q4CardEl) q4CardEl.textContent = res.qFloor.toFixed(2) + ' kWh/ngày';
-      const q5CardEl = document.getElementById('out-q5-card');
-      if (q5CardEl) q5CardEl.textContent = res.qLight.toFixed(2) + ' kWh/ngày';
-      const q6CardEl = document.getElementById('out-q6-card');
-      if (q6CardEl) q6CardEl.textContent = res.qDoor.toFixed(2) + ' kWh/ngày';
-      const q7CardEl = document.getElementById('out-q7-card');
-      if (q7CardEl) q7CardEl.textContent = res.qHuman.toFixed(2) + ' kWh/ngày';
+const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      const setText = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+
+      // Đồng bộ nhóm hàng hóa Q2 theo Q1
+      const prodQ1El = document.getElementById('adm-q1-product-type');
+      if (prodQ1El) setVal('adm-q2-product-type', prodQ1El.value);
+
+      // Tính giá trị thực tế đang dùng cho Q5, Q6, Q7
+      const effLightKw = config.useCustomRules ? (res.ruleLights * (config.lightKw || 0.4)) : (config.lightKw || 0.4);
+      const effLightHrs = config.useCustomRules ? config.ruleLightHrs : config.lightHrs;
+      const effDoorKj = config.useCustomRules ? config.ruleDoorKj : config.doorKjFactor;
+      const effHumanCnt = config.useCustomRules ? res.ruleHumans : config.humanCount;
+      const effHumanHrs = config.useCustomRules ? config.ruleHumanHrs : config.humanHrs;
+      const effHumanKw = config.useCustomRules ? (config.ruleHumanKw || 0.27) : (config.humanKw || 0.27);
+      const effDoorVol = Math.round(res.volume) * 0.5;
+
+      // Q2
+      setText('out-q2-card', res.qComm2.toFixed(2) + ' kWh/ngày');
+      setText('out-q2-live-calc', `Q2 = (${capacity} × ${config.perspirationRate}) / 3600 = ${res.qComm2.toFixed(2)} kWh/ngày`);
+
+      // Q3
+      setText('out-q3-card', res.qWallsRoof.toFixed(2) + ' kWh/ngày');
+      setVal('adm-q3-awall-disp', res.areaWallsRoof.toFixed(2));
+      setVal('adm-q3-dt-disp', dT);
+      setText('out-q3-live-calc', `Q3 = (${res.areaWallsRoof.toFixed(2)} × ${dT} × ${config.kWallRoof} / 1000) × 24 = ${res.qWallsRoof.toFixed(2)} kWh/ngày`);
+
+      // Q4
+      setText('out-q4-card', res.qFloor.toFixed(2) + ' kWh/ngày');
+      setVal('adm-q4-afloor-disp', res.areaFloor.toFixed(2));
+      setVal('adm-q4-dt-disp', dT);
+      setText('out-q4-live-calc', `Q4 = (${res.areaFloor.toFixed(2)} × ${dT} × ${config.kFloor} / 1000) × 24 = ${res.qFloor.toFixed(2)} kWh/ngày`);
+
+      // Q5
+      setText('out-q5-card', res.qLight.toFixed(2) + ' kWh/ngày');
+      setVal('adm-light-kw', effLightKw.toFixed(2));
+      setText('out-q5-live-calc', `Q5 = ${effLightKw.toFixed(2)} × ${effLightHrs} = ${res.qLight.toFixed(2)} kWh/ngày`);
+
+      // Q6
+      setText('out-q6-card', res.qDoor.toFixed(2) + ' kWh/ngày');
+      setVal('adm-q6-vdoor-disp', effDoorVol.toFixed(1));
+      setText('out-q6-live-calc', `Q6 = (${doorOpenings} × ${effDoorVol.toFixed(1)} × ${effDoorKj} × ${dT}) / 3600 = ${res.qDoor.toFixed(2)} kWh/ngày`);
+
+      // Q7
+      setText('out-q7-card', res.qHuman.toFixed(2) + ' kWh/ngày');
+      setVal('adm-human-cnt', effHumanCnt);
+      setVal('adm-q7-kw-disp', effHumanKw);
+      setText('out-q7-live-calc', `Q7 = ${effHumanCnt} × ${effHumanHrs} × ${effHumanKw} = ${res.qHuman.toFixed(2)} kWh/ngày`);
 
       document.getElementById('out-q-sum').textContent = res.qSum.toFixed(2) + ' kWh/ngày';
       document.getElementById('out-q-total').textContent = res.qTotal.toFixed(2) + ' kWh/ngày';
