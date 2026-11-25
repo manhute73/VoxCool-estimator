@@ -871,33 +871,40 @@
             </div>
           </div>
 
-          <!-- 2.5: Q5 Đèn chiếu sáng -->
+<!-- 2.5: Q5 Đèn chiếu sáng -->
           <div class="border border-slate-200 rounded-lg p-4 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-emerald-700 uppercase">2.5. Nhiệt đèn chiếu sáng (Q5)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q5-card">0.00 kWh/ngày</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <div class="flex items-center justify-between">
-                  <label class="text-[10px] text-slate-600 font-bold">Công suất đèn P_đèn (kW)</label>
-                  <button type="button" onclick="toggleSingleLock('adm-light-kw')" id="lock-btn-adm-light-kw" class="text-[11px]">🔒</button>
+                  <label class="text-[10px] text-slate-600 font-bold">Số lượng đèn (N_đèn)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-light-cnt')" id="lock-btn-adm-light-cnt" class="text-[11px]">🔒</button>
                 </div>
-                <input type="number" step="0.05" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+                <input type="number" step="1" id="adm-light-cnt" value="1" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
               </div>
               <div>
                 <div class="flex items-center justify-between">
-                  <label class="text-[10px] text-slate-600 font-bold">Thời gian bật đèn t_đèn (giờ/ngày)</label>
+                  <label class="text-[10px] text-slate-600 font-bold">Công suất 1 đèn (kW)</label>
+                  <button type="button" onclick="toggleSingleLock('adm-light-kw')" id="lock-btn-adm-light-kw" class="text-[11px]">🔒</button>
+                </div>
+                <input type="number" step="0.01" id="adm-light-kw" value="0.4" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
+              </div>
+              <div>
+                <div class="flex items-center justify-between">
+                  <label class="text-[10px] text-slate-600 font-bold">Thời gian bật t_đèn (giờ/ngày)</label>
                   <button type="button" onclick="toggleSingleLock('adm-light-hrs')" id="lock-btn-adm-light-hrs" class="text-[11px]">🔒</button>
                 </div>
                 <input type="number" step="0.5" id="adm-light-hrs" value="14" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border rounded text-xs font-bold">
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-- Q5 (Đèn) = P_đèn × t_đèn
+- Q5 (Đèn) = N_đèn × P_1 đèn × t_đèn
             </div>
             <div id="out-q5-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
-              Q5 = 0.40 × 14 = 5.60 kWh/ngày
+              Q5 = 1 × 0.40 × 14 = 5.60 kWh/ngày
             </div>
           </div>
 
@@ -1927,14 +1934,15 @@
       const ruleLights = areaFloor > 0 ? Math.max(1, Math.ceil(areaFloor / m2PerLight)) : 1;
       const ruleHumans = volume > 0 ? Math.max(1, Math.ceil(volume / m3PerHuman)) : 1;
 
-      const effectiveLightKw = params.useCustomRules ? (ruleLights * (Number(params.lightKw) || 0.4)) : Number(params.lightKw);
+      const effectiveLightCount = params.useCustomRules ? ruleLights : (Number(params.lightCount) || 1);
+      const effectiveLightKw = Number(params.lightKw) || 0.4;
       const effectiveLightHrs = params.useCustomRules ? (Number(params.ruleLightHrs) || 0) : Number(params.lightHrs);
       const effectiveDoorKj = params.useCustomRules ? (Number(params.ruleDoorKj) || 0) : Number(params.doorKjFactor);
       const effectiveHumanCount = params.useCustomRules ? ruleHumans : Number(params.humanCount);
       const effectiveHumanHrs = params.useCustomRules ? (Number(params.ruleHumanHrs) || 0) : Number(params.humanHrs);
       const effectiveHumanKw = params.useCustomRules ? (Number(params.ruleHumanKw) || 0.27) : Number(params.humanKw);
 
-      const qLight = 1 * effectiveLightKw * effectiveLightHrs;
+     const qLight = effectiveLightCount * effectiveLightKw * effectiveLightHrs;
       const doorVol = Math.round(volume) * 0.5;
       const qDoor = (Number(params.doorOpenings) * doorVol * effectiveDoorKj * dT) / 3600;
       const qHuman = effectiveHumanCount * effectiveHumanHrs * effectiveHumanKw;
@@ -2281,6 +2289,7 @@ function recalcAdmin() {
       }
       config.kWallRoof = getNumSafe('adm-k-wall', 0);
       config.kFloor = getNumSafe('adm-k-floor', 0);
+  config.lightCount = getNumSafe('adm-light-cnt', 1);
       config.lightKw = getNumSafe('adm-light-kw', 0);
       config.lightHrs = getNumSafe('adm-light-hrs', 0);
       config.doorKjFactor = getNumSafe('adm-door-kj', 0);
@@ -2385,10 +2394,13 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       setVal('adm-q4-dt-disp', dT);
       setText('out-q4-live-calc', `Q4 = (${res.areaFloor.toFixed(2)} × ${dT} × ${config.kFloor} / 1000) × 24 = ${res.qFloor.toFixed(2)} kWh/ngày`);
 
-      // Q5
+     // Q5
+      const effLightCnt = config.useCustomRules ? res.ruleLights : (config.lightCount || 1);
+      const effLightKw = config.lightKw || 0.4;
       setText('out-q5-card', res.qLight.toFixed(2) + ' kWh/ngày');
+      setVal('adm-light-cnt', effLightCnt);
       setVal('adm-light-kw', effLightKw.toFixed(2));
-      setText('out-q5-live-calc', `Q5 = ${effLightKw.toFixed(2)} × ${effLightHrs} = ${res.qLight.toFixed(2)} kWh/ngày`);
+      setText('out-q5-live-calc', `Q5 = ${effLightCnt} × ${effLightKw.toFixed(2)} × ${effLightHrs} = ${res.qLight.toFixed(2)} kWh/ngày`);
 
       // Q6
       setText('out-q6-card', res.qDoor.toFixed(2) + ' kWh/ngày');
