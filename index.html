@@ -724,6 +724,81 @@
               </tbody>
             </table>
           </div>
+          <!-- BẢNG HỆ SỐ TỶ LỆ THỂ TÍCH KHÔNG KHÍ TRAO ĐỔI MỖI LẦN MỞ CỬA -->
+          <div class="border border-indigo-100 rounded-lg overflow-hidden text-xs">
+            <div class="bg-indigo-50/70 px-3.5 py-2 font-bold text-indigo-950 flex flex-wrap items-center justify-between gap-2">
+              <span>Bảng tổng hợp hệ số tỷ lệ thể tích không khí trao đổi mỗi lần mở cửa (α)</span>
+              <span class="text-[11px] font-normal text-slate-600">Tự động áp dụng ở Q6 theo thể tích kho (V) & giải pháp chắn cửa • Bấm 🔒/🔓 để khóa hoặc mở từng ô</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-700 border-b border-indigo-100">
+                    <th class="p-2.5">Phân khúc quy mô kho</th>
+                    <th class="p-2.5">Thể tích tham chiếu (V)</th>
+                    <th class="p-2.5 w-60">Có rèm nhựa PVC (hệ số α)</th>
+                    <th class="p-2.5 w-60">Có phòng đệm / Airlock (hệ số α)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                  <tr>
+                    <td class="p-2.5 font-semibold text-slate-800">Kho nhỏ</td>
+                    <td class="p-2.5 text-slate-600 font-medium">&lt; 100 m³</td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-small-pvc" value="0.55" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(55%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-small-pvc')" id="lock-btn-rule-door-small-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-small-airlock" value="0.325" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(32.5%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-small-airlock')" id="lock-btn-rule-door-small-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-semibold text-slate-800">Kho trung bình</td>
+                    <td class="p-2.5 text-slate-600 font-medium">100 – 500 m³</td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-med-pvc" value="0.40" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(40%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-med-pvc')" id="lock-btn-rule-door-med-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-med-airlock" value="0.20" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(20%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-med-airlock')" id="lock-btn-rule-door-med-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-semibold text-slate-800">Kho lớn</td>
+                    <td class="p-2.5 text-slate-600 font-medium">&gt; 500 m³</td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-large-pvc" value="0.20" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(20%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-large-pvc')" id="lock-btn-rule-door-large-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                    <td class="p-2">
+                      <div class="flex items-center gap-1.5">
+                        <input type="number" step="0.005" min="0" max="1" id="rule-door-large-airlock" value="0.115" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
+                        <span class="text-[11px] text-slate-500">(11.5%)</span>
+                        <button type="button" onclick="toggleSingleLock('rule-door-large-airlock')" id="lock-btn-rule-door-large-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -908,19 +983,26 @@
             </div>
           </div>
 
-          <!-- 2.6: Q6 Mở cửa -->
+        <!-- 2.6: Q6 Mở cửa -->
           <div class="border border-slate-200 rounded-lg p-4 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-xs font-bold text-emerald-700 uppercase">2.6. Nhiệt thông gió / Mở cửa (Q6)</span>
               <span class="text-xs font-bold text-slate-900" id="out-q6-card">0.00 kWh/ngày</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div>
                 <label class="block text-[10px] text-sky-700 font-bold">Số lần mở cửa (lần/ngày)</label>
                 <input type="number" id="adm-door-cnt" value="10" oninput="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-sky-300 bg-sky-50/40 rounded text-xs font-bold">
               </div>
               <div>
-                <label class="block text-[10px] text-slate-500 font-bold">Thể tích 0.5×V (m³)</label>
+                <label class="block text-[10px] text-indigo-700 font-bold">Giải pháp chắn cửa</label>
+                <select id="adm-door-shield" onchange="recalcAdmin()" class="w-full mt-0.5 px-2 py-1 border border-indigo-300 bg-indigo-50/40 rounded text-xs font-bold text-slate-800">
+                  <option value="pvc">Có rèm nhựa PVC</option>
+                  <option value="airlock">Có phòng đệm / Airlock</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500 font-bold" id="lbl-q6-vdoor">Thể tích α×V (m³)</label>
                 <input type="text" id="adm-q6-vdoor-disp" value="4.0" readonly class="w-full mt-0.5 px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-slate-700 cursor-not-allowed">
               </div>
               <div>
@@ -932,7 +1014,7 @@
               </div>
             </div>
             <div class="formula-box text-[11px] bg-slate-50 p-2 rounded text-slate-600">
-- Q6 (Mở cửa) = (Số lần × 0.5×V × Hệ số kJ × ΔT) / 3600
+- Q6 (Mở cửa) = (Số lần × (α × V) × Hệ số kJ × ΔT) / 3600
             </div>
             <div id="out-q6-live-calc" class="text-[11px] font-semibold text-emerald-900 bg-emerald-50/70 border border-emerald-200 px-2.5 py-1.5 rounded">
               Q6 = (10 × 4.0 × 30 × 60) / 3600 = 20.00 kWh/ngày
@@ -1943,7 +2025,16 @@
       const effectiveHumanKw = params.useCustomRules ? (Number(params.ruleHumanKw) || 0.27) : Number(params.humanKw);
 
      const qLight = effectiveLightCount * effectiveLightKw * effectiveLightHrs;
-      const doorVol = Math.round(volume) * 0.5;
+     const shieldType = params.doorShield || 'pvc';
+      let doorAlpha = 0.5;
+      if (volume < 100) {
+        doorAlpha = shieldType === 'airlock' ? (Number(params.ruleDoorSmallAirlock) || 0.325) : (Number(params.ruleDoorSmallPvc) || 0.55);
+      } else if (volume <= 500) {
+        doorAlpha = shieldType === 'airlock' ? (Number(params.ruleDoorMedAirlock) || 0.20) : (Number(params.ruleDoorMedPvc) || 0.40);
+      } else {
+        doorAlpha = shieldType === 'airlock' ? (Number(params.ruleDoorLargeAirlock) || 0.115) : (Number(params.ruleDoorLargePvc) || 0.20);
+      }
+      const doorVol = Math.round(volume) * doorAlpha;
       const qDoor = (Number(params.doorOpenings) * doorVol * effectiveDoorKj * dT) / 3600;
       const qHuman = effectiveHumanCount * effectiveHumanHrs * effectiveHumanKw;
 
@@ -2027,7 +2118,7 @@
       const paybackYears = savingsYear > 0 ? (finalQuote / savingsYear) : 99;
 
       return {
-        volume, areaWallsRoof, areaFloor, ruleLights, ruleHumans,
+        volume, areaWallsRoof, areaFloor, ruleLights, ruleHumans, doorAlpha, doorVol,
         qComm1, qComm2, qWallsRoof, qFloor, qLight, qDoor, qHuman,
         qSum, qTotal, eDay, eMonth, costBaseMonth, costBaseYear,
         savingsYear, pctSavings, selectedPcm,
@@ -2305,6 +2396,13 @@ function recalcAdmin() {
       config.ruleHumanHrs = getNumSafe('rule-human-hrs', 0);
       config.ruleDoorKj = getNumSafe('rule-door-kj', 0);
       config.ruleHumanKw = getNumSafe('rule-human-kw', 0.27);
+  config.doorShield = document.getElementById('adm-door-shield')?.value || 'pvc';
+      config.ruleDoorSmallPvc = getNumSafe('rule-door-small-pvc', 0.55);
+      config.ruleDoorSmallAirlock = getNumSafe('rule-door-small-airlock', 0.325);
+      config.ruleDoorMedPvc = getNumSafe('rule-door-med-pvc', 0.40);
+      config.ruleDoorMedAirlock = getNumSafe('rule-door-med-airlock', 0.20);
+      config.ruleDoorLargePvc = getNumSafe('rule-door-large-pvc', 0.20);
+      config.ruleDoorLargeAirlock = getNumSafe('rule-door-large-airlock', 0.115);
 
       config.pPeak = getNumSafe('adm-p-peak', 0);
       config.pStd = getNumSafe('adm-p-std', 0);
@@ -2401,10 +2499,13 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       setVal('adm-light-kw', effLightKw.toFixed(2));
       setText('out-q5-live-calc', `Q5 = ${effLightCnt} × ${effLightKw.toFixed(2)} × ${effLightHrs} = ${res.qLight.toFixed(2)} kWh/ngày`);
 
-      // Q6
+    // Q6
+      const effDoorAlpha = res.doorAlpha ?? 0.5;
+      const effDoorVolNew = res.doorVol ?? (Math.round(res.volume) * effDoorAlpha);
       setText('out-q6-card', res.qDoor.toFixed(2) + ' kWh/ngày');
-      setVal('adm-q6-vdoor-disp', effDoorVol.toFixed(1));
-      setText('out-q6-live-calc', `Q6 = (${doorOpenings} × ${effDoorVol.toFixed(1)} × ${effDoorKj} × ${dT}) / 3600 = ${res.qDoor.toFixed(2)} kWh/ngày`);
+      setText('lbl-q6-vdoor', `Thể tích α×V (α = ${effDoorAlpha}) (m³)`);
+      setVal('adm-q6-vdoor-disp', effDoorVolNew.toFixed(1));
+      setText('out-q6-live-calc', `Q6 = (${doorOpenings} × ${effDoorVolNew.toFixed(1)} × ${effDoorKj} × ${dT}) / 3600 = ${res.qDoor.toFixed(2)} kWh/ngày`);
 
       // Q7
       setText('out-q7-card', res.qHuman.toFixed(2) + ' kWh/ngày');
