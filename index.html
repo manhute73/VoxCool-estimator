@@ -2255,10 +2255,14 @@
       if (tab === 'cashflow') recalcAdmin();
     }
 
-    function recalcAdmin() {
+function recalcAdmin() {
       const prodType = document.getElementById('adm-q1-product-type')?.value || 'unknown';
       const elDtRule = document.getElementById(`rule-prod-${prodType}-dt`);
       const elCpRule = document.getElementById(`rule-prod-${prodType}-cp`);
+      const elPerspRule = document.getElementById(`rule-prod-${prodType}-persp`);
+
+      const q2ProdEl = document.getElementById('adm-q2-product-type');
+      if (q2ProdEl) q2ProdEl.value = prodType;
 
       config.pctCooled = getNumSafe('adm-pct-cool', config.pctCooled || 0);
       config.dTCommodity = elDtRule
@@ -2267,7 +2271,14 @@
       config.cpCommodity = elCpRule
         ? getNumSafe(`rule-prod-${prodType}-cp`, 0)
         : getNumSafe('adm-cp-comm', config.cpCommodity || 0);
-      config.perspirationRate = getNumSafe('adm-persp', config.perspirationRate || 0);
+
+      const perspInputEl = document.getElementById('adm-persp');
+      if (perspInputEl && perspInputEl.disabled && elPerspRule) {
+        config.perspirationRate = getNumSafe(`rule-prod-${prodType}-persp`, 0);
+        perspInputEl.value = config.perspirationRate;
+      } else {
+        config.perspirationRate = getNumSafe('adm-persp', config.perspirationRate || 0);
+      }
       config.kWallRoof = getNumSafe('adm-k-wall', 0);
       config.kFloor = getNumSafe('adm-k-floor', 0);
       config.lightKw = getNumSafe('adm-light-kw', 0);
