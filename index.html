@@ -2370,7 +2370,8 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       if (prodQ1El) setVal('adm-q2-product-type', prodQ1El.value);
 
       // Tính giá trị thực tế đang dùng cho Q5, Q6, Q7
-      const effLightKw = config.useCustomRules ? (res.ruleLights * (config.lightKw || 0.4)) : (config.lightKw || 0.4);
+     const effLightCnt = config.useCustomRules ? res.ruleLights : (config.lightCount || 1);
+      const effLightKw = config.lightKw || 0.4;
       const effLightHrs = config.useCustomRules ? config.ruleLightHrs : config.lightHrs;
       const effDoorKj = config.useCustomRules ? config.ruleDoorKj : config.doorKjFactor;
       const effHumanCnt = config.useCustomRules ? res.ruleHumans : config.humanCount;
@@ -2395,8 +2396,6 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       setText('out-q4-live-calc', `Q4 = (${res.areaFloor.toFixed(2)} × ${dT} × ${config.kFloor} / 1000) × 24 = ${res.qFloor.toFixed(2)} kWh/ngày`);
 
      // Q5
-      const effLightCnt = config.useCustomRules ? res.ruleLights : (config.lightCount || 1);
-      const effLightKw = config.lightKw || 0.4;
       setText('out-q5-card', res.qLight.toFixed(2) + ' kWh/ngày');
       setVal('adm-light-cnt', effLightCnt);
       setVal('adm-light-kw', effLightKw.toFixed(2));
