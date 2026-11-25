@@ -443,33 +443,25 @@
         <p class="text-xs text-slate-400 mt-1" id="admin-save-timestamp">Bấm biểu tượng ổ khóa trên từng ô để khóa/mở thông số đó, sau đó bấm LƯU CẤU HÌNH CỐ ĐỊNH.</p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="exportConfigJson()"
-          class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-sm">
-          Xuất JSON
-        </button>
-        <label class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-bold shadow-sm cursor-pointer">
-          Nhập JSON
-          <input type="file" id="import-json-input" accept=".json" onchange="importConfigJson(event)" class="hidden">
-        </label>
-        <button onclick="window.print()"
-          class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold">
-          In bảng tính
-        </button>
-        <button onclick="resetAdminInputsToZero()"
-          class="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-sm">
-          RESTART
-        </button>
-        <button onclick="resetFactoryDefaults()"
-          class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-semibold">
-          Khôi phục mặc định gốc
-        </button>
-        <button onclick="saveFixedConfig()"
-          class="px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold shadow-lg flex items-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-          LƯU CẤU HÌNH CỐ ĐỊNH
-        </button>
-      </div>
+     <div class="flex flex-wrap items-center gap-2">
+      <button type="button" onclick="resetAdminInputsToZero()"
+        class="px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold shadow-sm">
+        RESTART
+      </button>
+      <button type="button" id="btn-undo-restart" onclick="undoRestartAdmin()" disabled
+        class="px-3.5 py-2 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 text-xs font-semibold cursor-not-allowed transition">
+        ↩ Hoàn tác Restart
+      </button>
+      <button type="button" onclick="saveAdminDraftConfig()"
+        class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-extrabold shadow-md flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        LƯU CẤU HÌNH CỐ ĐỊNH
+      </button>
+      <button type="button" onclick="syncConfigToClient()"
+        class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold shadow-lg flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        ĐỒNG BỘ SANG KHÁCH HÀNG
+      </button>
     </div>
 
     <!-- Admin Sub-Tabs -->
@@ -1939,16 +1931,48 @@
       document.getElementById('lbl-cust-off').textContent = config.pOff.toLocaleString('vi-VN') + ' đ/kWh';
     }
 
-    function saveFixedConfig() {
+const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
+    let lastRestartBackup = null;
+
+    function updateUndoRestartButton() {
+      const btn = document.getElementById('btn-undo-restart');
+      if (!btn) return;
+      if (lastRestartBackup) {
+        btn.disabled = false;
+        btn.className = 'px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-sm cursor-pointer transition';
+      } else {
+        btn.disabled = true;
+        btn.className = 'px-3.5 py-2 rounded-lg bg-slate-800 text-slate-500 border border-slate-700 text-xs font-semibold cursor-not-allowed transition';
+      }
+    }
+
+    function saveAdminDraftConfig() {
       recalcAdmin();
-      config.savedAt = new Date().toLocaleString('vi-VN');
+      config.adminSavedAt = new Date().toLocaleString('vi-VN');
+      localStorage.setItem(STORAGE_KEY_ADMIN_DRAFT, JSON.stringify(config));
+      const tsEl = document.getElementById('admin-save-timestamp');
+      if (tsEl) {
+        const clientText = config.savedAt ? ` • Bản Khách hàng đồng bộ lúc: ${config.savedAt}` : ' • Chưa đồng bộ sang Khách hàng';
+        tsEl.textContent = `Đã lưu bản Admin lúc: ${config.adminSavedAt}${clientText}`;
+      }
+      showToast('Đã lưu cấu hình cố định cho Admin (chưa đẩy sang giao diện Khách hàng).');
+    }
+
+    function syncConfigToClient() {
+      recalcAdmin();
+      const nowStr = new Date().toLocaleString('vi-VN');
+      config.savedAt = nowStr;
+      config.adminSavedAt = nowStr;
+      localStorage.setItem(STORAGE_KEY_ADMIN_DRAFT, JSON.stringify(config));
       localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(config));
       syncTariffLabelsToCustomer();
       applyConfigToAdminInputs();
-      showToast('Đã lưu công thức & trạng thái khóa! Giao diện Khách hàng sẽ chạy theo cấu hình này.');
+      showToast('Đã đồng bộ toàn bộ công thức & hệ số sang Giao diện Khách hàng!');
     }
 
     function resetAdminInputsToZero() {
+      recalcAdmin();
+      lastRestartBackup = JSON.parse(JSON.stringify(config));
       const zeroOrEmptyIds = [
         'adm-L', 'adm-W', 'adm-H', 'adm-room-temp', 'adm-dT',
         'adm-cap', 'adm-pct-cool', 'adm-dT-comm', 'adm-cp-comm', 'adm-persp',
@@ -1959,27 +1983,30 @@
         'adm-iot-cost', 'adm-bat-ship-rate', 'adm-frame-price-kg',
         'adm-penjico-pct', 'adm-markup-pct',
         'adm-opex-pct', 'adm-inf-pct', 'adm-disc-pct',
-        'rule-m2-per-light', 'rule-m3-per-human', 'rule-light-hrs', 'rule-human-hrs', 'rule-door-kj', 'rule-human-kw'
+        'rule-m2-per-light', 'rule-m3-per-human', 'rule-light-hrs', 'rule-human-hrs', 'rule-door-kj', 'rule-human-kw',
+        'rule-door-small-pvc', 'rule-door-small-airlock', 'rule-door-med-pvc', 'rule-door-med-airlock', 'rule-door-large-pvc', 'rule-door-large-airlock'
       ];
       zeroOrEmptyIds.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.value = '';
+        if (el) el.value = '0';
       });
       setValSafe('adm-frame-formula', 'M_bat * 0');
-      setValSafe('adm-frameship-formula', '');
+      setValSafe('adm-frameship-formula', '0');
       recalcAdmin();
-      showToast('Đã đưa các thông số về trống/0 để chờ bạn nhập vào.');
+      updateUndoRestartButton();
+      showToast('Đã đưa toàn bộ thông số về 0. Bấm "Hoàn tác Restart" nếu muốn quay lại.');
     }
 
-    function resetFactoryDefaults() {
-      localStorage.removeItem(STORAGE_KEY_CONFIG);
-      config = JSON.parse(JSON.stringify(DEFAULT_FIXED_CONFIG));
+    function undoRestartAdmin() {
+      if (!lastRestartBackup) return;
+      config = JSON.parse(JSON.stringify(lastRestartBackup));
+      lastRestartBackup = null;
       applyConfigToAdminInputs();
       renderPcmCatalogTable();
       applyAllFieldLocks();
-      syncTariffLabelsToCustomer();
       recalcAdmin();
-      showToast('Đã khôi phục về bộ thông số mặc định gốc của VOX Cool.');
+      updateUndoRestartButton();
+      showToast('Đã khôi phục lại trạng thái trước khi bấm Restart!');
     }
 
     function syncAdminTempToDeltaT() {
