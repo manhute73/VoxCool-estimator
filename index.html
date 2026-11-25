@@ -2273,7 +2273,7 @@ function recalcAdmin() {
         : getNumSafe('adm-cp-comm', config.cpCommodity || 0);
 
       const perspInputEl = document.getElementById('adm-persp');
-      if (perspInputEl && perspInputEl.disabled && elPerspRule) {
+     if (perspInputEl && perspInputEl.readOnly && elPerspRule) {
         config.perspirationRate = getNumSafe(`rule-prod-${prodType}-persp`, 0);
         perspInputEl.value = config.perspirationRate;
       } else {
