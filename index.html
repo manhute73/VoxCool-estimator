@@ -2404,12 +2404,13 @@ function recalcAdmin() {
       config.ruleDoorLargePvc = getNumSafe('rule-door-large-pvc', 0.20);
       config.ruleDoorLargeAirlock = getNumSafe('rule-door-large-airlock', 0.115);
   
-  setText('pct-rule-door-small-pvc', `(${+(config.ruleDoorSmallPvc * 100).toFixed(2)}%)`);
-      setText('pct-rule-door-small-airlock', `(${+(config.ruleDoorSmallAirlock * 100).toFixed(2)}%)`);
-      setText('pct-rule-door-med-pvc', `(${+(config.ruleDoorMedPvc * 100).toFixed(2)}%)`);
-      setText('pct-rule-door-med-airlock', `(${+(config.ruleDoorMedAirlock * 100).toFixed(2)}%)`);
-      setText('pct-rule-door-large-pvc', `(${+(config.ruleDoorLargePvc * 100).toFixed(2)}%)`);
-      setText('pct-rule-door-large-airlock', `(${+(config.ruleDoorLargeAirlock * 100).toFixed(2)}%)`);
+ const setPct = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = `(${+(v * 100).toFixed(2)}%)`; };
+      setPct('pct-rule-door-small-pvc', config.ruleDoorSmallPvc);
+      setPct('pct-rule-door-small-airlock', config.ruleDoorSmallAirlock);
+      setPct('pct-rule-door-med-pvc', config.ruleDoorMedPvc);
+      setPct('pct-rule-door-med-airlock', config.ruleDoorMedAirlock);
+      setPct('pct-rule-door-large-pvc', config.ruleDoorLargePvc);
+      setPct('pct-rule-door-large-airlock', config.ruleDoorLargeAirlock);
 
       config.pPeak = getNumSafe('adm-p-peak', 0);
       config.pStd = getNumSafe('adm-p-std', 0);
