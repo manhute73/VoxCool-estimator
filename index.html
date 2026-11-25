@@ -747,14 +747,14 @@
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-small-pvc" value="0.55" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(55%)</span>
+                   <span id="pct-rule-door-small-pvc" class="text-[11px] text-slate-500">(55%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-small-pvc')" id="lock-btn-rule-door-small-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-small-airlock" value="0.325" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(32.5%)</span>
+                       <span id="pct-rule-door-small-airlock" class="text-[11px] text-slate-500">(32.5%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-small-airlock')" id="lock-btn-rule-door-small-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
@@ -765,14 +765,14 @@
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-med-pvc" value="0.40" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(40%)</span>
+                      <span id="pct-rule-door-med-pvc" class="text-[11px] text-slate-500">(40%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-med-pvc')" id="lock-btn-rule-door-med-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-med-airlock" value="0.20" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(20%)</span>
+                      <span id="pct-rule-door-med-airlock" class="text-[11px] text-slate-500">(20%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-med-airlock')" id="lock-btn-rule-door-med-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
@@ -783,14 +783,14 @@
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-large-pvc" value="0.20" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(20%)</span>
+                       <span id="pct-rule-door-large-pvc" class="text-[11px] text-slate-500">(20%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-large-pvc')" id="lock-btn-rule-door-large-pvc" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
                     <td class="p-2">
                       <div class="flex items-center gap-1.5">
                         <input type="number" step="0.005" min="0" max="1" id="rule-door-large-airlock" value="0.115" oninput="recalcAdmin()" class="w-24 px-2 py-1 border rounded font-bold bg-white">
-                        <span class="text-[11px] text-slate-500">(11.5%)</span>
+                       <span id="pct-rule-door-large-airlock" class="text-[11px] text-slate-500">(11.5%)</span>
                         <button type="button" onclick="toggleSingleLock('rule-door-large-airlock')" id="lock-btn-rule-door-large-airlock" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
                       </div>
                     </td>
@@ -2403,6 +2403,13 @@ function recalcAdmin() {
       config.ruleDoorMedAirlock = getNumSafe('rule-door-med-airlock', 0.20);
       config.ruleDoorLargePvc = getNumSafe('rule-door-large-pvc', 0.20);
       config.ruleDoorLargeAirlock = getNumSafe('rule-door-large-airlock', 0.115);
+  
+  setText('pct-rule-door-small-pvc', `(${+(config.ruleDoorSmallPvc * 100).toFixed(2)}%)`);
+      setText('pct-rule-door-small-airlock', `(${+(config.ruleDoorSmallAirlock * 100).toFixed(2)}%)`);
+      setText('pct-rule-door-med-pvc', `(${+(config.ruleDoorMedPvc * 100).toFixed(2)}%)`);
+      setText('pct-rule-door-med-airlock', `(${+(config.ruleDoorMedAirlock * 100).toFixed(2)}%)`);
+      setText('pct-rule-door-large-pvc', `(${+(config.ruleDoorLargePvc * 100).toFixed(2)}%)`);
+      setText('pct-rule-door-large-airlock', `(${+(config.ruleDoorLargeAirlock * 100).toFixed(2)}%)`);
 
       config.pPeak = getNumSafe('adm-p-peak', 0);
       config.pStd = getNumSafe('adm-p-std', 0);
