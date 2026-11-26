@@ -556,14 +556,18 @@
               <label class="text-xs font-semibold text-slate-600">Nhiệt độ kho (°C)</label>
               <button type="button" onclick="toggleSingleLock('adm-room-temp')" id="lock-btn-adm-room-temp" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
             </div>
-            <input type="number" step="0.5" id="adm-room-temp" value="-18" oninput="syncAdminTempToDeltaT()" class="w-full mt-1 px-3 py-2 bg-sky-50/40 border border-sky-300 rounded-lg text-sm font-bold text-sky-900">
+           <div class="flex items-center gap-1 mt-1">
+  <input type="number" step="0.5" id="adm-room-temp" value="-18" oninput="syncAdminTempToDeltaT()" class="w-full min-w-0 px-3 py-2 bg-sky-50/40 border border-sky-300 rounded-lg text-sm font-bold text-sky-900">
+  <span class="text-xs text-slate-500">đến</span>
+  <input type="number" step="0.5" id="adm-room-temp-to" value="-21" oninput="syncAdminTempToDeltaT()" class="w-full min-w-0 px-3 py-2 bg-sky-50/40 border border-sky-300 rounded-lg text-sm font-bold text-sky-900">
+</div>
           </div>
           <div>
             <div class="flex items-center justify-between">
               <label class="text-xs font-semibold text-slate-600">Chênh lệch ΔT (K)</label>
               <button type="button" onclick="toggleSingleLock('adm-dT')" id="lock-btn-adm-dT" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
             </div>
-            <input type="number" step="1" id="adm-dT" value="60" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-sky-50/40 border border-sky-300 rounded-lg text-sm font-bold">
+            <input type="number" step="1" id="adm-dT" value="63" oninput="recalcAdmin()" class="w-full mt-1 px-3 py-2 bg-sky-50/40 border border-sky-300 rounded-lg text-sm font-bold">
           </div>
         </div>
 
@@ -1774,7 +1778,8 @@
       applySingleFieldLockUI(inputId, !current);
     }
 
-    function applySingleFieldLockUI(inputId, locked) {
+   function applySingleFieldLockUI(inputId, locked) {  // có sẵn
+  if (inputId === 'adm-room-temp') applySingleFieldLockUI('adm-room-temp-to', locked);  // THÊM
       const el = document.getElementById(inputId);
       const btn = document.getElementById(`lock-btn-${inputId}`);
       if (el) {
@@ -1804,7 +1809,8 @@
           if (el) vals[id] = el.value;
         }
       });
-      config.lockedValues = vals;
+      if (config.lockedFields['adm-room-temp']) vals['adm-room-temp-to'] = document.getElementById('adm-room-temp-to').value;  // THÊM
+config.lockedValues = vals;  // có sẵn
     }
 
     // Khôi phục giá trị các ô đã khóa khi mở lại trang
@@ -2044,7 +2050,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       recalcAdmin();
       lastRestartBackup = JSON.parse(JSON.stringify(config));
       const zeroOrEmptyIds = [
-        'adm-L', 'adm-W', 'adm-H', 'adm-room-temp', 'adm-dT',
+      'adm-L', 'adm-W', 'adm-H', 'adm-room-temp', 'adm-room-temp-to', 'adm-dT',
         'adm-cap', 'adm-pct-cool', 'adm-dT-comm', 'adm-cp-comm', 'adm-persp',
         'adm-k-wall', 'adm-k-floor', 'adm-light-kw', 'adm-light-hrs',
         'adm-door-cnt', 'adm-door-kj', 'adm-human-cnt', 'adm-human-hrs',
@@ -2079,19 +2085,16 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       showToast('Đã khôi phục lại trạng thái trước khi bấm Restart!');
     }
 
-    function syncAdminTempToDeltaT() {
-      const rawT = document.getElementById('adm-room-temp').value;
-      if (rawT === '') {
-        if (!config.lockedFields['adm-dT']) setValSafe('adm-dT', '');
-        recalcAdmin();
-        return;
-      }
-      const t = parseFloat(rawT);
-      if (!isNaN(t) && !config.lockedFields['adm-dT']) {
-        setValSafe('adm-dT', Math.max(10, 35 - t + (t <= -18 ? 7 : 0)));
-      }
-      recalcAdmin();
-    }
+   function syncAdminTempToDeltaT() {
+  const temps = ['adm-room-temp', 'adm-room-temp-to']
+    .map(id => getNumSafe(id, null))
+    .filter(v => v !== null);
+  if (!config.lockedFields['adm-dT']) {
+    const t = Math.min(...temps); // ΔT theo nhiệt độ thấp nhất
+    setValSafe('adm-dT', temps.length ? Math.max(10, 35 - t + (t <= -18 ? 7 : 0)) : '');
+  }
+  recalcAdmin();
+}
 
     function runEngineeringCalculation(params) {
       const L = Number(params.L) || 0;
