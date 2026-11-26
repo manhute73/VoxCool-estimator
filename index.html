@@ -256,25 +256,13 @@
             <div>
               <h3 class="text-base font-bold text-slate-800 mb-3">Hệ thống máy nén lạnh (Freezer Equipment)</h3>
               <div class="space-y-2.5">
-                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="hfc_35" class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -35°C</span>
-                </label>
-                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="hfc_25" class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-medium text-slate-700">HFC / Freon 1 cấp / Song song @ -25°C</span>
-                </label>
-                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="nh3_1stage" class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) Trục vít 1 cấp</span>
-                </label>
-                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="nh3_2stage" class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-medium text-slate-700">Ammonia (NH3) 2 cấp</span>
-                </label>
                 <label class="flex items-center space-x-3 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer">
-                  <input type="radio" name="cust-equip" value="unknown" checked class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-bold text-emerald-800">Không rõ (Unknown — Mặc định theo Admin)</span>
+                  <input type="radio" name="cust-equip" value="independent" checked class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-bold text-emerald-800">Máy nén độc lập</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
+                  <input type="radio" name="cust-equip" value="central" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Máy nén trung tâm</span>
                 </label>
               </div>
             </div>
@@ -1179,13 +1167,23 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div>
-            <div class="flex items-center justify-between">
-              <label class="text-[11px] font-semibold text-slate-600">COP mặc định</label>
-              <button type="button" onclick="toggleSingleLock('adm-cop')" id="lock-btn-adm-cop" class="text-xs">🔒</button>
+        <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
+                   <div class="col-span-2 border border-slate-200 rounded-lg p-2.5 bg-slate-50/60">
+            <div class="text-[11px] font-bold text-slate-700 mb-1.5">Loại máy nén & hệ số COP tương ứng</div>
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2">
+                <input type="radio" name="adm-comp-type" value="independent" checked onchange="recalcAdmin()" class="accent-emerald-600">
+                <span class="text-[11px] font-semibold text-slate-700 w-28">Máy nén độc lập</span>
+                <input type="number" step="0.1" id="adm-cop" value="1.6" oninput="recalcAdmin()" class="w-20 px-2 py-1 border rounded text-xs font-bold">
+                <button type="button" onclick="toggleSingleLock('adm-cop')" id="lock-btn-adm-cop" class="text-xs">🔓</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="radio" name="adm-comp-type" value="central" onchange="recalcAdmin()" class="accent-emerald-600">
+                <span class="text-[11px] font-semibold text-slate-700 w-28">Máy nén trung tâm</span>
+                <input type="number" step="0.1" id="adm-cop-central" value="1.2" oninput="recalcAdmin()" class="w-20 px-2 py-1 border rounded text-xs font-bold">
+                <button type="button" onclick="toggleSingleLock('adm-cop-central')" id="lock-btn-adm-cop-central" class="text-xs">🔓</button>
+              </div>
             </div>
-            <input type="number" step="0.1" id="adm-cop" value="1.6" oninput="recalcAdmin()" class="w-full mt-1 px-2.5 py-1.5 border rounded text-xs font-bold">
           </div>
           <div>
             <div class="flex items-center justify-between">
