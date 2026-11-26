@@ -2488,9 +2488,10 @@ function highlightRadioGroup(name) {
     }
 let custDoorFreqLevel = null;
 
-    function selectDoorFrequency(level, opens) {
+    function selectDoorFrequency(level, fallbackOpens) {
       custDoorFreqLevel = level;
-      setValSafe('cust-door-opens', opens);
+      const opens = getDoorRuleOpens(level) ?? fallbackOpens;
+      setValSafe('cust-door-openings', opens);
       const activeCls = 'py-3 px-2 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-xs text-center transition';
       const inactiveCls = 'py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition';
       ['low', 'med', 'high'].forEach(lv => {
@@ -2498,6 +2499,27 @@ let custDoorFreqLevel = null;
         if (btn) btn.className = (lv === level) ? activeCls : inactiveCls;
       });
     }
+
+    function getDoorRuleOpens(level) {
+      const defaults = { low: 3, med: 10, high: 20 };
+      const idMap = { low: 'adm-door-low', med: 'adm-door-med', high: 'adm-door-high' };
+      const val = getNumSafe(idMap[level], NaN);
+      return (!isNaN(val) && val >= 0) ? val : (defaults[level] || 10);
+    }
+
+    function onAdminDoorRuleChange() {
+      // Nếu Admin đang bật "Áp dụng Bảng quy định riêng", tự cập nhật ô Số lần mở cửa ở 2.6 (Q6) theo mức Trung bình (hoặc mức đang chọn)
+      const useCustom = document.getElementById('chk-use-custom-rules')?.checked;
+      if (useCustom) {
+        const medOpens = getDoorRuleOpens('med');
+        const q6OpensInput = document.getElementById('adm-door-opens'); // ID ô Số lần mở cửa ở mục 2.6
+        if (q6OpensInput && !config?.lockedFields?.['adm-door-opens']) {
+          q6OpensInput.value = medOpens;
+        }
+      }
+      if (typeof recalcAdmin === 'function') recalcAdmin();
+    }
+    
     function updateLiveVolume() {
       const L = getNumSafe('cust-length', 0);
       const W = getNumSafe('cust-width', 0);
@@ -2551,7 +2573,7 @@ const roomTemp = t1 ?? t2 ?? 0;
 const tMin = Math.min(roomTemp, t2 ?? roomTemp);
 const dT = tMin !== 0 ? Math.max(10, 35 - tMin + (tMin <= -18 ? 7 : 0)) : 0;
       const capacity = getNumSafe('cust-capacity', 0) * 1000;
-      const doorOpenings = getNumSafe('cust-door-openings', 0);
+      const doorOpenings = custDoorFreqLevel ? getDoorRuleOpens(custDoorFreqLevel) : getNumSafe('cust-door-openings', 0);
       const prodType = document.getElementById('cust-product-type')?.value || 'unknown';
       const dTCommodity = getNumSafe(`rule-prod-${prodType}-dt`, config.dTCommodity);
       const cpCommodity = getNumSafe(`rule-prod-${prodType}-cp`, config.cpCommodity);
