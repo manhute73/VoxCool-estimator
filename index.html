@@ -139,6 +139,12 @@
           </div>
           <div class="flex items-center gap-2 no-print">
             <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+              <div class="inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-bold mr-2">
+  <button type="button" id="btn-lang-vi" onclick="setClientLanguage('vi')"
+    class="px-2.5 py-1 rounded-md bg-white text-emerald-700 shadow-sm transition">VI</button>
+  <button type="button" id="btn-lang-en" onclick="setClientLanguage('en')"
+    class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">EN</button>
+</div>
               IN / PDF
             </button>
             <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
