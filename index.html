@@ -2825,6 +2825,13 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
     }
     loadAdminBg();
     loadSavedFixedConfig();
+    ['adm-L','adm-W','adm-H','adm-room-temp','adm-dT'].forEach(id => {
+  setValSafe(id, '');
+  config.lockedFields[id] = false;
+  applySingleFieldLockUI(id, false);
+});
+setValSafe('adm-room-temp-to', '');
+    resetCustomerForm();   // thêm nếu cần
     recalcAdmin();
     renderLeadsTable();
   </script>
