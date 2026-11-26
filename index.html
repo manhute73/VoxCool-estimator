@@ -2558,7 +2558,7 @@ function recalcAdmin() {
       const shiftHours = getNumSafe('adm-shift-hrs', 0);
 
       const res = runEngineeringCalculation({
-        ...config, L, W, H, roomTemp, dT, capacity, doorOpenings,
+        ...config, L, W, H, roomTemp, roomTempTo: getNumSafe('adm-room-temp-to', null), dT, capacity, doorOpenings,
         equip: 'unknown', cond: 'unknown', defrost: 'unknown', solar: 'unknown',
         shiftHours, cop: config.copBase
       });
