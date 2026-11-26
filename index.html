@@ -1789,11 +1789,30 @@
       }
     }
 
-    function applyAllFieldLocks() {
-      Object.keys(DEFAULT_LOCKED_FIELDS).forEach(id => {
+     function applyAllFieldLocks() {
+      const ids = new Set([...Object.keys(DEFAULT_LOCKED_FIELDS), ...Object.keys(config.lockedFields || {})]);
+      ids.forEach(id => {
         const isLocked = config.lockedFields[id] !== undefined ? config.lockedFields[id] : DEFAULT_LOCKED_FIELDS[id];
-        applySingleFieldLockUI(id, isLocked);
+        applySingleFieldLockUI(id, !!isLocked);
       });
+    }
+
+    // Lưu giá trị của TẤT CẢ ô đang khóa
+    function collectLockedValues() {
+      const vals = {};
+      Object.keys(config.lockedFields || {}).forEach(id => {
+        if (config.lockedFields[id]) {
+          const el = document.getElementById(id);
+          if (el) vals[id] = el.value;
+        }
+      });
+      config.lockedValues = vals;
+    }
+
+    // Khôi phục giá trị các ô đã khóa khi mở lại trang
+    function restoreLockedValues() {
+      const vals = config.lockedValues || {};
+      Object.keys(vals).forEach(id => setValSafe(id, vals[id]));
     }
 
     function renderPcmCatalogTable() {
@@ -1900,7 +1919,10 @@
     }
 
     function loadSavedFixedConfig() {
-      const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
+      let raw = null;
+      try {
+        raw = localStorage.getItem(STORAGE_KEY_CONFIG + '_admin_draft') || localStorage.getItem(STORAGE_KEY_CONFIG);
+      } catch (e) {}
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
@@ -1915,6 +1937,7 @@
         }
       }
       applyConfigToAdminInputs();
+      restoreLockedValues();
       renderPcmCatalogTable();
       applyAllFieldLocks();
       syncTariffLabelsToCustomer();
@@ -2008,6 +2031,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
 
     function syncConfigToClient() {
       recalcAdmin();
+      collectLockedValues();
       const nowStr = new Date().toLocaleString('vi-VN');
       config.savedAt = nowStr;
       config.adminSavedAt = nowStr;
