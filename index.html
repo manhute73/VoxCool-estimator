@@ -283,17 +283,17 @@
             </div>
           </div>
 
-         <!-- STEP 3: FREEZER EQUIPMENT -->
+        <!-- STEP 3: FREEZER EQUIPMENT -->
           <div id="step-3" class="hidden max-w-xl mx-auto">
             <div>
               <h3 class="text-base font-bold text-slate-800 mb-3">Hệ thống máy nén lạnh (Freezer Equipment)</h3>
               <div class="space-y-2.5">
-                <label class="flex items-center space-x-3 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer">
-                  <input type="radio" name="cust-equip" value="independent" checked class="w-4 h-4 accent-emerald-600">
-                  <span class="text-sm font-bold text-emerald-800">Máy nén độc lập</span>
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                  <input type="radio" name="cust-equip" value="independent" onchange="highlightRadioGroup('cust-equip')" class="w-4 h-4 accent-emerald-600">
+                  <span class="text-sm font-medium text-slate-700">Máy nén độc lập</span>
                 </label>
-                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50">
-                  <input type="radio" name="cust-equip" value="central" class="w-4 h-4 accent-emerald-600">
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                  <input type="radio" name="cust-equip" value="central" onchange="highlightRadioGroup('cust-equip')" class="w-4 h-4 accent-emerald-600">
                   <span class="text-sm font-medium text-slate-700">Máy nén trung tâm</span>
                 </label>
               </div>
@@ -2374,6 +2374,8 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
         const lbl = r.closest('label');
         if (lbl) {
           lbl.className = 'flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50';
+          const sp = lbl.querySelector('span');
+          if (sp) sp.className = 'text-sm font-medium text-slate-700';
         }
       });
 
