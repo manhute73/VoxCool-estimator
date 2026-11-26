@@ -2390,7 +2390,19 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       updateLiveVolume();
       goToStep(1);
     }
-
+function highlightRadioGroup(name) {
+   document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+     const lbl = r.closest('label');
+     const sp = lbl ? lbl.querySelector('span') : null;
+     if (r.checked) {
+       if (lbl) lbl.className = 'flex items-center space-x-3 p-3 rounded-lg border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer transition';
+       if (sp) sp.className = 'text-sm font-bold text-emerald-800';
+     } else {
+       if (lbl) lbl.className = 'flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition';
+       if (sp) sp.className = 'text-sm font-medium text-slate-700';
+     }
+   });
+ }
     let custHasAirlock = null; // null = chưa chọn (mặc định tính theo PVC), true = Có, false = Không
 
     function resetRoomAndAirlockSelection() {
