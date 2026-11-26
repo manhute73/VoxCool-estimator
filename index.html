@@ -1163,7 +1163,7 @@
                 Điện Sản xuất
               </button>
             </div>
-            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded">Cơ sở 28 ngày/tháng (24 ngày thường + 4 Chủ nhật)</span>
+            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded">Cơ sở 30 ngày/tháng (26 ngày thường + 4 Chủ nhật)</span>
           </div>
         </div>
 
@@ -1218,8 +1218,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-slate-50 p-4 rounded-lg border border-slate-200">
           <div class="lg:col-span-7 formula-box text-[11px] text-slate-700 space-y-1">
             <div>• Electrical load of the chiller: <strong>E_day = Q_total / COP</strong> | Tháng: <strong>E_month = E_day × 30</strong></div>
-            <div>• Total Electricity Costs of Baseline : <strong>Cost_base = [24×(E_day/24)×(5×P_peak + 13×P_std + 6×P_off) + 4×(E_day/24)×(18×P_std + 6×P_off)] × 12</strong></div>
-            <div>• Total Electricity Cost Savings: <strong>Savings_year = E_day × (h_cắt / 24) × (P_peak - P_off) × 24 ngày × 12 tháng</strong> (nếu h_cắt &le; 5h)</div>
+            <div>• Total Electricity Costs of Baseline : <strong>Cost_base = [26×(E_day/24)×(5×P_peak + 13×P_std + 6×P_off) + 4×(E_day/24)×(18×P_std + 6×P_off)] × 12</strong></div>
+            <div>• Total Electricity Cost Savings: <strong>Savings_year = E_day × (h_cắt / 24) × (P_peak - P_off) × 26 ngày × 12 tháng</strong> (nếu h_cắt &le; 5h)</div>
           </div>
           <div class="lg:col-span-5 grid grid-cols-2 gap-2 text-xs">
             <div class="bg-white p-2.5 rounded border">
@@ -2156,7 +2156,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
 
       const costWd = (eDay / 24) * (5 * Number(params.pPeak) + 13 * Number(params.pStd) + 6 * Number(params.pOff));
       const costSun = (eDay / 24) * (18 * Number(params.pStd) + 6 * Number(params.pOff));
-      const costBaseMonth = costWd * 24 + costSun * 4;
+      const costBaseMonth = costWd * 26 + costSun * 4;
       const costBaseYear = costBaseMonth * 12;
 
       const shiftHrs = Number(params.shiftHours) || 0;
@@ -2169,7 +2169,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
 
       const tariffSavingsWd = ePeakShift * (Number(params.pPeak) - Number(params.pOff)) + eStdShift * (Number(params.pStd) - Number(params.pOff));
       const efficiencyBonusYear = costBaseYear * defrostBonus;
-      const savingsYear = tariffSavingsWd * 24 * 12 + efficiencyBonusYear;
+      const savingsYear = tariffSavingsWd * 26 * 12 + efficiencyBonusYear;
       const pctSavings = costBaseYear > 0 ? (savingsYear / costBaseYear) : 0;
 
       const selectedPcm = selectMatchingPcm(params.roomTemp, params.pcmCatalog);
