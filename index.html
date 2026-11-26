@@ -2263,8 +2263,87 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       5: 'Bước 5: Biểu giá điện áp dụng',
       6: 'Kết quả Ước tính Tiết kiệm Năng lượng'
     };
+    function validateStepInputs(step) {
+      const lang = typeof currentClientLang !== 'undefined' ? currentClientLang : 'vi';
+      const showWarn = (viMsg, enMsg) => {
+        alert(lang === 'en' ? enMsg : viMsg);
+        return false;
+      };
 
-    function goToStep(step) {
+      // KIỂM TRA BƯỚC 1: Kích thước & Nhiệt độ
+      if (step === 1) {
+        if (custHasAirlock === null) {
+          return showWarn(
+            'Vui lòng chọn trạng thái Phòng đệm (Có hoặc Không) trước khi tiếp tục!',
+            'Please select Airlock status (Yes or No) before continuing!'
+          );
+        }
+        const L = getNumSafe('cust-length', 0);
+        const W = getNumSafe('cust-width', 0);
+        const H = getNumSafe('cust-height', 0);
+        if (L <= 0 || W <= 0 || H <= 0) {
+          return showWarn(
+            'Vui lòng nhập đầy đủ kích thước Dài, Rộng, Cao (> 0) của kho!',
+            'Please enter valid Length, Width, and Height (> 0) of the cold room!'
+          );
+        }
+        const tFrom = document.getElementById('cust-temp')?.value?.trim();
+        const tTo = document.getElementById('cust-temp-to')?.value?.trim();
+        if (tFrom === '' || tTo === '') {
+          return showWarn(
+            'Vui lòng nhập đầy đủ dải nhiệt độ vận hành kho (°C)!',
+            'Please enter the full operating temperature range (°C)!'
+          );
+        }
+      }
+
+      // KIỂM TRA CÁC BƯỚC 2, 3, 4, 5: Quét tự động mọi ô input đang hiển thị (không bị ẩn/khóa)
+      if (step >= 2 && step <= 5) {
+        const panel = document.getElementById(`step-${step}`);
+        if (panel) {
+          // 1. Kiểm tra các ô nhập số/chữ đang hiển thị
+          const inputs = panel.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"])');
+          for (const inp of inputs) {
+            if (inp.offsetParent !== null && !inp.disabled && inp.value.trim() === '') {
+              inp.focus();
+              return showWarn(
+                'Vui lòng điền đầy đủ tất cả thông tin ở bước hiện tại trước khi bấm NEXT!',
+                'Please fill in all required fields in the current step before clicking NEXT!'
+              );
+            }
+          }
+          // 2. Kiểm tra các nhóm nút radio (nếu có) phải chọn ít nhất 1 lựa chọn
+          const radioNames = new Set();
+          panel.querySelectorAll('input[type="radio"]').forEach(r => {
+            if (r.offsetParent !== null) radioNames.add(r.name);
+          });
+          for (const name of radioNames) {
+            const checked = panel.querySelector(`input[name="${name}"]:checked`);
+            if (!checked) {
+              return showWarn(
+                'Vui lòng chọn đầy đủ các tùy chọn ở bước hiện tại trước khi bấm NEXT!',
+                'Please complete all selections in the current step before clicking NEXT!'
+              );
+            }
+          }
+        }
+        // Riêng Bước 4: Kiểm tra đã chọn số giờ cắt tải (5h, 8h, 10h...) chưa
+        if (step === 4 && typeof selectedShiftHours !== 'undefined' && (!selectedShiftHours || selectedShiftHours <= 0)) {
+          return showWarn(
+            'Vui lòng chọn thời gian cắt tải trước khi bấm NEXT!',
+            'Please select load-shedding duration before clicking NEXT!'
+          );
+        }
+      }
+
+      return true;
+    }
+      function goToStep(step) {
+      if (step > currentStep) {
+        for (let s = currentStep; s < step; s++) {
+          if (!validateStepInputs(s)) return;
+        }
+      }
       currentStep = step;
       for (let i = 1; i <= 6; i++) {
         const el = document.getElementById(`step-${i}`);
@@ -2387,6 +2466,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
     let lastCustomerResult = null;
 
     function calculateAndShowResult() {
+      if (!validateStepInputs(5)) return;
       const L = getNumSafe('cust-length', 0);
       const W = getNumSafe('cust-width', 0);
       const H = getNumSafe('cust-height', 0);
