@@ -827,7 +827,53 @@
           </div>
         </div>
       </div>
-
+<!-- Bảng quy định tần suất mở cửa mỗi ngày -->
+            <div class="mt-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">Bảng quy định tần suất mở cửa mỗi ngày (lần/ngày)</span>
+                <span class="text-[11px] text-slate-500">Áp dụng cho lựa chọn Thấp / Trung bình / Cao ở Bước 2 • Bấm 🔒/🔓 để khóa hoặc mở từng ô</span>
+              </div>
+              <div class="divide-y divide-slate-100 text-xs">
+                <div class="grid grid-cols-12 items-center px-4 py-2.5 bg-slate-50/60 font-semibold text-slate-600">
+                  <div class="col-span-4">Mức tần suất mở cửa</div>
+                  <div class="col-span-4">Mô tả tham chiếu</div>
+                  <div class="col-span-4">Số lần mở cửa quy ước (lần/ngày)</div>
+                </div>
+                <!-- Mức Thấp -->
+                <div class="grid grid-cols-12 items-center px-4 py-2.5">
+                  <div class="col-span-4 font-semibold text-slate-800">Thấp (Low)</div>
+                  <div class="col-span-4 text-slate-500">1 – 5 lần/ngày (Ít xuất nhập hàng)</div>
+                  <div class="col-span-4 flex items-center gap-2">
+                    <input type="number" step="1" min="0" id="adm-door-low" value="3" oninput="onAdminDoorRuleChange()"
+                      class="w-24 px-2.5 py-1.5 text-sm font-bold text-slate-800 bg-slate-100 border border-slate-200 rounded-md focus:outline-none focus:border-indigo-500">
+                    <span class="text-slate-500">lần/ngày</span>
+                    <button type="button" onclick="toggleLock('adm-door-low')" id="lock-adm-door-low" class="text-amber-500 hover:scale-110 transition" title="Khóa/Mở ô">🔒</button>
+                  </div>
+                </div>
+                <!-- Mức Trung bình -->
+                <div class="grid grid-cols-12 items-center px-4 py-2.5">
+                  <div class="col-span-4 font-semibold text-slate-800">Trung bình (Medium)</div>
+                  <div class="col-span-4 text-slate-500">6 – 15 lần/ngày (Vận hành tiêu chuẩn)</div>
+                  <div class="col-span-4 flex items-center gap-2">
+                    <input type="number" step="1" min="0" id="adm-door-med" value="10" oninput="onAdminDoorRuleChange()"
+                      class="w-24 px-2.5 py-1.5 text-sm font-bold text-slate-800 bg-slate-100 border border-slate-200 rounded-md focus:outline-none focus:border-indigo-500">
+                    <span class="text-slate-500">lần/ngày</span>
+                    <button type="button" onclick="toggleLock('adm-door-med')" id="lock-adm-door-med" class="text-amber-500 hover:scale-110 transition" title="Khóa/Mở ô">🔒</button>
+                  </div>
+                </div>
+                <!-- Mức Cao -->
+                <div class="grid grid-cols-12 items-center px-4 py-2.5">
+                  <div class="col-span-4 font-semibold text-slate-800">Cao (High)</div>
+                  <div class="col-span-4 text-slate-500">&gt; 15 lần/ngày (Xuất nhập liên tục)</div>
+                  <div class="col-span-4 flex items-center gap-2">
+                    <input type="number" step="1" min="0" id="adm-door-high" value="20" oninput="onAdminDoorRuleChange()"
+                      class="w-24 px-2.5 py-1.5 text-sm font-bold text-slate-800 bg-slate-100 border border-slate-200 rounded-md focus:outline-none focus:border-indigo-500">
+                    <span class="text-slate-500">lần/ngày</span>
+                    <button type="button" onclick="toggleLock('adm-door-high')" id="lock-adm-door-high" class="text-amber-500 hover:scale-110 transition" title="Khóa/Mở ô">🔒</button>
+                  </div>
+                </div>
+              </div>
+            </div>
     <!-- PHẦN 2: PHỤ TẢI NHIỆT LẠNH NGÀY (HEAT LOAD) -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
