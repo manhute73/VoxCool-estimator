@@ -2308,7 +2308,22 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
           );
         }
       }
-
+// KIỂM TRA BƯỚC 2: Sức chứa hàng hóa (tấn) & Tần suất mở cửa
+      if (step === 2) {
+        const capTons = getNumSafe('cust-capacity', 0);
+        if (capTons <= 0) {
+          return showWarn(
+            'Vui lòng nhập sức chứa hàng hóa của kho (tấn)!',
+            'Please enter the cold room storage capacity (tons)!'
+          );
+        }
+        if (!custDoorFreqLevel) {
+          return showWarn(
+            'Vui lòng chọn tần suất mở cửa kho mỗi ngày (Thấp, Trung bình hoặc Cao)!',
+            'Please select daily door opening frequency (Low, Medium, or High)!'
+          );
+        }
+      }
       // KIỂM TRA CÁC BƯỚC 2, 3, 4, 5: Quét tự động mọi ô input đang hiển thị (không bị ẩn/khóa)
       if (step >= 2 && step <= 5) {
         const panel = document.getElementById(`step-${step}`);
@@ -2436,7 +2451,18 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       btnYes.className = custHasAirlock ? activeGreenCls : inactiveCls;
       btnNo.className = !custHasAirlock ? activeGreenCls : inactiveCls;
     }
+let custDoorFreqLevel = null;
 
+    function selectDoorFrequency(level, opens) {
+      custDoorFreqLevel = level;
+      setValSafe('cust-door-opens', opens);
+      const activeCls = 'py-3 px-2 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-xs text-center transition';
+      const inactiveCls = 'py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition';
+      ['low', 'med', 'high'].forEach(lv => {
+        const btn = document.getElementById(`btn-door-${lv}`);
+        if (btn) btn.className = (lv === level) ? activeCls : inactiveCls;
+      });
+    }
     function updateLiveVolume() {
       const L = getNumSafe('cust-length', 0);
       const W = getNumSafe('cust-width', 0);
@@ -2489,7 +2515,7 @@ const t2 = getNumSafe('cust-temp-to', null);
 const roomTemp = t1 ?? t2 ?? 0;
 const tMin = Math.min(roomTemp, t2 ?? roomTemp);
 const dT = tMin !== 0 ? Math.max(10, 35 - tMin + (tMin <= -18 ? 7 : 0)) : 0;
-      const capacity = getNumSafe('cust-capacity', 0);
+      const capacity = getNumSafe('cust-capacity', 0) * 1000;
       const doorOpenings = getNumSafe('cust-door-openings', 0);
       const prodType = document.getElementById('cust-product-type')?.value || 'unknown';
       const dTCommodity = getNumSafe(`rule-prod-${prodType}-dt`, config.dTCommodity);
