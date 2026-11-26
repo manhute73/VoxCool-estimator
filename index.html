@@ -1160,7 +1160,7 @@
               </button>
               <button type="button" onclick="applyAdminTariffPreset('industrial_lt6')" id="btn-adm-tariff-industrial"
                 class="px-2.5 py-1 rounded-md font-semibold text-amber-900 hover:bg-amber-100 transition">
-                Điện Sản xuất (&lt;6kV)
+                Điện Sản xuất
               </button>
             </div>
             <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded">Cơ sở 28 ngày/tháng (24 ngày thường + 4 Chủ nhật)</span>
@@ -1217,18 +1217,18 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-slate-50 p-4 rounded-lg border border-slate-200">
           <div class="lg:col-span-7 formula-box text-[11px] text-slate-700 space-y-1">
-            <div>• Điện tiêu thụ ngày: <strong>E_day = Q_total / COP</strong> | Tháng: <strong>E_month = E_day × 30</strong></div>
-            <div>• Tiền điện nền năm: <strong>Cost_base = [24×(E_day/24)×(5×P_peak + 13×P_std + 6×P_off) + 4×(E_day/24)×(18×P_std + 6×P_off)] × 12</strong></div>
-            <div>• Tiền tiết kiệm năm: <strong>Savings_year = E_day × (h_cắt / 24) × (P_peak - P_off) × 24 ngày × 12 tháng</strong> (nếu h_cắt &le; 5h)</div>
+            <div>• Electrical load of the chiller: <strong>E_day = Q_total / COP</strong> | Tháng: <strong>E_month = E_day × 30</strong></div>
+            <div>• Total Electricity Costs of Baseline : <strong>Cost_base = [24×(E_day/24)×(5×P_peak + 13×P_std + 6×P_off) + 4×(E_day/24)×(18×P_std + 6×P_off)] × 12</strong></div>
+            <div>• Total Electricity Cost Savings: <strong>Savings_year = E_day × (h_cắt / 24) × (P_peak - P_off) × 24 ngày × 12 tháng</strong> (nếu h_cắt &le; 5h)</div>
           </div>
           <div class="lg:col-span-5 grid grid-cols-2 gap-2 text-xs">
             <div class="bg-white p-2.5 rounded border">
-              <div class="text-slate-500">Điện tiêu thụ nền:</div>
+              <div class="text-slate-500">Electrical load of the chiller:</div>
               <div id="out-e-month" class="font-bold text-slate-900 text-sm">798.1 kWh/tháng</div>
-              <div class="text-[10px] text-slate-500 mt-0.5">Tiền điện nền: <strong id="out-cost-base-year">31,880,000 đ/năm</strong></div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Total Electricity Costs of Baseline: <strong id="out-cost-base-year">31,880,000 đ/năm</strong></div>
             </div>
             <div class="bg-emerald-600 text-white p-2.5 rounded">
-              <div class="text-emerald-100">Tiết kiệm hàng năm:</div>
+              <div class="text-emerald-100">Total Electricity Cost Savings:</div>
               <div id="out-save-year" class="font-extrabold text-sm">6,152,559 đ (19.3%)</div>
               <div class="text-[10px] text-emerald-100 mt-0.5">Sau tiết kiệm: <strong id="out-cost-after-year">25,727,441 đ/năm</strong></div>
             </div>
