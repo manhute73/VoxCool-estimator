@@ -2648,7 +2648,8 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       document.getElementById('out-save-year').textContent = `${fmtVND(res.savingsYear)} đ (${(res.pctSavings*100).toFixed(1)}%)`;
       document.getElementById('out-cost-after-year').textContent = fmtVND(Math.max(0, res.costBaseYear - res.savingsYear)) + ' đ/năm';
 
-      document.getElementById('out-pcm-room-t').textContent = roomTemp + '°C';
+      //document.getElementById('out-pcm-room-t').textContent = roomTemp + '°C';
+  document.getElementById('out-pcm-room-t').textContent = `lạnh ${roomTemp} → ${getNumSafe('adm-room-temp-to', roomTemp)}°C`;
       document.getElementById('out-pcm-selected-name').textContent = `${res.selectedPcm.name} (${res.selectedPcm.temp}°C)`;
       document.getElementById('out-pcm-selected-spec').textContent = res.selectedPcm.density;
 
