@@ -240,33 +240,45 @@
             </div>
           </div>
 
-          <!-- STEP 2: COMMODITY & DAILY OPERATIONS -->
-          <div id="step-2" class="hidden space-y-6 max-w-2xl">
+         <!-- STEP 2: COMMODITY & DOOR OPENINGS -->
+          <div id="step-2" class="hidden space-y-6">
             <div>
-              <label class="block text-base font-bold text-slate-800 mb-2">1. Sức chứa hàng hóa của kho (Capacity of Cold Room)</label>
-              <p class="text-xs text-slate-500 mb-2">Chỉ cần nhập tổng khối lượng hàng hóa chứa trong kho (kg), hệ thống tự động tính toán phụ tải nhiệt làm lạnh sản phẩm.</p>
-              <div class="relative max-w-sm">
-                <input type="number" id="cust-capacity" value="0" placeholder="Ví dụ: 2000"
-                  class="w-full px-4 py-3 text-xl font-bold text-emerald-600 bg-slate-100 border-2 border-slate-200 focus:border-emerald-500 rounded-lg focus:outline-none">
-                <span class="absolute right-4 top-3.5 text-base font-bold text-slate-600">kg</span>
+              <label class="block text-sm font-bold text-slate-800 mb-2">1. Sức chứa hàng hóa của kho (Capacity of Cold Room)</label>
+              <div class="relative max-w-md">
+                <input type="number" step="0.1" id="cust-capacity" placeholder="Ví dụ: 2" onfocus="activeInputId='cust-capacity'"
+                  class="w-full px-4 py-3 text-xl font-bold text-emerald-600 placeholder:text-slate-400 placeholder:font-normal bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                <span class="absolute right-4 top-3.5 text-sm font-semibold text-slate-500">tấn</span>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-bold text-slate-800 mb-2">2. Nhóm hàng hóa bảo quản</label>
-                <select id="cust-product-type" class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:border-emerald-500">
-                  <option value="frozen_meat">Thủy hải sản / Thịt cấp đông</option>
-                  <option value="processed">Thực phẩm chế biến / Kem / Sữa</option>
-                  <option value="produce">Rau củ quả / Nông sản</option>
-                  <option value="unknown" selected>Chưa có thông tin / Hỗn hợp</option>
+                <select id="cust-product-type" class="w-full px-4 py-3 text-sm font-semibold text-slate-700 bg-slate-100 border-2 border-transparent focus:border-emerald-500 rounded-lg focus:outline-none">
+                  <option value="seafood">Thủy hải sản / Thịt cấp đông</option>
+                  <option value="fruit">Rau củ / Trái cây</option>
+                  <option value="dairy">Sữa / Thực phẩm chế biến</option>
+                  <option value="pharma">Dược phẩm / Vaccine</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-sm font-bold text-slate-800 mb-2">3. Số lần mở cửa kho mỗi ngày</label>
-                <input type="number" id="cust-door-openings" value="10" min="0" max="200"
-                  class="w-full px-4 py-3 text-lg font-bold text-emerald-600 bg-slate-100 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500">
+                <label class="block text-sm font-bold text-slate-800 mb-2">3. Tần suất mở cửa kho mỗi ngày</label>
+                <input type="hidden" id="cust-door-opens" value="">
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" id="btn-door-low" onclick="selectDoorFrequency('low', 3)"
+                    class="py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition">
+                    Thấp<span class="block text-[10px] font-normal text-slate-400 mt-0.5">(1–5 lần)</span>
+                  </button>
+                  <button type="button" id="btn-door-med" onclick="selectDoorFrequency('med', 10)"
+                    class="py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition">
+                    Trung bình<span class="block text-[10px] font-normal text-slate-400 mt-0.5">(6–15 lần)</span>
+                  </button>
+                  <button type="button" id="btn-door-high" onclick="selectDoorFrequency('high', 20)"
+                    class="py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition">
+                    Cao<span class="block text-[10px] font-normal text-slate-400 mt-0.5">(&gt;15 lần)</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
