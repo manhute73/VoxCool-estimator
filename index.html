@@ -2354,23 +2354,36 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       if (currentStep > 1) goToStep(currentStep - 1);
     }
 
-    function resetCustomerForm() {
-    ['cust-length', 'cust-width', 'cust-height', 'cust-temp', 'cust-temp-to', 'cust-capacity', 'cust-door-openings'].forEach(id => {
+  function resetCustomerForm() {
+      ['cust-length', 'cust-width', 'cust-height', 'cust-temp', 'cust-temp-to', 'cust-capacity', 'cust-door-opens'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
-      ['cust-equip', 'cust-cond', 'cust-defrost', 'cust-solar'].forEach(name => {
-        const el = document.querySelector(`input[name="${name}"][value="unknown"]`);
-        if (el) el.checked = true;
+
+      // Reset Bước 2: Tần suất mở cửa (Thấp / Trung bình / Cao)
+      if (typeof custDoorFreqLevel !== 'undefined') custDoorFreqLevel = null;
+      const neutralDoorCls = 'py-3 px-2 rounded-lg border-2 border-slate-200 bg-white text-slate-600 font-semibold text-xs text-center hover:border-slate-300 transition';
+      ['low', 'med', 'high'].forEach(lv => {
+        const b = document.getElementById(`btn-door-${lv}`);
+        if (b) b.className = neutralDoorCls;
       });
-      const tarDefault = document.querySelector('input[name="cust-tariff"][value="admin_default"]');
-      if (tarDefault) tarDefault.checked = true;
-      custTariffMode = 'admin_default';
+
+      // Reset Bước 3, 4, 5: Bỏ tick toàn bộ radio/checkbox và đưa nhãn về viền xám
+      document.querySelectorAll('#step-3 input[type="radio"], #step-4 input[type="radio"], #step-5 input[type="radio"]').forEach(r => {
+        r.checked = false;
+        const lbl = r.closest('label');
+        if (lbl) {
+          lbl.className = 'flex items-center space-x-3 p-3 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-50';
+        }
+      });
+
+      custTariffMode = null;
       selectedShiftHours = 0;
       [5, 8, 10].forEach(h => {
         const btn = document.getElementById(`btn-hrs-${h}`);
         if (btn) btn.className = 'hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center';
       });
+
       resetRoomAndAirlockSelection();
       updateLiveVolume();
       goToStep(1);
