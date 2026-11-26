@@ -137,20 +137,20 @@
             <p class="text-xs font-bold tracking-widest text-sky-600 uppercase">COLD STORAGE ENERGY SAVINGS ESTIMATOR</p>
             <h1 id="step-title" class="text-xl font-bold text-slate-800 mt-0.5">Bước 1: Kích thước & Nhiệt độ vận hành kho</h1>
           </div>
-          <div class="flex items-center gap-2 no-print">
-            <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
-              <div class="inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-bold mr-2">
-  <button type="button" id="btn-lang-vi" onclick="setClientLanguage('vi')"
-    class="px-2.5 py-1 rounded-md bg-white text-emerald-700 shadow-sm transition">VI</button>
-  <button type="button" id="btn-lang-en" onclick="setClientLanguage('en')"
-    class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">EN</button>
-</div>
-              IN / PDF
-            </button>
-            <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
-              RESTART
-            </button>
+         <div class="flex items-center gap-2 no-print">
+          <div class="inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 p-0.5 text-xs font-bold mr-2">
+            <button type="button" id="btn-lang-vi" onclick="setClientLanguage('vi')"
+              class="px-2.5 py-1 rounded-md bg-white text-emerald-700 shadow-sm transition">VI</button>
+            <button type="button" id="btn-lang-en" onclick="setClientLanguage('en')"
+              class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">EN</button>
           </div>
+          <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+            IN / PDF
+          </button>
+          <button onclick="resetCustomerForm()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded shadow-sm transition">
+            RESTART
+          </button>
+        </div>
         </div>
 
         <!-- STEP PANELS -->
@@ -2840,6 +2840,80 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     resetCustomerForm();   // thêm nếu cần
     recalcAdmin();
     renderLeadsTable();
+    let currentClientLang = 'vi';
+
+    const CLIENT_I18N_DICT = {
+      'Kho lạnh': 'Cold Room',
+      'Hàng hóa': 'Commodity',
+      'Hệ lạnh': 'Cooling System',
+      'Cắt tải': 'Load Shedding',
+      'Giá điện': 'Electricity Tariff',
+      'Kết quả': 'Results',
+      'IN / PDF': 'PRINT / PDF',
+
+      'Bước 1: Kích thước & Nhiệt độ vận hành kho': 'Step 1: Cold Room Dimensions & Operating Temperature',
+      'Bước 2: Thông tin Hàng hóa bảo quản': 'Step 2: Stored Commodity Information',
+      'Bước 3: Hệ thống lạnh & Thiết bị': 'Step 3: Refrigeration System & Equipment',
+      'Bước 4: Cắt tải & Thời gian vận hành': 'Step 4: Load Shedding & Operating Schedule',
+      'Bước 5: Biểu giá điện năng': 'Step 5: Electricity Tariff',
+      'Bước 6: Kết quả ước tính tiết kiệm năng lượng': 'Step 6: Energy Savings Estimation Results',
+
+      'Loại kho lạnh': 'Cold Room Type',
+      'Kho đông (Freezer)': 'Freezer',
+      'Phòng đệm:': 'Airlock:',
+      'Kích thước lọt lòng kho (Dài × Rộng × Cao)': 'Internal Cold Room Dimensions (L × W × H)',
+      'm (Dài)': 'm (Length)',
+      'm (Rộng)': 'm (Width)',
+      'm (Cao)': 'm (Height)',
+      'Dải nhiệt độ vận hành kho (°C)': 'Operating Temperature Range (°C)',
+      'đến': 'to'
+    };
+
+    const clientTextNodesCache = [];
+
+    function initClientI18nCache() {
+      if (clientTextNodesCache.length > 0) return;
+      const clientRoot = document.getElementById('view-client') || document.body;
+      const walker = document.createTreeWalker(clientRoot, NodeFilter.SHOW_TEXT, null);
+      let node;
+      while ((node = walker.nextNode())) {
+        const raw = node.nodeValue;
+        const trimmed = raw.trim();
+        if (trimmed && CLIENT_I18N_DICT[trimmed]) {
+          clientTextNodesCache.push({
+            node,
+            prefix: raw.match(/^\s*/)[0],
+            suffix: raw.match(/\s*$/)[0],
+            vi: trimmed,
+            en: CLIENT_I18N_DICT[trimmed]
+          });
+        }
+      }
+    }
+
+    function setClientLanguage(lang) {
+      initClientI18nCache();
+      currentClientLang = lang === 'en' ? 'en' : 'vi';
+
+      const btnVi = document.getElementById('btn-lang-vi');
+      const btnEn = document.getElementById('btn-lang-en');
+      const activeLangCls = 'px-2.5 py-1 rounded-md bg-white text-emerald-700 shadow-sm transition';
+      const inactiveLangCls = 'px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition';
+
+      if (btnVi && btnEn) {
+        btnVi.className = currentClientLang === 'vi' ? activeLangCls : inactiveLangCls;
+        btnEn.className = currentClientLang === 'en' ? activeLangCls : inactiveLangCls;
+      }
+
+      clientTextNodesCache.forEach(item => {
+        item.node.nodeValue = item.prefix + (currentClientLang === 'en' ? item.en : item.vi) + item.suffix;
+      });
+
+      const btnAirYes = document.getElementById('btn-airlock-yes');
+      const btnAirNo = document.getElementById('btn-airlock-no');
+      if (btnAirYes) btnAirYes.textContent = currentClientLang === 'en' ? 'Yes' : 'Có';
+      if (btnAirNo) btnAirNo.textContent = currentClientLang === 'en' ? 'No' : 'Không';
+    }
   </script>
 </body>
 </html>
