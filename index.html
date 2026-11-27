@@ -125,6 +125,52 @@
   #view-customer .numpad-btn {
     height: 3.5rem; font-size: 1.125rem; border-radius: 0.625rem;
   }
+      /* ===== BỐ CỤC CÂN ĐỐI: MỖI BƯỚC LÀ CÁC THẺ ĐỀU NHAU ===== */
+
+  /* Thẻ chung cho mọi bước */
+  #view-customer div#step-1[id].grid > div,
+  #view-customer div#step-3[id].grid > div,
+  #view-customer div#step-2[id],
+  #view-customer div#step-4[id],
+  #view-customer div#step-5[id] {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  }
+
+  /* Độ rộng: bước 1 và 3 có 2 thẻ nên rộng hơn; bước 2, 4, 5 có 1 thẻ */
+  #view-customer div#step-1[id],
+  #view-customer div#step-3[id] { max-width: 1100px; }
+  #view-customer div#step-2[id],
+  #view-customer div#step-4[id],
+  #view-customer div#step-5[id] { max-width: 880px; }
+
+  @media (min-width: 1024px) {
+    /* Bước 1: thẻ form giãn hết chỗ, thẻ bàn phím rộng cố định 340px, cao bằng nhau */
+    #view-customer div#step-1[id].grid {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      align-items: stretch;
+      column-gap: 1.5rem;
+    }
+    #view-customer div#step-1[id].grid > div { grid-column: auto; }
+
+    /* Bước 3: hai thẻ cao bằng nhau */
+    #view-customer div#step-3[id].grid {
+      align-items: stretch;
+      column-gap: 1.5rem;
+    }
+  }
+
+  /* Thẻ bàn phím: bàn phím nằm chính giữa thẻ */
+  #view-customer div#step-1[id].grid > div:last-child {
+    display: flex; align-items: center; justify-content: center;
+  }
+  #view-customer #step-1 div:has(> .numpad-btn) {
+    background: transparent; border: 0; padding: 0;
+    width: 100%; max-width: 17rem;
+  }
     @media print {
       header, #wizard-footer, #admin-modal, #toast-banner, .no-print { display: none !important; }
       body { background-color: #fff !important; }
