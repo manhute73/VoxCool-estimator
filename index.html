@@ -840,27 +840,39 @@
                   <div class="col-span-4">Số lần mở cửa quy ước (lần/ngày)</div>
                 </div>
                 <!-- Dòng Thấp (Low) -->
-<div class="col-span-4 flex items-center gap-2">
-  <input type="number" step="1" min="0" id="adm-door-low" value="5" oninput="onAdminDoorRuleChange()"
-    class="w-24 px-2 py-1 border rounded font-bold bg-white">
-  <span class="text-slate-500">lần/ngày</span>
-  <button type="button" onclick="toggleSingleLock('adm-door-low')" id="lock-btn-adm-door-low" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+<div class="grid grid-cols-12 items-center px-4 py-2.5">
+  <div class="col-span-4 font-semibold text-slate-800">Thấp (Low)</div>
+  <div class="col-span-4 text-slate-600">1 – 5 lần/ngày (Ít xuất nhập hàng)</div>
+  <div class="col-span-4 flex items-center gap-2">
+    <input type="number" step="1" min="0" id="adm-door-low" value="5" oninput="onAdminDoorRuleChange()"
+      class="w-24 px-2 py-1 border rounded font-bold bg-white">
+    <span class="text-slate-500">lần/ngày</span>
+    <button type="button" onclick="toggleSingleLock('adm-door-low')" id="lock-btn-adm-door-low" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+  </div>
 </div>
 
 <!-- Dòng Trung bình (Medium) -->
-<div class="col-span-4 flex items-center gap-2">
-  <input type="number" step="1" min="0" id="adm-door-med" value="10" oninput="onAdminDoorRuleChange()"
-    class="w-24 px-2 py-1 border rounded font-bold bg-white">
-  <span class="text-slate-500">lần/ngày</span>
-  <button type="button" onclick="toggleSingleLock('adm-door-med')" id="lock-btn-adm-door-med" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+<div class="grid grid-cols-12 items-center px-4 py-2.5">
+  <div class="col-span-4 font-semibold text-slate-800">Trung bình (Medium)</div>
+  <div class="col-span-4 text-slate-600">6 – 15 lần/ngày (Vận hành tiêu chuẩn)</div>
+  <div class="col-span-4 flex items-center gap-2">
+    <input type="number" step="1" min="0" id="adm-door-med" value="10" oninput="onAdminDoorRuleChange()"
+      class="w-24 px-2 py-1 border rounded font-bold bg-white">
+    <span class="text-slate-500">lần/ngày</span>
+    <button type="button" onclick="toggleSingleLock('adm-door-med')" id="lock-btn-adm-door-med" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+  </div>
 </div>
 
 <!-- Dòng Cao (High) -->
-<div class="col-span-4 flex items-center gap-2">
-  <input type="number" step="1" min="0" id="adm-door-high" value="15" oninput="onAdminDoorRuleChange()"
-    class="w-24 px-2 py-1 border rounded font-bold bg-white">
-  <span class="text-slate-500">lần/ngày</span>
-  <button type="button" onclick="toggleSingleLock('adm-door-high')" id="lock-btn-adm-door-high" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+<div class="grid grid-cols-12 items-center px-4 py-2.5">
+  <div class="col-span-4 font-semibold text-slate-800">Cao (High)</div>
+  <div class="col-span-4 text-slate-600">&gt; 15 lần/ngày (Xuất nhập liên tục)</div>
+  <div class="col-span-4 flex items-center gap-2">
+    <input type="number" step="1" min="0" id="adm-door-high" value="15" oninput="onAdminDoorRuleChange()"
+      class="w-24 px-2 py-1 border rounded font-bold bg-white">
+    <span class="text-slate-500">lần/ngày</span>
+    <button type="button" onclick="toggleSingleLock('adm-door-high')" id="lock-btn-adm-door-high" class="text-xs hover:scale-110 transition" title="Khóa/Mở khóa ô này">🔓</button>
+  </div>
 </div>
                 </div>
               </div>
