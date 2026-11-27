@@ -427,42 +427,26 @@
             </div>
           </div>
 
-          <!-- STEP 4: PEAK SHIFTING HOURS & SOLAR PV -->
+                   <!-- STEP 4: THỜI GIAN CẮT TẢI -->
           <div id="step-4" class="hidden space-y-6 max-w-2xl">
             <div>
-              <label class="block text-base font-bold text-slate-800 mb-2">1. Số giờ muốn tắt máy nén chạy bằng Pin lạnh VOX Cool mỗi ngày</label>
-              <p class="text-xs text-slate-500 mb-3">Mặc định theo Case I: cắt 5 giờ cao điểm mỗi ngày (17h30 – 22h30).</p>
-              <div class="grid grid-cols-3 gap-3">
-                <button type="button" onclick="selectShiftHours(5)" id="btn-hrs-5" class="hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center">
+              <label class="block text-base font-bold text-slate-800 mb-2">Số giờ muốn tắt máy nén chạy bằng Pin lạnh VOX Cool mỗi ngày</label>
+              <p class="text-xs text-slate-500 mb-3">Mặc định theo Case I: cắt 5 giờ cao điểm mỗi ngày (17h30 – 22h30). Nếu muốn số giờ khác, nhập vào ô bên phải.</p>
+              <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="selectShiftHours(5)" id="btn-hrs-5"
+                  class="hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center">
                   <div class="text-lg">5 giờ/ngày</div>
-                  <div class="text-xs font-normal text-emerald-700">Case I (Mặc định)</div>
+                  <div class="text-xs font-normal">Case I (Mặc định)</div>
                 </button>
-                <button type="button" onclick="selectShiftHours(8)" id="btn-hrs-8" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
-                  <div class="text-lg">8 giờ/ngày</div>
-                  <div class="text-xs font-normal text-slate-500">Cao điểm + 3h bình thường</div>
-                </button>
-                <button type="button" onclick="selectShiftHours(10)" id="btn-hrs-10" class="hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center">
-                  <div class="text-lg">10 giờ/ngày</div>
-                  <div class="text-xs font-normal text-slate-500">Tối đa trữ lạnh đêm</div>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-base font-bold text-slate-800 mb-2">2. Kho có hệ thống Điện mặt trời mái nhà (Solar PV) dư công suất không?</label>
-              <div class="grid grid-cols-3 gap-3 max-w-md">
-                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
-                  <input type="radio" name="cust-solar" value="yes" class="mr-2 accent-emerald-600">
-                  <span class="text-sm font-semibold">Có (Yes)</span>
-                </label>
-                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
-                  <input type="radio" name="cust-solar" value="no" class="mr-2 accent-emerald-600">
-                  <span class="text-sm font-semibold">Không (No)</span>
-                </label>
-                <label class="flex items-center justify-center p-3 rounded-lg border border-slate-200 cursor-pointer">
-                  <input type="radio" name="cust-solar" value="unknown" checked class="mr-2 accent-emerald-600">
-                  <span class="text-sm font-semibold">Không rõ</span>
-                </label>
+                <div id="box-hrs-custom" class="py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <input type="number" id="cust-shift-hours" min="0.5" max="18" step="0.5" placeholder="Nhập số"
+                      oninput="onCustomShiftHours()"
+                      class="w-24 px-2 py-1 font-bold text-center border border-slate-200 rounded-lg bg-slate-100 focus:outline-none focus:border-emerald-500">
+                    <span class="text-lg font-bold">giờ/ngày</span>
+                  </div>
+                  <div class="text-xs font-normal text-slate-500 mt-1">Số giờ khác theo nhu cầu (tối đa 18 giờ)</div>
+                </div>
               </div>
             </div>
           </div>
@@ -2572,6 +2556,7 @@ const STORAGE_KEY_ADMIN_DRAFT = STORAGE_KEY_CONFIG + '_admin_draft';
       });
 
       resetRoomAndAirlockSelection();
+      selectShiftHours(5);
       updateLiveVolume();
       goToStep(1);
     }
@@ -2686,16 +2671,34 @@ let custDoorFreqLevel = null;
       updateLiveVolume();
     }
 
-    function selectShiftHours(hrs) {
-      selectedShiftHours = hrs;
-      [5, 8, 10].forEach(h => {
-        const btn = document.getElementById(`btn-hrs-${h}`);
-        btn.className = (h === hrs)
-          ? 'hrs-btn py-3 px-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-center'
-          : 'hrs-btn py-3 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-center';
-      });
+    function setShiftHighlight(mode) {
+      const on = 'border-emerald-500 bg-emerald-50 text-emerald-800';
+      const off = 'border-slate-200 bg-white text-slate-700';
+      const b5 = document.getElementById('btn-hrs-5');
+      const bc = document.getElementById('box-hrs-custom');
+      if (b5) b5.className = 'hrs-btn py-3 px-4 rounded-xl border-2 font-bold text-center ' + (mode === 'default' ? on : off);
+      if (bc) bc.className = 'py-3 px-4 rounded-xl border-2 text-center ' + (mode === 'custom' ? on : off);
     }
 
+    function selectShiftHours(hrs) {
+      selectedShiftHours = hrs;
+      const inp = document.getElementById('cust-shift-hours');
+      if (inp) inp.value = '';
+      setShiftHighlight('default');
+    }
+
+    function onCustomShiftHours() {
+      const inp = document.getElementById('cust-shift-hours');
+      let v = parseFloat(inp.value);
+      if (isNaN(v) || v <= 0) {      // để trống thì quay về mặc định 5 giờ
+        selectedShiftHours = 5;
+        setShiftHighlight('default');
+        return;
+      }
+      if (v > 18) { v = 18; inp.value = 18; }
+      selectedShiftHours = v;
+      setShiftHighlight('custom');
+    }
     let custTariffMode = 'admin_default';
     function selectTariffPreset(preset) {
       custTariffMode = preset;
