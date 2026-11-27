@@ -63,18 +63,13 @@
 <body class="text-slate-800 antialiased">
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="bg-[#0f172a] text-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-extrabold text-slate-950 text-lg shadow">
-          V
-        </div>
-        <div>
-          <span class="font-bold tracking-wider text-lg text-white">VOX COOL</span>
-          <span class="hidden sm:inline-block text-xs text-emerald-400 font-semibold ml-2 uppercase tracking-widest border-l border-slate-700 pl-2">
-            Thermal Energy Storage
-          </span>
-        </div>
+  <header class="bg-white shadow-md border-b border-slate-200 sticky top-0 z-50">
+    <div class="w-full px-6 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <img src="logo-voxcool.jpg" alt="VOX Cool" class="h-12 w-auto">
+        <span class="hidden sm:inline-block text-xs text-emerald-600 font-semibold uppercase tracking-widest border-l border-slate-300 pl-4">
+          Thermal Energy Storage
+        </span>
       </div>
 
       <div class="flex items-center space-x-3">
@@ -96,22 +91,22 @@
   <!-- ===================================================================== -->
   <!-- VIEW 1: CUSTOMER / PARTNER ESTIMATOR (CHẠY THEO CÔNG THỨC ADMIN LƯU)  -->
   <!-- ===================================================================== -->
-<main id="view-customer" class="max-w-7xl mx-auto my-8 px-4">
-  <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 items-stretch">
+  <main id="view-customer" class="w-full">
+  <div class="grid grid-cols-1 lg:grid-cols-10 lg:h-[calc(100vh_-_5rem)]">
 
-       <!-- CỘT ẢNH PIN LẠNH (3/10) -->
-    <div class="lg:col-span-3 flex flex-col items-center justify-center p-5 min-h-[260px] no-print">
+    <!-- KHỐI TRÁI 3/10: ẢNH PIN LẠNH -->
+    <div class="lg:col-span-3 flex flex-col items-center justify-center p-6 lg:p-8 no-print">
       <img src="vox-battery.jpg" alt="Pin lạnh VOX Cool"
-        class="w-full max-h-[420px] object-contain mix-blend-multiply">
-      <div class="mt-4 text-center">
-        <div class="text-slate-800 font-extrabold text-base">Pin lạnh VOX Cool</div>
-        <div class="text-emerald-600 text-xs font-semibold mt-0.5">Innovative Cooling Solutions</div>
+        class="w-full max-w-md max-h-[260px] lg:max-h-[55vh] object-contain mix-blend-multiply">
+      <div class="mt-6 text-center">
+        <div class="text-slate-800 font-extrabold text-xl">Pin lạnh VOX Cool</div>
+        <div class="text-emerald-600 text-sm font-semibold mt-1">Giải pháp trữ lạnh thông minh PCM</div>
       </div>
     </div>
 
-    <!-- CỘT BẢNG TÍNH (7/10) -->
-    <div class="lg:col-span-7">
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 min-h-[580px] flex flex-col md:flex-row">
+    <!-- KHỐI PHẢI 7/10: BẢNG TÍNH -->
+    <div class="lg:col-span-7 p-4 lg:p-6 flex flex-col lg:overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200 flex-1 min-h-[580px] flex flex-col md:flex-row">
       
       <!-- LEFT SIDEBAR STEPPER -->
       <aside class="w-full md:w-20 bg-[#1e293b] text-slate-400 flex md:flex-col justify-between py-3 md:py-6 px-4 md:px-0 items-center shrink-0 no-print">
