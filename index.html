@@ -621,7 +621,6 @@
         class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
 3. Review &amp; Chỉnh Giao Diện Khách<span id="lead-count-badge" hidden></span>
       </button>
-      </button>
     </div>
 
     <!-- ADMIN TAB 1 -->
@@ -3258,37 +3257,48 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       if (btnAirNo) btnAirNo.textContent = currentClientLang === 'en' ? 'No' : 'Không';
     }
   </script>
-  <!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH (dán cả khối này ngay TRÊN thẻ đóng body) ===== -->
+ <!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH ===== -->
 <script>
 (() => {
   // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
   const PUBLISHED = null;
- 
+
   const KEY = 'voxcool_theme_v1';
   const FONTS = ['Inter', 'Be Vietnam Pro', 'Roboto', 'Montserrat', 'Open Sans', 'Arial', 'Times New Roman'];
   const root = document.getElementById('view-customer');
   const isPreview = new URLSearchParams(location.search).has('preview') && window.self !== window.top;
   const $ = id => document.getElementById(id);
- 
-  const empty = () => ({ pageBg: '', font: '', rules: {}, blocks: [] });
+
+  const empty = () => ({ pageBg: '', font: '', rules: {}, texts: {}, blocks: [] });
+  const clone = obj => JSON.parse(JSON.stringify(obj));
   const load = () => {
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-    return { ...empty(), ...JSON.parse(JSON.stringify(saved || PUBLISHED || {})) };
+    return { ...empty(), ...clone(saved || PUBLISHED || {}) };
   };
   let theme = load();
- 
+
   const link = document.head.appendChild(document.createElement('link'));
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
- 
-  /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
+
+  const origTexts = new WeakMap();
+  function setLeafText(el, val) {
+    if (!origTexts.has(el)) origTexts.set(el, el.textContent);
+    el.textContent = val;
+  }
+  function restoreAllTexts() {
+    root.querySelectorAll('*').forEach(el => {
+      if (origTexts.has(el)) el.textContent = origTexts.get(el);
+    });
+  }
+
   const style = document.head.appendChild(document.createElement('style'));
   function apply() {
     let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
     if (theme.pageBg) css += `#view-customer{background:${theme.pageBg}!important}`;
     if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
-    for (const [sel, r] of Object.entries(theme.rules)) {
+    for (const [sel, r] of Object.entries(theme.rules || {})) {
       let own = '', deep = '';
       if (r.bg) own += `background:${r.bg}!important;`;
       if (r.w) own += `width:${r.w}px!important;max-width:none!important;`;
@@ -3302,10 +3312,19 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       if (deep) css += `${sel},${sel} *{${deep}}`;
     }
     style.textContent = css;
+
+    restoreAllTexts();
+    for (const [sel, txt] of Object.entries(theme.texts || {})) {
+      try {
+        const el = root.querySelector(sel);
+        if (el && !el.classList.contains('vox-block')) setLeafText(el, txt);
+      } catch (e) {}
+    }
   }
+
   function renderBlocks() {
     root.querySelectorAll(':scope > .vox-block').forEach(b => b.remove());
-    theme.blocks.forEach(b => {
+    (theme.blocks || []).forEach(b => {
       const d = root.appendChild(document.createElement('div'));
       d.id = b.id;
       d.className = 'vox-block';
@@ -3314,9 +3333,9 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   }
   const refresh = () => { apply(); renderBlocks(); };
   refresh();
- 
- /* ---------- Trang chính: XÓA hẳn mục Khách Hàng Đã Tính Toán & THAY BẰNG Tab Review Giao Diện Khách ---------- */
- if (!isPreview) {
+
+  /* ---------- Trang chính: nạp khung Review vào Tab 3 ---------- */
+  if (!isPreview) {
     window.addEventListener('storage', e => { if (e.key === KEY) { theme = load(); refresh(); } });
     const tabBtn = $('admin-tab-leads'), wrap = $('vox-review-host'), frame = $('vox-preview-frame');
     const reloadBtn = $('vox-reload-btn'), fullBtn = $('vox-full-btn');
@@ -3340,76 +3359,284 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     return;
   }
 
-    // 3. Thay thế nút Tab 3 cũ bằng nút Tab mới: "3. Review & Chỉnh Giao Diện Khách"
-    const newTab = oldTab.cloneNode(false);
-    newTab.id = 'admin-tab-review';
-    newTab.textContent = '3. Review & Chỉnh Giao Diện Khách';
-    oldTab.replaceWith(newTab);
+  /* ---------- Trang xem trước: công cụ chỉnh sửa ---------- */
+  document.querySelector('header').style.display = 'none';
+  window.validateStepInputs = () => true;
+  switchMode('customer');
 
-    // 4. Tạo mới hoàn toàn khung nội dung Review & Chỉnh Giao Diện Khách thay cho panel cũ
-    const reviewPanel = document.createElement('div');
-    reviewPanel.id = 'admin-panel-review';
-    reviewPanel.className = oldPanel ? oldPanel.className : 'max-w-7xl mx-auto mt-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm';
-    reviewPanel.style.display = 'none';
+  document.head.appendChild(document.createElement('style')).textContent = `
+    #vox-tool{position:fixed;top:8px;right:8px;width:255px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
+    #vox-tool.left{right:auto;left:8px}
+    #vox-tool.min .body{display:none}
+    #vox-tool .body,#vt-sel{display:flex;flex-direction:column;gap:6px}
+    #vox-tool [hidden]{display:none!important}
+    #vox-tool .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    #vox-tool button,#vox-tool select,#vox-tool textarea,#vox-tool input[type=number]{border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;padding:4px 6px}
+    #vox-tool select,#vox-tool input[type=number]{width:125px}
+    #vox-tool button{cursor:pointer}
+    #vox-tool button:disabled{opacity:0.45;cursor:not-allowed}
+    #vox-tool button.main{background:#059669;border-color:#059669;color:#fff;font-weight:700}
+    #vox-tool button.undo{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:700}
+    #vox-box{position:fixed;display:none;border:2px dashed #2563eb;pointer-events:none;z-index:99998}
+    #vox-box i{position:absolute;right:-9px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:#2563eb;pointer-events:auto;cursor:nwse-resize;touch-action:none}
+    body.vox-editing #view-customer,body.vox-editing #view-customer *{cursor:move!important;user-select:none;touch-action:none}`;
 
-    const normal = 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
-    reviewPanel.innerHTML = `
-      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px">
-        <span style="font-size:12px;color:#475569;font-weight:600">🎨 Bấm vào khối hoặc chữ bất kỳ để đổi màu nền, màu ô, phông chữ, màu chữ, sửa nội dung, kéo thả vị trí hoặc kéo góc xanh đổi kích thước.</span>
-        <div style="display:flex;gap:6px">
-          <button type="button" data-act="reload" style="border:1px solid #cbd5e1;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;background:#fff;color:#0f172a;cursor:pointer">↻ Tải lại</button>
-          <button type="button" data-act="full" style="border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;background:#0f172a;color:#fff;cursor:pointer">⛶ Toàn màn hình</button>
+  const opts = '<option value="">Mặc định</option>' + FONTS.map(f => `<option>${f}</option>`).join('');
+  const tool = document.body.appendChild(document.createElement('div'));
+  tool.id = 'vox-tool';
+  tool.innerHTML = `
+    <div class="row"><b>Chỉnh giao diện</b><span><button data-a="undo" id="vt-undo" class="undo" title="Quay lại thao tác trước (Ctrl+Z)" disabled>↶ Quay lại</button> <button data-a="side" title="Đổi bên">⇆</button> <button data-a="min" title="Thu gọn">—</button></span></div>
+    <div class="body">
+      <label class="row">Chế độ chỉnh <input type="checkbox" id="vt-edit" checked></label>
+      <small>Bấm vào chữ hoặc khối bất kỳ để sửa. Tắt chế độ chỉnh để chuyển bước.</small>
+      <hr><b>Toàn trang</b>
+      <label class="row">Màu nền <input type="color" data-g="pageBg" value="#f4f7f9"></label>
+      <label class="row">Phông chữ <select data-g="font">${opts}</select></label>
+      <hr><b>Khối đang chọn</b>
+      <small id="vt-name">Bấm vào một khối trên trang</small>
+      <div id="vt-sel" hidden>
+        <button data-a="parent">↑ Chọn khối lớn hơn</button>
+        <div id="vt-text-wrap" style="display:flex;flex-direction:column;gap:3px">
+          <small style="font-weight:700;color:#334155">Nội dung chữ:</small>
+          <textarea id="vt-text" rows="2" placeholder="Nhập nội dung chữ..."></textarea>
         </div>
+        <label class="row">Màu nền <input type="color" data-p="bg"></label>
+        <label class="row">Màu chữ <input type="color" data-p="color"></label>
+        <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
+        <label class="row">Cỡ chữ <input type="number" data-p="size" min="8" max="96"></label>
+        <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
+        <label class="row">Cao (px) <input type="number" data-p="h" min="20"></label>
+        <button data-a="clear">Bỏ chỉnh khối này</button>
+        <button data-a="del">Xóa khối</button>
       </div>
-      <div data-wrap style="${normal}">
-        <iframe title="Review giao diện khách" allow="clipboard-write" style="flex:1;width:100%;border:1px solid #cbd5e1;border-radius:12px"></iframe>
-      </div>`;
+      <hr>
+      <button data-a="add">+ Thêm khối chữ</button>
+      <button data-a="save" class="main">Lưu giao diện</button>
+      <button data-a="copy">Sao chép mã giao diện</button>
+      <button data-a="reset">Về mặc định</button>
+      <small id="vt-msg"></small>
+    </div>`;
 
-    if (oldPanel) {
-      oldPanel.replaceWith(reviewPanel);
-    } else {
-      const adminView = $('view-admin') || document.body;
-      adminView.appendChild(reviewPanel);
+  const box = document.body.appendChild(document.createElement('div'));
+  box.id = 'vox-box';
+  box.innerHTML = '<i title="Kéo để đổi kích thước"></i>';
+  tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
+  tool.querySelector('[data-g="font"]').value = theme.font || '';
+
+  const history = [];
+  let textInputTimer = null;
+  function updateUndoBtn() {
+    const btn = $('vt-undo');
+    if (btn) btn.disabled = history.length === 0;
+  }
+  function pushHistory() {
+    const snap = JSON.stringify(theme);
+    if (history.length && history[history.length - 1] === snap) return;
+    history.push(snap);
+    if (history.length > 40) history.shift();
+    updateUndoBtn();
+  }
+  function undo() {
+    if (!history.length) return;
+    theme = JSON.parse(history.pop());
+    updateUndoBtn();
+    tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
+    tool.querySelector('[data-g="font"]').value = theme.font || '';
+    refresh();
+    if (sel && !document.body.contains(sel)) sel = null;
+    select(sel);
+    msg('Đã quay lại bước trước.');
+  }
+
+  let sel = null, drag = null;
+  const editing = () => $('vt-edit').checked;
+  const msg = text => { $('vt-msg').textContent = text; };
+  const keyOf = el => {
+    const path = [];
+    while (!el.id) {
+      path.unshift(`${el.tagName.toLowerCase()}:nth-child(${[...el.parentElement.children].indexOf(el) + 1})`);
+      el = el.parentElement;
     }
+    return ['#' + CSS.escape(el.id), ...path].join(' > ');
+  };
+  const rule = () => (theme.rules[keyOf(sel)] ||= {});
+  const hex = c => {
+    const m = c.match(/[\d.]+/g);
+    if (!m || m[3] === '0') return '#ffffff';
+    return '#' + m.slice(0, 3).map(n => Math.round(n).toString(16).padStart(2, '0')).join('');
+  };
+  const canEditText = el => {
+    if (!el || el === root) return false;
+    if (el.classList.contains('vox-block')) return true;
+    const tag = el.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA', 'IMG', 'SVG', 'PATH', 'TABLE', 'TBODY', 'TR'].includes(tag)) return false;
+    return el.children.length === 0;
+  };
 
-    const wrap = reviewPanel.querySelector('[data-wrap]');
-    const frame = reviewPanel.querySelector('iframe');
-    const reloadBtn = reviewPanel.querySelector('[data-act="reload"]');
-    const fullBtn = reviewPanel.querySelector('[data-act="full"]');
-    const previewUrl = () => location.href.split(/[?#]/)[0] + '?preview=1';
+  function place() {
+    if (!sel || !editing() || !sel.getClientRects().length) { box.style.display = 'none'; return; }
+    const r = sel.getBoundingClientRect();
+    Object.assign(box.style, { display: 'block', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  }
 
-    // Xử lý chuyển qua lại giữa Tab 1, Tab 2 và Tab 3 (Review)
-    const tabBar = newTab.parentElement;
-    if (tabBar) {
-      tabBar.addEventListener('click', e => {
-        const clicked = e.target.closest('button, [role="tab"], a');
-        if (!clicked) return;
-        const isReview = (clicked === newTab);
-        reviewPanel.style.display = isReview ? 'block' : 'none';
-        if (isReview) {
-          // Bật kiểu active cho Tab 3 và tắt active ở Tab 1, 2
-          [...tabBar.children].forEach(t => {
-            t.classList.remove('border-emerald-600', 'text-emerald-700', 'font-bold', 'bg-white', 'shadow-sm');
-          });
-          newTab.classList.add('border-emerald-600', 'text-emerald-700', 'font-bold', 'bg-white', 'shadow-sm');
-          // Ẩn nội dung Tab 1 & Tab 2 nếu đang mở
-          document.querySelectorAll('[id^="admin-panel-"]:not(#admin-panel-review), [id*="tab-content"]').forEach(p => {
-            p.style.display = 'none';
-          });
-          if (!frame.getAttribute('src')) frame.src = previewUrl();
-        }
+  function select(el) {
+    sel = el;
+    $('vt-sel').hidden = !el;
+    const isBlock = !!el && el.classList.contains('vox-block');
+    $('vt-name').textContent = !el ? 'Bấm vào một khối trên trang'
+      : isBlock ? 'Khối chữ tự thêm'
+      : `<${el.tagName.toLowerCase()}> ${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 32)}`;
+    if (el) {
+      const r = theme.rules[keyOf(el)] || {}, cs = getComputedStyle(el), rect = el.getBoundingClientRect();
+      const hints = { size: parseInt(cs.fontSize), w: Math.round(rect.width), h: Math.round(rect.height) };
+      tool.querySelectorAll('[data-p]').forEach(i => {
+        const p = i.dataset.p;
+        i.value = i.type === 'color' ? (r[p] || hex(p === 'bg' ? cs.backgroundColor : cs.color)) : (r[p] || '');
+        if (p in hints) i.placeholder = hints[p];
       });
+      const editable = canEditText(el);
+      $('vt-text-wrap').hidden = !editable;
+      tool.querySelector('[data-a="del"]').hidden = !isBlock;
+      if (editable) $('vt-text').value = el.textContent;
+    }
+    place();
+  }
+
+  tool.addEventListener('input', e => {
+    const t = e.target;
+    if (t.id === 'vt-text' && sel) {
+      if (!textInputTimer) pushHistory();
+      clearTimeout(textInputTimer);
+      textInputTimer = setTimeout(() => { textInputTimer = null; }, 600);
+
+      if (sel.classList.contains('vox-block')) {
+        sel.textContent = t.value;
+        const blk = theme.blocks.find(b => b.id === sel.id);
+        if (blk) blk.text = t.value;
+      } else {
+        setLeafText(sel, t.value);
+        theme.texts[keyOf(sel)] = t.value;
+      }
+      place();
+      return;
     }
 
-    let isFull = false;
-    fullBtn.onclick = () => {
-      isFull = !isFull;
-      wrap.style.cssText = isFull ? normal + ';position:fixed;inset:0;height:100vh;z-index:99990;padding:10px' : normal;
-      fullBtn.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
-    };
-    reloadBtn.onclick = () => { frame.src = previewUrl(); };
-    return;
-  } 
- 
+    if (t.dataset.g) {
+      pushHistory();
+      theme[t.dataset.g] = t.value;
+    } else if (t.dataset.p && sel) {
+      pushHistory();
+      const r = rule();
+      if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
+      else delete r[t.dataset.p];
+    } else return;
+    apply();
+    place();
+  });
+
+  tool.addEventListener('click', e => {
+    const a = e.target.dataset.a;
+    if (!a) return;
+    if (a === 'undo') { undo(); return; }
+    if (a === 'min') tool.classList.toggle('min');
+    if (a === 'side') tool.classList.toggle('left');
+    if (a === 'parent' && sel && sel !== root) select(sel.parentElement);
+    if (a === 'add') {
+      pushHistory();
+      const b = { id: 'vox-block-' + Date.now(), text: 'Nội dung mới' };
+      theme.blocks.push(b);
+      renderBlocks();
+      select($(b.id));
+    }
+    if (a === 'clear' && sel) {
+      pushHistory();
+      const k = keyOf(sel);
+      delete theme.rules[k];
+      if (theme.texts && k in theme.texts) delete theme.texts[k];
+      apply();
+      select(sel);
+    }
+    if (a === 'del' && sel) {
+      pushHistory();
+      theme.blocks = theme.blocks.filter(b => b.id !== sel.id);
+      delete theme.rules[keyOf(sel)];
+      select(null);
+      refresh();
+    }
+    if (a === 'save') { localStorage.setItem(KEY, JSON.stringify(theme)); msg('Đã lưu trên trình duyệt này.'); }
+    if (a === 'copy') {
+      const code = JSON.stringify(theme).replace(/</g, '\\u003c');
+      (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject())
+        .then(() => msg('Đã sao chép. Dán thay chữ null ở dòng const PUBLISHED.'))
+        .catch(() => prompt('Bấm Ctrl+C để sao chép:', code));
+    }
+    if (a === 'reset' && confirm('Xóa toàn bộ chỉnh sửa giao diện?')) {
+      pushHistory();
+      theme = empty();
+      select(null);
+      refresh();
+      msg('Đã về mặc định. Bấm "Lưu giao diện" để giữ.');
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && document.activeElement?.id !== 'vt-text') {
+      e.preventDefault();
+      undo();
+    }
+  });
+
+  document.addEventListener('pointerdown', e => {
+    if (!editing()) return;
+    const t = e.target;
+    if (box.contains(t) && sel) {
+      const r = sel.getBoundingClientRect();
+      drag = { mode: 'size', x: e.clientX, y: e.clientY, w: r.width, h: r.height, saved: false };
+      e.preventDefault();
+      return;
+    }
+    if (!root.contains(t)) return;
+    e.preventDefault();
+    if (sel !== t) select(t);
+    const r = theme.rules[keyOf(sel)] || {};
+    drag = { mode: 'move', target: t, x: e.clientX, y: e.clientY, ox: r.x || 0, oy: r.y || 0, moved: false, saved: false };
+  }, true);
+
+  document.addEventListener('pointermove', e => {
+    if (!drag || !sel) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    drag.moved = true;
+    if (sel === root) return;
+    if (!drag.saved) { pushHistory(); drag.saved = true; }
+    const r = rule();
+    if (drag.mode === 'size') {
+      r.w = Math.max(20, Math.round(drag.w + dx));
+      r.h = Math.max(20, Math.round(drag.h + dy));
+    } else {
+      r.x = Math.round(drag.ox + dx);
+      r.y = Math.round(drag.oy + dy);
+      if (getComputedStyle(sel).display === 'inline') r.inline = true;
+    }
+    apply();
+    place();
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (!drag) return;
+    if (drag.mode === 'move' && !drag.moved) select(drag.target);
+    else if (sel) select(sel);
+    drag = null;
+  });
+
+  ['mousedown', 'click', 'dblclick'].forEach(type => document.addEventListener(type, e => {
+    if (editing() && root.contains(e.target)) { e.preventDefault(); e.stopPropagation(); }
+  }, true));
+  $('vt-edit').addEventListener('change', () => { document.body.classList.toggle('vox-editing', editing()); place(); });
+  document.body.classList.add('vox-editing');
+  addEventListener('scroll', place, true);
+  addEventListener('resize', place);
+})();
+</script>
 </body>
 </html>
