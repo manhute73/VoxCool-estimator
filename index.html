@@ -3351,6 +3351,107 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     return;
   }
  
+ <!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH (dán cả khối này ngay TRÊN thẻ đóng body) ===== -->
+<script>
+(() => {
+  // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
+  const PUBLISHED = null;
+ 
+  const KEY = 'voxcool_theme_v1';
+  const FONTS = ['Inter', 'Be Vietnam Pro', 'Roboto', 'Montserrat', 'Open Sans', 'Arial', 'Times New Roman'];
+  const root = document.getElementById('view-customer');
+  const isPreview = new URLSearchParams(location.search).has('preview') && window.self !== window.top;
+  const $ = id => document.getElementById(id);
+ 
+  const empty = () => ({ pageBg: '', font: '', rules: {}, blocks: [], texts: [] });
+  const load = () => {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    return { ...empty(), ...JSON.parse(JSON.stringify(saved || PUBLISHED || {})) };
+  };
+  let theme = load();
+ 
+  const link = document.head.appendChild(document.createElement('link'));
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
+ 
+  /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
+  const style = document.head.appendChild(document.createElement('style'));
+  function apply() {
+    let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
+    if (theme.pageBg) css += `#view-customer{background:${theme.pageBg}!important}`;
+    if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
+    for (const [sel, r] of Object.entries(theme.rules)) {
+      let own = '', deep = '';
+      if (r.bg) own += `background:${r.bg}!important;`;
+      if (r.w) own += `width:${r.w}px!important;max-width:none!important;`;
+      if (r.h) own += `height:${r.h}px!important;min-height:0!important;`;
+      if (r.x || r.y) own += `translate:${r.x || 0}px ${r.y || 0}px!important;`;
+      if (r.inline) own += 'display:inline-block!important;';
+      if (r.color) deep += `color:${r.color}!important;`;
+      if (r.font) deep += `font-family:'${r.font}',sans-serif!important;`;
+      if (r.size) deep += `font-size:${r.size}px!important;`;
+      if (own) css += `${sel}{${own}}`;
+      if (deep) css += `${sel},${sel} *{${deep}}`;
+    }
+    style.textContent = css;
+  }
+  function renderBlocks() {
+    root.querySelectorAll(':scope > .vox-block').forEach(b => b.remove());
+    theme.blocks.forEach(b => {
+      const d = root.appendChild(document.createElement('div'));
+      d.id = b.id;
+      d.className = 'vox-block';
+      d.textContent = b.text;
+    });
+  }
+  // Chữ đã sửa: chỉ thay khi chữ hiện tại đúng bằng chữ gốc (không đè lên số/tiêu đề đã đổi)
+  const targetOf = x => {
+    const el = document.querySelector(x.sel);
+    if (!el) return null;
+    if (x.i === 'ph') return { get: () => el.getAttribute('placeholder') || '', set: v => el.setAttribute('placeholder', v) };
+    const n = [...el.childNodes].filter(c => c.nodeType === 3)[x.i];
+    return n && {
+      get: () => n.nodeValue.trim(),
+      set: v => { const raw = n.nodeValue, t = raw.trim(); n.nodeValue = t ? raw.replace(t, () => v) : v; }
+    };
+  };
+  function applyTexts(back) {
+    theme.texts.forEach(x => {
+      const t = targetOf(x);
+      const [a, b] = back ? [x.to, x.from] : [x.from, x.to];
+      if (t && a !== b && t.get() === a) t.set(b);
+    });
+  }
+  const refresh = () => { apply(); renderBlocks(); applyTexts(); };
+  refresh();
+  new MutationObserver(() => applyTexts()).observe(root, { childList: true, characterData: true, subtree: true });
+ 
+  /* ---------- Trang chính: thay tab 3 bằng khung xem trước ---------- */
+  if (!isPreview) {
+    window.addEventListener('storage', e => { if (e.key === KEY) { applyTexts(true); theme = load(); refresh(); } });
+    const tabBtn = $('admin-tab-leads'), panel = $('admin-panel-leads');
+    if (!tabBtn || !panel) return;
+    // Giữ lại phần tử cũ (ẩn đi) để các hàm sẵn có không bị lỗi
+    tabBtn.innerHTML = '3. Xem trước &amp; Chỉnh giao diện khách<span id="lead-count-badge" hidden></span>';
+    [...panel.children].forEach(c => c.style.display = 'none');
+    const wrap = panel.appendChild(document.createElement('div'));
+    const normal = 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
+    wrap.style.cssText = normal;
+    wrap.innerHTML = '<button type="button" style="align-self:flex-end;border:1px solid #cbd5e1;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">⛶ Toàn màn hình</button><iframe title="Xem trước giao diện khách" allow="clipboard-write" style="flex:1;width:100%;border:1px solid #cbd5e1;border-radius:12px"></iframe>';
+    const [full, frame] = wrap.children;
+    let isFull = false;
+    full.onclick = () => {
+      isFull = !isFull;
+      wrap.style.cssText = isFull ? normal + ';position:fixed;inset:0;height:100vh;z-index:1000;padding:8px' : normal;
+      full.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
+    };
+    tabBtn.addEventListener('click', () => {
+      if (!frame.getAttribute('src')) frame.src = location.href.split(/[?#]/)[0] + '?preview=1';
+    });
+    return;
+  }
+ 
   /* ---------- Trang xem trước: công cụ chỉnh sửa ---------- */
   document.querySelector('header').style.display = 'none';
   window.validateStepInputs = () => true; // cho phép xem mọi bước, không cần nhập liệu
@@ -3386,6 +3487,8 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       <small id="vt-name">Bấm vào một khối trên trang</small>
       <div id="vt-sel" hidden>
         <button data-a="parent">↑ Chọn khối lớn hơn</button>
+        <b>Sửa chữ</b>
+        <div id="vt-texts" style="display:flex;flex-direction:column;gap:4px"></div>
         <label class="row">Màu nền <input type="color" data-p="bg"></label>
         <label class="row">Màu chữ <input type="color" data-p="color"></label>
         <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
@@ -3397,6 +3500,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         <button data-a="del">Xóa khối</button>
       </div>
       <hr>
+      <button data-a="undo">↶ Hoàn tác (Ctrl+Z)</button>
       <button data-a="add">+ Thêm khối chữ</button>
       <button data-a="save" class="main">Lưu giao diện</button>
       <button data-a="copy">Sao chép mã giao diện</button>
@@ -3406,8 +3510,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   const box = document.body.appendChild(document.createElement('div'));
   box.id = 'vox-box';
   box.innerHTML = '<i title="Kéo để đổi kích thước"></i>';
-  tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
-  tool.querySelector('[data-g="font"]').value = theme.font;
  
   let sel = null, drag = null;
   const editing = () => $('vt-edit').checked;
@@ -3431,6 +3533,61 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     const r = sel.getBoundingClientRect();
     Object.assign(box.style, { display: 'block', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
   }
+  const past = [];
+  let lastTag = '', lastAt = 0;
+  // Lưu trạng thái trước khi đổi; gõ liên tục hoặc rê màu được gộp thành 1 bước
+  function record(tag = '') {
+    const now = Date.now();
+    if (!tag || tag !== lastTag || now - lastAt > 800) {
+      past.push(JSON.stringify(theme));
+      if (past.length > 100) past.shift();
+    }
+    lastTag = tag;
+    lastAt = now;
+  }
+  function syncGlobals() {
+    tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
+    tool.querySelector('[data-g="font"]').value = theme.font;
+  }
+  function undo() {
+    if (!past.length) return msg('Không còn bước nào để hoàn tác.');
+    const id = sel && sel.id;
+    applyTexts(true);
+    theme = JSON.parse(past.pop());
+    lastTag = '';
+    refresh();
+    syncGlobals();
+    select(sel && sel.isConnected ? sel : (id ? $(id) : null));
+    msg('Đã hoàn tác.');
+  }
+  function textEditors(el) {
+    const holder = $('vt-texts');
+    holder.textContent = '';
+    if (el.classList.contains('vox-block')) return;
+    const found = [];
+    const add = (node, i) => found.push({ sel: keyOf(node), i });
+    const scan = node => [...node.childNodes].filter(c => c.nodeType === 3).forEach((c, i) => { if (c.nodeValue.trim()) add(node, i); });
+    if (el.tagName === 'SELECT') [...el.options].forEach(scan);
+    else scan(el);
+    if (el.hasAttribute('placeholder')) add(el, 'ph');
+    found.forEach(f => {
+      const t = targetOf(f);
+      const now = t.get();
+      let entry = theme.texts.find(x => x.sel === f.sel && x.i === f.i && x.to === now);
+      const from = entry ? entry.from : now;
+      const area = holder.appendChild(document.createElement('textarea'));
+      area.rows = 2;
+      area.value = now;
+      area.addEventListener('input', () => {
+        record('text' + f.sel + f.i);
+        theme.texts = theme.texts.filter(x => !(x.sel === f.sel && x.i === f.i && x.from === from));
+        if (area.value !== from) theme.texts.push({ ...f, from, to: area.value });
+        targetOf(f).set(area.value);
+        place();
+      });
+    });
+    if (!found.length) holder.innerHTML = '<small>Khối này không có chữ trực tiếp. Hãy bấm đúng vào dòng chữ.</small>';
+  }
   function select(el) {
     sel = el;
     $('vt-sel').hidden = !el;
@@ -3449,18 +3606,23 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       $('vt-text').hidden = !isBlock;
       tool.querySelector('[data-a="del"]').hidden = !isBlock;
       if (isBlock) $('vt-text').value = el.textContent;
+      textEditors(el);
     }
     place();
   }
  
+  syncGlobals();
+ 
   tool.addEventListener('input', e => {
     const t = e.target;
-    if (t.dataset.g) theme[t.dataset.g] = t.value;
+    if (t.dataset.g) { record(t.dataset.g); theme[t.dataset.g] = t.value; }
     else if (t.dataset.p && sel) {
+      record(t.dataset.p + keyOf(sel));
       const r = rule();
       if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
       else delete r[t.dataset.p];
     } else if (t.id === 'vt-text' && sel) {
+      record('block' + sel.id);
       sel.textContent = t.value;
       theme.blocks.find(b => b.id === sel.id).text = t.value;
     } else return;
@@ -3474,14 +3636,25 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (a === 'min') tool.classList.toggle('min');
     if (a === 'side') tool.classList.toggle('left');
     if (a === 'parent' && sel && sel !== root) select(sel.parentElement);
+    if (a === 'undo') undo();
     if (a === 'add') {
+      record();
       const b = { id: 'vox-block-' + Date.now(), text: 'Nội dung mới' };
       theme.blocks.push(b);
       renderBlocks();
       select($(b.id));
     }
-    if (a === 'clear' && sel) { delete theme.rules[keyOf(sel)]; apply(); select(sel); }
+    if (a === 'clear' && sel) {
+      record();
+      const key = keyOf(sel), mine = x => x.sel === key || x.sel.startsWith(key + ' >');
+      applyTexts(true);
+      theme.texts = theme.texts.filter(x => !mine(x));
+      delete theme.rules[key];
+      refresh();
+      select(sel.isConnected ? sel : $(sel.id));
+    }
     if (a === 'del' && sel) {
+      record();
       theme.blocks = theme.blocks.filter(b => b.id !== sel.id);
       delete theme.rules[keyOf(sel)];
       select(null);
@@ -3495,19 +3668,23 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         .catch(() => prompt('Bấm Ctrl+C để sao chép:', code));
     }
     if (a === 'reset' && confirm('Xóa toàn bộ chỉnh sửa giao diện?')) {
+      record();
+      applyTexts(true);
       theme = empty();
       select(null);
       refresh();
+      syncGlobals();
       msg('Đã về mặc định. Bấm "Lưu giao diện" để giữ.');
     }
   });
  
   document.addEventListener('pointerdown', e => {
     if (!editing()) return;
+    window.focus(); // để Ctrl+Z nhận được trong khung xem trước
     const t = e.target;
     if (box.contains(t) && sel) {
       const r = sel.getBoundingClientRect();
-      drag = { mode: 'size', x: e.clientX, y: e.clientY, w: r.width, h: r.height };
+      drag = { mode: 'size', moved: false, x: e.clientX, y: e.clientY, w: r.width, h: r.height };
       e.preventDefault();
       return;
     }
@@ -3521,8 +3698,9 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (!drag || !sel) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (sel === root) { drag.moved = true; return; }
+    if (!drag.moved) record();
     drag.moved = true;
-    if (sel === root) return;
     const r = rule();
     if (drag.mode === 'size') {
       r.w = Math.max(20, Math.round(drag.w + dx));
@@ -3543,14 +3721,22 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   });
   // Khi đang chỉnh, chặn bấm nút/ô nhập của trang
   ['mousedown', 'click', 'dblclick'].forEach(type => document.addEventListener(type, e => {
-    if (editing() && root.contains(e.target)) { e.preventDefault(); e.stopPropagation(); }
+    if (editing() && root.contains(e.target)) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (type === 'dblclick') $('vt-texts').querySelector('textarea')?.focus();
+    }
   }, true));
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+  }, true);
   $('vt-edit').addEventListener('change', () => { document.body.classList.toggle('vox-editing', editing()); place(); });
   document.body.classList.add('vox-editing');
   addEventListener('scroll', place, true);
   addEventListener('resize', place);
 })();
 </script>
+ 
  
 </body>
 </html>
