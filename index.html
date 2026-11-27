@@ -348,7 +348,7 @@
                 <label onclick="selectTariffPreset('admin_default')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50/40 cursor-pointer">
                   <input type="radio" name="cust-tariff" value="admin_default" checked class="mt-1 w-4 h-4 accent-emerald-600">
                   <div class="flex-1">
-                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Kinh doanh (Mặc định theo cấu hình VOX Cool)</div>
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Kinh doanh</div>
                     <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
                       <span>Cao điểm: <strong id="lbl-cust-peak">5.964,2 đ/kWh</strong></span>
                       <span>Bình thường: <strong id="lbl-cust-std">3.467,2 đ/kWh</strong></span>
@@ -360,7 +360,7 @@
                 <label onclick="selectTariffPreset('industrial_lt6')" class="flex items-start space-x-3 p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 cursor-pointer">
                   <input type="radio" name="cust-tariff" value="industrial_lt6" class="mt-1 w-4 h-4 accent-emerald-600">
                   <div class="flex-1">
-                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Sản xuất công nghiệp (Cấp điện áp dưới 6kV)</div>
+                    <div class="font-bold text-slate-800 text-sm">Giá bán lẻ điện Sản xuất công nghiệp</div>
                     <div class="text-xs text-slate-600 mt-1 grid grid-cols-3 gap-2">
                       <span>Cao điểm: <strong>3.640 đ/kWh</strong></span>
                       <span>Bình thường: <strong>1.997 đ/kWh</strong></span>
@@ -2914,6 +2914,7 @@ const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.v
       document.getElementById('out-final-quote').textContent = fmtVND(res.finalQuote) + ' đ';
       document.getElementById('out-adm-payback').textContent = res.paybackYears.toFixed(2) + ' năm';
 
+      syncTariffLabelsToCustomer();
       updateCashflowAndSensitivity(res);
     }
 
