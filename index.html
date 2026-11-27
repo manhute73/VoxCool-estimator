@@ -3457,13 +3457,13 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
 (() => {
   // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
   const PUBLISHED = null;
- 
+
   const KEY = 'voxcool_theme_v1';
   const FONTS = ['Inter', 'Be Vietnam Pro', 'Roboto', 'Montserrat', 'Open Sans', 'Arial', 'Times New Roman'];
   const root = document.getElementById('view-customer');
   const isPreview = new URLSearchParams(location.search).has('preview') && window.self !== window.top;
   const $ = id => document.getElementById(id);
- 
+
   const empty = () => ({ pageBg: '', font: '', rules: {}, blocks: [] });
   const load = () => {
     let saved = null;
@@ -3471,11 +3471,11 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     return { ...empty(), ...JSON.parse(JSON.stringify(saved || PUBLISHED || {})) };
   };
   let theme = load();
- 
+
   const link = document.head.appendChild(document.createElement('link'));
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
- 
+
   /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
   const style = document.head.appendChild(document.createElement('style'));
   function apply() {
@@ -3508,7 +3508,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   }
   const refresh = () => { apply(); renderBlocks(); };
   refresh();
- 
+
   /* ---------- Trang chính: thay tab 3 bằng khung xem trước ---------- */
   if (!isPreview) {
     window.addEventListener('storage', e => { if (e.key === KEY) { theme = load(); refresh(); } });
@@ -3533,12 +3533,12 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     });
     return;
   }
- 
+
   /* ---------- Trang xem trước: công cụ chỉnh sửa ---------- */
   document.querySelector('header').style.display = 'none';
   window.validateStepInputs = () => true; // cho phép xem mọi bước, không cần nhập liệu
   switchMode('customer');
- 
+
   document.head.appendChild(document.createElement('style')).textContent = `
     #vox-tool{position:fixed;top:8px;right:8px;width:240px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
     #vox-tool.left{right:auto;left:8px}
@@ -3553,7 +3553,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     #vox-box{position:fixed;display:none;border:2px dashed #2563eb;pointer-events:none;z-index:99998}
     #vox-box i{position:absolute;right:-9px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:#2563eb;pointer-events:auto;cursor:nwse-resize;touch-action:none}
     body.vox-editing #view-customer,body.vox-editing #view-customer *{cursor:move!important;user-select:none;touch-action:none}`;
- 
+
   const opts = '<option value="">Mặc định</option>' + FONTS.map(f => `<option>${f}</option>`).join('');
   const tool = document.body.appendChild(document.createElement('div'));
   tool.id = 'vox-tool';
@@ -3591,7 +3591,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   box.innerHTML = '<i title="Kéo để đổi kích thước"></i>';
   tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
   tool.querySelector('[data-g="font"]').value = theme.font;
- 
+
   let sel = null, drag = null;
   const editing = () => $('vt-edit').checked;
   const msg = text => { $('vt-msg').textContent = text; };
@@ -3635,7 +3635,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     }
     place();
   }
- 
+
   tool.addEventListener('input', e => {
     const t = e.target;
     if (t.dataset.g) theme[t.dataset.g] = t.value;
@@ -3650,7 +3650,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     apply();
     place();
   });
- 
+
   tool.addEventListener('click', e => {
     const a = e.target.dataset.a;
     if (!a) return;
@@ -3684,7 +3684,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       msg('Đã về mặc định. Bấm "Lưu giao diện" để giữ.');
     }
   });
- 
+
   document.addEventListener('pointerdown', e => {
     if (!editing()) return;
     const t = e.target;
