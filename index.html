@@ -3282,6 +3282,23 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap';
 
+  // Đánh dấu cố định cho mọi phần tử trong #view-customer để không bao giờ bị lệch selector
+  function tagAllElements() {
+    let idx = 0;
+    root.querySelectorAll('*').forEach(el => {
+      if (!el.classList.contains('vox-block') && !el.dataset.voxIdx) {
+        el.dataset.voxIdx = 'v' + (++idx);
+      }
+    });
+  }
+  tagAllElements();
+
+  const keyOf = el => {
+    if (el.classList.contains('vox-block')) return '#' + CSS.escape(el.id);
+    if (!el.dataset.voxIdx) tagAllElements();
+    return `[data-vox-idx="${el.dataset.voxIdx}"]`;
+  };
+
   const origTexts = new WeakMap();
   function setLeafText(el, val) {
     if (!origTexts.has(el)) origTexts.set(el, el.textContent);
@@ -3293,33 +3310,76 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     });
   }
 
+  // Xóa inline style cũ trước khi áp lại
+  const MANAGED_PROPS = [
+    'background', 'width', 'max-width', 'height', 'min-height',
+    'translate', 'display', 'color', '-webkit-text-fill-color',
+    '-webkit-background-clip', 'background-clip', 'font-family',
+    'font-size', 'font-weight', 'font-style'
+  ];
+  function clearInlineRule(el) {
+    MANAGED_PROPS.forEach(p => el.style.removeProperty(p));
+  }
+
+  function applyInlineRule(el, r) {
+    clearInlineRule(el);
+    if (!r) return;
+    if (r.bg) el.style.setProperty('background', r.bg, 'important');
+    if (r.w) {
+      el.style.setProperty('width', r.w + 'px', 'important');
+      el.style.setProperty('max-width', 'none', 'important');
+    }
+    if (r.h) {
+      el.style.setProperty('height', r.h + 'px', 'important');
+      el.style.setProperty('min-height', '0', 'important');
+    }
+    if (r.x || r.y) el.style.setProperty('translate', `${r.x || 0}px ${r.y || 0}px`, 'important');
+    if (r.inline) el.style.setProperty('display', 'inline-block', 'important');
+
+    const targets = [el, ...el.querySelectorAll('*')];
+    targets.forEach(t => {
+      if (r.color) {
+        t.style.setProperty('color', r.color, 'important');
+        t.style.setProperty('-webkit-text-fill-color', r.color, 'important');
+        t.style.setProperty('-webkit-background-clip', 'border-box', 'important');
+        t.style.setProperty('background-clip', 'border-box', 'important');
+      }
+      if (r.font) t.style.setProperty('font-family', `'${r.font}', sans-serif`, 'important');
+      if (r.size) t.style.setProperty('font-size', r.size + 'px', 'important');
+      if (r.style === 'normal') {
+        t.style.setProperty('font-weight', '400', 'important');
+        t.style.setProperty('font-style', 'normal', 'important');
+      } else if (r.style === 'bold') {
+        t.style.setProperty('font-weight', '700', 'important');
+        t.style.setProperty('font-style', 'normal', 'important');
+      } else if (r.style === 'italic') {
+        t.style.setProperty('font-weight', '400', 'important');
+        t.style.setProperty('font-style', 'italic', 'important');
+      } else if (r.style === 'bold-italic') {
+        t.style.setProperty('font-weight', '700', 'important');
+        t.style.setProperty('font-style', 'italic', 'important');
+      }
+    });
+  }
+
   const style = document.head.appendChild(document.createElement('style'));
   function apply() {
+    tagAllElements();
     let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
     if (theme.pageBg) css += `#view-customer{background:${theme.pageBg}!important}`;
     if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
-    for (const [sel, r] of Object.entries(theme.rules || {})) {
-      let own = '', deep = '';
-      if (r.bg) own += `background:${r.bg}!important;`;
-      if (r.w) own += `width:${r.w}px!important;max-width:none!important;`;
-      if (r.h) own += `height:${r.h}px!important;min-height:0!important;`;
-      if (r.x || r.y) own += `translate:${r.x || 0}px ${r.y || 0}px!important;`;
-      if (r.inline) own += 'display:inline-block!important;';
-
-      if (r.color) {
-        deep += `color:${r.color}!important;-webkit-text-fill-color:${r.color}!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;`;
-      }
-      if (r.font) deep += `font-family:'${r.font}',sans-serif!important;`;
-      if (r.size) deep += `font-size:${r.size}px!important;`;
-      if (r.style === 'normal') deep += 'font-weight:400!important;font-style:normal!important;';
-      if (r.style === 'bold') deep += 'font-weight:700!important;font-style:normal!important;';
-      if (r.style === 'italic') deep += 'font-weight:400!important;font-style:italic!important;';
-      if (r.style === 'bold-italic') deep += 'font-weight:700!important;font-style:italic!important;';
-
-      if (own) css += `${sel}{${own}}`;
-      if (deep) css += `${sel},${sel} *{${deep}}`;
-    }
     style.textContent = css;
+
+    // Reset toàn bộ inline style đã quản lý trên root
+    root.querySelectorAll('*').forEach(clearInlineRule);
+
+    // Áp lại từng rule trực tiếp lên DOM
+    for (const [sel, r] of Object.entries(theme.rules || {})) {
+      try {
+        const el = root.querySelector(sel);
+        if (el) applyInlineRule(el, r);
+      } catch (e) {}
+    }
 
     restoreAllTexts();
     for (const [sel, txt] of Object.entries(theme.texts || {})) {
@@ -3339,7 +3399,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       d.textContent = b.text;
     });
   }
-  const refresh = () => { apply(); renderBlocks(); };
+  const refresh = () => { renderBlocks(); apply(); };
   refresh();
 
   /* ---------- Trang chính: nạp khung Review vào Tab 3 ---------- */
@@ -3468,14 +3528,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   let sel = null, drag = null;
   const editing = () => $('vt-edit').checked;
   const msg = text => { $('vt-msg').textContent = text; };
-  const keyOf = el => {
-    const path = [];
-    while (!el.id) {
-      path.unshift(`${el.tagName.toLowerCase()}:nth-child(${[...el.parentElement.children].indexOf(el) + 1})`);
-      el = el.parentElement;
-    }
-    return ['#' + CSS.escape(el.id), ...path].join(' > ');
-  };
   const rule = () => (theme.rules[keyOf(sel)] ||= {});
   const hex = c => {
     const m = c.match(/[\d.]+/g);
