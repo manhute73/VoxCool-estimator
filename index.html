@@ -617,9 +617,10 @@
         class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
 2. Dòng Tiền 10 Năm & Độ Nhạy
       </button>
-      <button onclick="switchAdminTab('leads')" id="admin-tab-leads"
+     <button onclick="switchAdminTab('leads')" id="admin-tab-leads"
         class="py-3 px-4 text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5">
-3. Khách Hàng Đã Tính Toán (<span id="lead-count-badge">0</span>)
+3. Review &amp; Chỉnh Giao Diện Khách<span id="lead-count-badge" hidden></span>
+      </button>
       </button>
     </div>
 
@@ -1643,7 +1644,7 @@
                 <td class="p-3 font-bold text-slate-500">C7</td>
                 <td class="p-3 font-semibold">
                   <div class="flex items-center justify-between">
-                    <<span>C7: Chi phí chiết khấu / Markup thương mại (%)</span>
+                    <span>C7: Chi phí chiết khấu / Markup thương mại (%)</span>
                     <button type="button" onclick="toggleSingleLock('adm-markup-pct')" id="lock-btn-adm-markup-pct" class="text-xs">🔒</button>
                   </div>
                 </td>
@@ -1718,32 +1719,20 @@
       </div>
     </div>
 
-    <!-- ADMIN TAB 3: CUSTOMER LEADS -->
+    <!-- ADMIN TAB 3: REVIEW & CHỈNH GIAO DIỆN KHÁCH -->
     <div id="admin-panel-leads" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-slate-800">Danh sách Khách hàng đã tính toán trên Web</h3>
-        <button onclick="clearAllLeads()" class="text-xs text-red-600 hover:underline">Xóa lịch sử</button>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-100 text-slate-700 border-b">
-              <th class="p-2.5">Thời gian</th>
-              <th class="p-2.5">Khách hàng / Công ty</th>
-              <th class="p-2.5">Liên hệ</th>
-              <th class="p-2.5">Kho & Dòng PCM</th>
-              <th class="p-2.5 text-right">Tiết kiệm/năm</th>
-              <th class="p-2.5 text-right">Báo giá CAPEX</th>
-              <th class="p-2.5 text-center">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="leads-tbody" class="divide-y divide-slate-100">
-            <tr><td colspan="7" class="p-6 text-center text-slate-400">Chưa có khách hàng nào gửi yêu cầu. Hãy thử nhập ở Giao diện Khách hàng!</td></tr>
-          </tbody>
-        </table>
+      <div id="leads-tbody" hidden></div>
+      <div id="vox-review-host" style="display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#475569;font-weight:600">🎨 Bấm vào khối hoặc chữ bất kỳ để đổi màu nền, màu ô, phông chữ, màu chữ, sửa nội dung, kéo thả vị trí hoặc kéo góc xanh đổi kích thước.</span>
+          <div style="display:flex;gap:6px">
+            <button type="button" id="vox-reload-btn" style="border:1px solid #cbd5e1;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;background:#fff;cursor:pointer">↻ Tải lại</button>
+            <button type="button" id="vox-full-btn" style="border:none;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;background:#0f172a;color:#fff;cursor:pointer">⛶ Toàn màn hình</button>
+          </div>
+        </div>
+        <iframe id="vox-preview-frame" title="Review giao diện khách" allow="clipboard-write" style="flex:1;width:100%;border:1px solid #cbd5e1;border-radius:12px"></iframe>
       </div>
     </div>
-
   </section>
 
   <!-- ADMIN LOGIN MODAL -->
@@ -3429,108 +3418,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     return;
   }
  
- <!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH (dán cả khối này ngay TRÊN thẻ đóng body) ===== -->
-<script>
-(() => {
-  // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
-  const PUBLISHED = null;
- 
-  const KEY = 'voxcool_theme_v1';
-  const FONTS = ['Inter', 'Be Vietnam Pro', 'Roboto', 'Montserrat', 'Open Sans', 'Arial', 'Times New Roman'];
-  const root = document.getElementById('view-customer');
-  const isPreview = new URLSearchParams(location.search).has('preview') && window.self !== window.top;
-  const $ = id => document.getElementById(id);
- 
-  const empty = () => ({ pageBg: '', font: '', rules: {}, blocks: [], texts: [] });
-  const load = () => {
-    let saved = null;
-    try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-    return { ...empty(), ...JSON.parse(JSON.stringify(saved || PUBLISHED || {})) };
-  };
-  let theme = load();
- 
-  const link = document.head.appendChild(document.createElement('link'));
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
- 
-  /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
-  const style = document.head.appendChild(document.createElement('style'));
-  function apply() {
-    let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
-    if (theme.pageBg) css += `#view-customer{background:${theme.pageBg}!important}`;
-    if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
-    for (const [sel, r] of Object.entries(theme.rules)) {
-      let own = '', deep = '';
-      if (r.bg) own += `background:${r.bg}!important;`;
-      if (r.w) own += `width:${r.w}px!important;max-width:none!important;`;
-      if (r.h) own += `height:${r.h}px!important;min-height:0!important;`;
-      if (r.x || r.y) own += `translate:${r.x || 0}px ${r.y || 0}px!important;`;
-      if (r.inline) own += 'display:inline-block!important;';
-      if (r.color) deep += `color:${r.color}!important;`;
-      if (r.font) deep += `font-family:'${r.font}',sans-serif!important;`;
-      if (r.size) deep += `font-size:${r.size}px!important;`;
-      if (own) css += `${sel}{${own}}`;
-      if (deep) css += `${sel},${sel} *{${deep}}`;
-    }
-    style.textContent = css;
-  }
-  function renderBlocks() {
-    root.querySelectorAll(':scope > .vox-block').forEach(b => b.remove());
-    theme.blocks.forEach(b => {
-      const d = root.appendChild(document.createElement('div'));
-      d.id = b.id;
-      d.className = 'vox-block';
-      d.textContent = b.text;
-    });
-  }
-  // Chữ đã sửa: chỉ thay khi chữ hiện tại đúng bằng chữ gốc (không đè lên số/tiêu đề đã đổi)
-  const targetOf = x => {
-    const el = document.querySelector(x.sel);
-    if (!el) return null;
-    if (x.i === 'ph') return { get: () => el.getAttribute('placeholder') || '', set: v => el.setAttribute('placeholder', v) };
-    const n = [...el.childNodes].filter(c => c.nodeType === 3)[x.i];
-    return n && {
-      get: () => n.nodeValue.trim(),
-      set: v => { const raw = n.nodeValue, t = raw.trim(); n.nodeValue = t ? raw.replace(t, () => v) : v; }
-    };
-  };
-  function applyTexts(back) {
-    theme.texts.forEach(x => {
-      const t = targetOf(x);
-      const [a, b] = back ? [x.to, x.from] : [x.from, x.to];
-      if (t && a !== b && t.get() === a) t.set(b);
-    });
-  }
-  const refresh = () => { apply(); renderBlocks(); applyTexts(); };
-  refresh();
-  new MutationObserver(() => applyTexts()).observe(root, { childList: true, characterData: true, subtree: true });
- 
-  /* ---------- Trang chính: thay tab 3 bằng khung xem trước ---------- */
-  if (!isPreview) {
-    window.addEventListener('storage', e => { if (e.key === KEY) { applyTexts(true); theme = load(); refresh(); } });
-    const tabBtn = $('admin-tab-leads'), panel = $('admin-panel-leads');
-    if (!tabBtn || !panel) return;
-    // Giữ lại phần tử cũ (ẩn đi) để các hàm sẵn có không bị lỗi
-    tabBtn.innerHTML = '3. Xem trước &amp; Chỉnh giao diện khách<span id="lead-count-badge" hidden></span>';
-    [...panel.children].forEach(c => c.style.display = 'none');
-    const wrap = panel.appendChild(document.createElement('div'));
-    const normal = 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
-    wrap.style.cssText = normal;
-    wrap.innerHTML = '<button type="button" style="align-self:flex-end;border:1px solid #cbd5e1;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">⛶ Toàn màn hình</button><iframe title="Xem trước giao diện khách" allow="clipboard-write" style="flex:1;width:100%;border:1px solid #cbd5e1;border-radius:12px"></iframe>';
-    const [full, frame] = wrap.children;
-    let isFull = false;
-    full.onclick = () => {
-      isFull = !isFull;
-      wrap.style.cssText = isFull ? normal + ';position:fixed;inset:0;height:100vh;z-index:1000;padding:8px' : normal;
-      full.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
-    };
-    tabBtn.addEventListener('click', () => {
-      if (!frame.getAttribute('src')) frame.src = location.href.split(/[?#]/)[0] + '?preview=1';
-    });
-    return;
-  }
- 
-<!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH (dán cả khối này ngay TRÊN thẻ đóng body) ===== -->
+<!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH ===== -->
 <script>
 (() => {
   // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
@@ -3555,7 +3443,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
 
-  /* ---------- Lưu trữ nội dung chữ gốc trước khi áp bản sửa ---------- */
   const origTexts = new WeakMap();
   function setLeafText(el, val) {
     if (!origTexts.has(el)) origTexts.set(el, el.textContent);
@@ -3567,7 +3454,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     });
   }
 
-  /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
   const style = document.head.appendChild(document.createElement('style'));
   function apply() {
     let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
@@ -3588,7 +3474,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     }
     style.textContent = css;
 
-    // Áp lại các nội dung chữ đã chỉnh sửa
     restoreAllTexts();
     for (const [sel, txt] of Object.entries(theme.texts || {})) {
       try {
@@ -3610,26 +3495,25 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   const refresh = () => { apply(); renderBlocks(); };
   refresh();
 
-  /* ---------- Trang chính: thay tab 3 bằng khung xem trước ---------- */
+  /* ---------- Trang chính: nạp khung Review vào Tab 3 ---------- */
   if (!isPreview) {
     window.addEventListener('storage', e => { if (e.key === KEY) { theme = load(); refresh(); } });
-    const tabBtn = $('admin-tab-leads'), panel = $('admin-panel-leads');
-    if (!tabBtn || !panel) return;
-    tabBtn.innerHTML = '3. Xem trước &amp; Chỉnh giao diện khách<span id="lead-count-badge" hidden></span>';
-    [...panel.children].forEach(c => c.style.display = 'none');
-    const wrap = panel.appendChild(document.createElement('div'));
-    const normal = 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
-    wrap.style.cssText = normal;
-    wrap.innerHTML = '<button type="button" style="align-self:flex-end;border:1px solid #cbd5e1;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700">⛶ Toàn màn hình</button><iframe title="Xem trước giao diện khách" allow="clipboard-write" style="flex:1;width:100%;border:1px solid #cbd5e1;border-radius:12px"></iframe>';
-    const [full, frame] = wrap.children;
+    const tabBtn = $('admin-tab-leads'), wrap = $('vox-review-host'), frame = $('vox-preview-frame');
+    const reloadBtn = $('vox-reload-btn'), fullBtn = $('vox-full-btn');
+    if (!tabBtn || !wrap || !frame) return;
+
+    const previewUrl = () => location.href.split(/[?#]/)[0] + '?preview=1';
     let isFull = false;
-    full.onclick = () => {
+    fullBtn.onclick = () => {
       isFull = !isFull;
-      wrap.style.cssText = isFull ? normal + ';position:fixed;inset:0;height:100vh;z-index:1000;padding:8px' : normal;
-      full.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
+      wrap.style.cssText = isFull
+        ? 'display:flex;flex-direction:column;gap:8px;position:fixed;inset:0;height:100vh;z-index:99990;background:#fff;padding:10px'
+        : 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
+      fullBtn.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
     };
+    reloadBtn.onclick = () => { frame.src = previewUrl(); };
     tabBtn.addEventListener('click', () => {
-      if (!frame.getAttribute('src')) frame.src = location.href.split(/[?#]/)[0] + '?preview=1';
+      if (!frame.getAttribute('src')) frame.src = previewUrl();
     });
     return;
   }
@@ -3698,7 +3582,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
   tool.querySelector('[data-g="font"]').value = theme.font || '';
 
-  /* ---------- Lịch sử thao tác (Undo) ---------- */
   const history = [];
   let textInputTimer = null;
   function updateUndoBtn() {
@@ -3741,7 +3624,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (!m || m[3] === '0') return '#ffffff';
     return '#' + m.slice(0, 3).map(n => Math.round(n).toString(16).padStart(2, '0')).join('');
   };
-  // Kiểm tra phần tử có phải là nút/nhãn chứa chữ trực tiếp (không chứa các thẻ div/section con phức tạp)
   const canEditText = el => {
     if (!el || el === root) return false;
     if (el.classList.contains('vox-block')) return true;
@@ -3782,7 +3664,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   tool.addEventListener('input', e => {
     const t = e.target;
     if (t.id === 'vt-text' && sel) {
-      // Gom nhóm thao tác gõ chữ liên tục thành 1 bước Undo
       if (!textInputTimer) pushHistory();
       clearTimeout(textInputTimer);
       textInputTimer = setTimeout(() => { textInputTimer = null; }, 600);
@@ -3875,7 +3756,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     }
     if (!root.contains(t)) return;
     e.preventDefault();
-    // Ưu tiên chọn trực tiếp thẻ chữ bên trong khi click vào chữ, nếu click lần nữa mới giữ khối đang chọn
     if (sel !== t) select(t);
     const r = theme.rules[keyOf(sel)] || {};
     drag = { mode: 'move', target: t, x: e.clientX, y: e.clientY, ox: r.x || 0, oy: r.y || 0, moved: false, saved: false };
