@@ -3803,5 +3803,99 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   addEventListener('resize', place);
 })();
 </script>
+  <!-- ===== VOX COOL: ĐỒNG BỘ SUPABASE TỨC THÌ ===== -->
+<script>
+(() => {
+  const SB_URL = 'https://mpjeonfkdhnimuaazxog.supabase.co/rest/v1/voxcool_settings';
+  const SB_KEY = 'sb_publishable_rfTySRdDFPTnh3UT-vJ-uw_SJ9-RbAP';
+  const HEADERS = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates,return=minimal'
+  };
+
+  async function sbUpsert(id, data) {
+    try {
+      await fetch(SB_URL + '?on_conflict=id', {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({ id, data, updated_at: new Date().toISOString() })
+      });
+    } catch (e) { console.error('Supabase save error:', e); }
+  }
+
+  async function sbFetchAll() {
+    try {
+      const res = await fetch(SB_URL + '?select=id,data,updated_at', { headers: HEADERS });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) { return null; }
+  }
+
+  // 1. Bắt sự kiện nút "ĐỒNG BỘ SANG KHÁCH HÀNG"
+  const origSync = window.syncConfigToClient;
+  if (typeof origSync === 'function') {
+    window.syncConfigToClient = async function () {
+      origSync.apply(this, arguments);
+      const saved = localStorage.getItem('voxcool_saved_fixed_config_v2');
+      if (saved) {
+        await sbUpsert('fixed_config', JSON.parse(saved));
+        if (typeof showToast === 'function') {
+          showToast('Đã đồng bộ công thức lên Cloud — Tất cả khách hàng đã nhận bản mới!');
+        }
+      }
+    };
+  }
+
+  // 2. Bắt sự kiện nút "Lưu giao diện" trong khung Review Tab 3
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.dataset && e.target.dataset.a === 'save') {
+      setTimeout(async () => {
+        const themeRaw = localStorage.getItem('voxcool_theme_v1');
+        if (themeRaw) {
+          await sbUpsert('client_theme', JSON.parse(themeRaw));
+          const msgEl = document.getElementById('vt-msg');
+          if (msgEl) msgEl.textContent = 'Đã lưu lên Cloud! Mọi khách hàng sẽ thấy ngay.';
+        }
+      }, 80);
+    }
+  }, true);
+
+  // 3. Tự động tải dữ liệu mới nhất từ Supabase cho mọi máy
+  let lastStamp = '';
+  async function pullLatestFromCloud(isInitial) {
+    const rows = await sbFetchAll();
+    if (!rows || !rows.length) return;
+
+    const stamp = rows.map(r => r.id + ':' + r.updated_at).join('|');
+    if (stamp === lastStamp) return;
+    lastStamp = stamp;
+
+    const cfgRow = rows.find(r => r.id === 'fixed_config');
+    if (cfgRow && cfgRow.data) {
+      const jsonStr = JSON.stringify(cfgRow.data);
+      localStorage.setItem('voxcool_saved_fixed_config_v2', jsonStr);
+      if (!localStorage.getItem('voxcool_saved_fixed_config_v2_admin_draft')) {
+        localStorage.setItem('voxcool_saved_fixed_config_v2_admin_draft', jsonStr);
+      }
+      if (typeof loadSavedFixedConfig === 'function') loadSavedFixedConfig();
+      if (typeof recalcAdmin === 'function') recalcAdmin();
+    }
+
+    const themeRow = rows.find(r => r.id === 'client_theme');
+    if (themeRow && themeRow.data) {
+      const themeStr = JSON.stringify(themeRow.data);
+      if (localStorage.getItem('voxcool_theme_v1') !== themeStr) {
+        localStorage.setItem('voxcool_theme_v1', themeStr);
+        window.dispatchEvent(new StorageEvent('storage', { key: 'voxcool_theme_v1', newValue: themeStr }));
+      }
+    }
+  }
+
+  pullLatestFromCloud(true);
+  setInterval(() => pullLatestFromCloud(false), 5000);
+})();
+</script>
 </body>
 </html>
