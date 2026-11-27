@@ -3257,7 +3257,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       if (btnAirNo) btnAirNo.textContent = currentClientLang === 'en' ? 'No' : 'Không';
     }
   </script>
- <!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH ===== -->
+<!-- ===== VOX: XEM TRƯỚC & CHỈNH GIAO DIỆN KHÁCH ===== -->
 <script>
 (() => {
   // Muốn mọi khách thấy giao diện mới: bấm "Sao chép mã giao diện", dán thay chữ null bên dưới rồi Commit
@@ -3280,7 +3280,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
 
   const link = document.head.appendChild(document.createElement('link'));
   link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
+  link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap';
 
   const origTexts = new WeakMap();
   function setLeafText(el, val) {
@@ -3305,9 +3305,17 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       if (r.h) own += `height:${r.h}px!important;min-height:0!important;`;
       if (r.x || r.y) own += `translate:${r.x || 0}px ${r.y || 0}px!important;`;
       if (r.inline) own += 'display:inline-block!important;';
-      if (r.color) deep += `color:${r.color}!important;`;
+
+      if (r.color) {
+        deep += `color:${r.color}!important;-webkit-text-fill-color:${r.color}!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;`;
+      }
       if (r.font) deep += `font-family:'${r.font}',sans-serif!important;`;
       if (r.size) deep += `font-size:${r.size}px!important;`;
+      if (r.style === 'normal') deep += 'font-weight:400!important;font-style:normal!important;';
+      if (r.style === 'bold') deep += 'font-weight:700!important;font-style:normal!important;';
+      if (r.style === 'italic') deep += 'font-weight:400!important;font-style:italic!important;';
+      if (r.style === 'bold-italic') deep += 'font-weight:700!important;font-style:italic!important;';
+
       if (own) css += `${sel}{${own}}`;
       if (deep) css += `${sel},${sel} *{${deep}}`;
     }
@@ -3365,14 +3373,15 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   switchMode('customer');
 
   document.head.appendChild(document.createElement('style')).textContent = `
-    #vox-tool{position:fixed;top:8px;right:8px;width:255px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
+    #vox-tool{position:fixed;top:8px;right:8px;width:265px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
     #vox-tool.left{right:auto;left:8px}
     #vox-tool.min .body{display:none}
     #vox-tool .body,#vt-sel{display:flex;flex-direction:column;gap:6px}
     #vox-tool [hidden]{display:none!important}
     #vox-tool .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
     #vox-tool button,#vox-tool select,#vox-tool textarea,#vox-tool input[type=number]{border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;padding:4px 6px}
-    #vox-tool select,#vox-tool input[type=number]{width:125px}
+    #vox-tool select,#vox-tool input[type=number]{width:132px}
+    #vox-tool input[type=color]{width:46px;height:28px;padding:1px;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;background:#fff}
     #vox-tool button{cursor:pointer}
     #vox-tool button:disabled{opacity:0.45;cursor:not-allowed}
     #vox-tool button.main{background:#059669;border-color:#059669;color:#fff;font-weight:700}
@@ -3382,6 +3391,13 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     body.vox-editing #view-customer,body.vox-editing #view-customer *{cursor:move!important;user-select:none;touch-action:none}`;
 
   const opts = '<option value="">Mặc định</option>' + FONTS.map(f => `<option>${f}</option>`).join('');
+  const styleOpts = `
+    <option value="">Mặc định</option>
+    <option value="normal">Thường</option>
+    <option value="bold">In đậm</option>
+    <option value="italic">In nghiêng</option>
+    <option value="bold-italic">Đậm + Nghiêng</option>`;
+
   const tool = document.body.appendChild(document.createElement('div'));
   tool.id = 'vox-tool';
   tool.innerHTML = `
@@ -3402,6 +3418,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         </div>
         <label class="row">Màu nền <input type="color" data-p="bg"></label>
         <label class="row">Màu chữ <input type="color" data-p="color"></label>
+        <label class="row">Kiểu chữ <select data-p="style">${styleOpts}</select></label>
         <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
         <label class="row">Cỡ chữ <input type="number" data-p="size" min="8" max="96"></label>
         <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
@@ -3462,7 +3479,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   const rule = () => (theme.rules[keyOf(sel)] ||= {});
   const hex = c => {
     const m = c.match(/[\d.]+/g);
-    if (!m || m[3] === '0') return '#ffffff';
+    if (!m || m[3] === '0') return '#0f172a';
     return '#' + m.slice(0, 3).map(n => Math.round(n).toString(16).padStart(2, '0')).join('');
   };
   const canEditText = el => {
@@ -3502,6 +3519,20 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     place();
   }
 
+  function handleFieldUpdate(t) {
+    if (t.dataset.g) {
+      pushHistory();
+      theme[t.dataset.g] = t.value;
+    } else if (t.dataset.p && sel) {
+      pushHistory();
+      const r = rule();
+      if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
+      else delete r[t.dataset.p];
+    } else return;
+    apply();
+    place();
+  }
+
   tool.addEventListener('input', e => {
     const t = e.target;
     if (t.id === 'vt-text' && sel) {
@@ -3520,18 +3551,13 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       place();
       return;
     }
+    handleFieldUpdate(t);
+  });
 
-    if (t.dataset.g) {
-      pushHistory();
-      theme[t.dataset.g] = t.value;
-    } else if (t.dataset.p && sel) {
-      pushHistory();
-      const r = rule();
-      if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
-      else delete r[t.dataset.p];
-    } else return;
-    apply();
-    place();
+  tool.addEventListener('change', e => {
+    if (e.target.id !== 'vt-text' && e.target.id !== 'vt-edit') {
+      handleFieldUpdate(e.target);
+    }
   });
 
   tool.addEventListener('click', e => {
