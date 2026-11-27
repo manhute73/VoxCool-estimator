@@ -2717,7 +2717,7 @@ let custDoorFreqLevel = null;
 const t2 = getNumSafe('cust-temp-to', null);
 const roomTemp = t1 ?? t2 ?? 0;
 const tMin = Math.min(roomTemp, t2 ?? roomTemp);
-const dT = tMin !== 0 ? Math.max(10, 35 - tMin + (tMin <= -18 ? 7 : 0)) : 0;
+const dT = custHasAirlock ? 35 : 60;
       const capacity = getNumSafe('cust-capacity', 0) * 1000;
       const doorOpenings = custDoorFreqLevel ? getDoorRuleOpens(custDoorFreqLevel) : getNumSafe('cust-door-openings', 0);
       const prodType = document.getElementById('cust-product-type')?.value || 'unknown';
@@ -2912,7 +2912,8 @@ function recalcAdmin() {
       const W = getNumSafe('adm-W', 0);
       const H = getNumSafe('adm-H', 0);
       const roomTemp = getNumSafe('adm-room-temp', 0);
-      const dT = getNumSafe('adm-dT', 0);
+     const dT = config.doorShield === 'airlock' ? 35 : 60;
+      setValSafe('adm-dT', dT);
       const capacity = getNumSafe('adm-cap', 0);
       const doorOpenings = getNumSafe('adm-door-cnt', 0);
       const shiftHours = getNumSafe('adm-shift-hrs', 0);
