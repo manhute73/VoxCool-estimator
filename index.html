@@ -3464,11 +3464,12 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   const isPreview = new URLSearchParams(location.search).has('preview') && window.self !== window.top;
   const $ = id => document.getElementById(id);
 
-  const empty = () => ({ pageBg: '', font: '', rules: {}, blocks: [] });
+  const empty = () => ({ pageBg: '', font: '', rules: {}, texts: {}, blocks: [] });
+  const clone = obj => JSON.parse(JSON.stringify(obj));
   const load = () => {
     let saved = null;
     try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-    return { ...empty(), ...JSON.parse(JSON.stringify(saved || PUBLISHED || {})) };
+    return { ...empty(), ...clone(saved || PUBLISHED || {}) };
   };
   let theme = load();
 
@@ -3476,13 +3477,25 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;600;800&family=Open+Sans:wght@400;600;800&display=swap';
 
+  /* ---------- Lưu trữ nội dung chữ gốc trước khi áp bản sửa ---------- */
+  const origTexts = new WeakMap();
+  function setLeafText(el, val) {
+    if (!origTexts.has(el)) origTexts.set(el, el.textContent);
+    el.textContent = val;
+  }
+  function restoreAllTexts() {
+    root.querySelectorAll('*').forEach(el => {
+      if (origTexts.has(el)) el.textContent = origTexts.get(el);
+    });
+  }
+
   /* ---------- Áp giao diện (dùng cho cả trang khách thật và trang xem trước) ---------- */
   const style = document.head.appendChild(document.createElement('style'));
   function apply() {
     let css = '#view-customer{position:relative}.vox-block{position:absolute;left:24px;top:24px;z-index:30;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;white-space:pre-wrap;overflow:hidden;min-width:60px;max-width:90%}';
     if (theme.pageBg) css += `#view-customer{background:${theme.pageBg}!important}`;
     if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
-    for (const [sel, r] of Object.entries(theme.rules)) {
+    for (const [sel, r] of Object.entries(theme.rules || {})) {
       let own = '', deep = '';
       if (r.bg) own += `background:${r.bg}!important;`;
       if (r.w) own += `width:${r.w}px!important;max-width:none!important;`;
@@ -3496,10 +3509,20 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       if (deep) css += `${sel},${sel} *{${deep}}`;
     }
     style.textContent = css;
+
+    // Áp lại các nội dung chữ đã chỉnh sửa
+    restoreAllTexts();
+    for (const [sel, txt] of Object.entries(theme.texts || {})) {
+      try {
+        const el = root.querySelector(sel);
+        if (el && !el.classList.contains('vox-block')) setLeafText(el, txt);
+      } catch (e) {}
+    }
   }
+
   function renderBlocks() {
     root.querySelectorAll(':scope > .vox-block').forEach(b => b.remove());
-    theme.blocks.forEach(b => {
+    (theme.blocks || []).forEach(b => {
       const d = root.appendChild(document.createElement('div'));
       d.id = b.id;
       d.className = 'vox-block';
@@ -3514,7 +3537,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     window.addEventListener('storage', e => { if (e.key === KEY) { theme = load(); refresh(); } });
     const tabBtn = $('admin-tab-leads'), panel = $('admin-panel-leads');
     if (!tabBtn || !panel) return;
-    // Giữ lại phần tử cũ (ẩn đi) để các hàm sẵn có không bị lỗi
     tabBtn.innerHTML = '3. Xem trước &amp; Chỉnh giao diện khách<span id="lead-count-badge" hidden></span>';
     [...panel.children].forEach(c => c.style.display = 'none');
     const wrap = panel.appendChild(document.createElement('div'));
@@ -3536,20 +3558,22 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
 
   /* ---------- Trang xem trước: công cụ chỉnh sửa ---------- */
   document.querySelector('header').style.display = 'none';
-  window.validateStepInputs = () => true; // cho phép xem mọi bước, không cần nhập liệu
+  window.validateStepInputs = () => true;
   switchMode('customer');
 
   document.head.appendChild(document.createElement('style')).textContent = `
-    #vox-tool{position:fixed;top:8px;right:8px;width:240px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
+    #vox-tool{position:fixed;top:8px;right:8px;width:255px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
     #vox-tool.left{right:auto;left:8px}
     #vox-tool.min .body{display:none}
     #vox-tool .body,#vt-sel{display:flex;flex-direction:column;gap:6px}
     #vox-tool [hidden]{display:none!important}
     #vox-tool .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
     #vox-tool button,#vox-tool select,#vox-tool textarea,#vox-tool input[type=number]{border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;padding:4px 6px}
-    #vox-tool select,#vox-tool input[type=number]{width:120px}
+    #vox-tool select,#vox-tool input[type=number]{width:125px}
     #vox-tool button{cursor:pointer}
+    #vox-tool button:disabled{opacity:0.45;cursor:not-allowed}
     #vox-tool button.main{background:#059669;border-color:#059669;color:#fff;font-weight:700}
+    #vox-tool button.undo{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:700}
     #vox-box{position:fixed;display:none;border:2px dashed #2563eb;pointer-events:none;z-index:99998}
     #vox-box i{position:absolute;right:-9px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:#2563eb;pointer-events:auto;cursor:nwse-resize;touch-action:none}
     body.vox-editing #view-customer,body.vox-editing #view-customer *{cursor:move!important;user-select:none;touch-action:none}`;
@@ -3558,10 +3582,10 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   const tool = document.body.appendChild(document.createElement('div'));
   tool.id = 'vox-tool';
   tool.innerHTML = `
-    <div class="row"><b>Chỉnh giao diện</b><span><button data-a="side" title="Đổi bên">⇆</button> <button data-a="min" title="Thu gọn">—</button></span></div>
+    <div class="row"><b>Chỉnh giao diện</b><span><button data-a="undo" id="vt-undo" class="undo" title="Quay lại thao tác trước (Ctrl+Z)" disabled>↶ Quay lại</button> <button data-a="side" title="Đổi bên">⇆</button> <button data-a="min" title="Thu gọn">—</button></span></div>
     <div class="body">
       <label class="row">Chế độ chỉnh <input type="checkbox" id="vt-edit" checked></label>
-      <small>Tắt đi để bấm thử và chuyển bước.</small>
+      <small>Bấm vào chữ hoặc khối bất kỳ để sửa. Tắt chế độ chỉnh để chuyển bước.</small>
       <hr><b>Toàn trang</b>
       <label class="row">Màu nền <input type="color" data-g="pageBg" value="#f4f7f9"></label>
       <label class="row">Phông chữ <select data-g="font">${opts}</select></label>
@@ -3569,13 +3593,16 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       <small id="vt-name">Bấm vào một khối trên trang</small>
       <div id="vt-sel" hidden>
         <button data-a="parent">↑ Chọn khối lớn hơn</button>
+        <div id="vt-text-wrap" style="display:flex;flex-direction:column;gap:3px">
+          <small style="font-weight:700;color:#334155">Nội dung chữ:</small>
+          <textarea id="vt-text" rows="2" placeholder="Nhập nội dung chữ..."></textarea>
+        </div>
         <label class="row">Màu nền <input type="color" data-p="bg"></label>
         <label class="row">Màu chữ <input type="color" data-p="color"></label>
         <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
         <label class="row">Cỡ chữ <input type="number" data-p="size" min="8" max="96"></label>
         <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
         <label class="row">Cao (px) <input type="number" data-p="h" min="20"></label>
-        <textarea id="vt-text" rows="3" placeholder="Nội dung khối"></textarea>
         <button data-a="clear">Bỏ chỉnh khối này</button>
         <button data-a="del">Xóa khối</button>
       </div>
@@ -3586,11 +3613,38 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       <button data-a="reset">Về mặc định</button>
       <small id="vt-msg"></small>
     </div>`;
+
   const box = document.body.appendChild(document.createElement('div'));
   box.id = 'vox-box';
   box.innerHTML = '<i title="Kéo để đổi kích thước"></i>';
   tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
-  tool.querySelector('[data-g="font"]').value = theme.font;
+  tool.querySelector('[data-g="font"]').value = theme.font || '';
+
+  /* ---------- Lịch sử thao tác (Undo) ---------- */
+  const history = [];
+  let textInputTimer = null;
+  function updateUndoBtn() {
+    const btn = $('vt-undo');
+    if (btn) btn.disabled = history.length === 0;
+  }
+  function pushHistory() {
+    const snap = JSON.stringify(theme);
+    if (history.length && history[history.length - 1] === snap) return;
+    history.push(snap);
+    if (history.length > 40) history.shift();
+    updateUndoBtn();
+  }
+  function undo() {
+    if (!history.length) return;
+    theme = JSON.parse(history.pop());
+    updateUndoBtn();
+    tool.querySelector('[data-g="pageBg"]').value = theme.pageBg || '#f4f7f9';
+    tool.querySelector('[data-g="font"]').value = theme.font || '';
+    refresh();
+    if (sel && !document.body.contains(sel)) sel = null;
+    select(sel);
+    msg('Đã quay lại bước trước.');
+  }
 
   let sel = null, drag = null;
   const editing = () => $('vt-edit').checked;
@@ -3609,18 +3663,28 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (!m || m[3] === '0') return '#ffffff';
     return '#' + m.slice(0, 3).map(n => Math.round(n).toString(16).padStart(2, '0')).join('');
   };
+  // Kiểm tra phần tử có phải là nút/nhãn chứa chữ trực tiếp (không chứa các thẻ div/section con phức tạp)
+  const canEditText = el => {
+    if (!el || el === root) return false;
+    if (el.classList.contains('vox-block')) return true;
+    const tag = el.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA', 'IMG', 'SVG', 'PATH', 'TABLE', 'TBODY', 'TR'].includes(tag)) return false;
+    return el.children.length === 0;
+  };
+
   function place() {
     if (!sel || !editing() || !sel.getClientRects().length) { box.style.display = 'none'; return; }
     const r = sel.getBoundingClientRect();
     Object.assign(box.style, { display: 'block', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
   }
+
   function select(el) {
     sel = el;
     $('vt-sel').hidden = !el;
     const isBlock = !!el && el.classList.contains('vox-block');
     $('vt-name').textContent = !el ? 'Bấm vào một khối trên trang'
       : isBlock ? 'Khối chữ tự thêm'
-      : `<${el.tagName.toLowerCase()}> ${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 30)}`;
+      : `<${el.tagName.toLowerCase()}> ${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 32)}`;
     if (el) {
       const r = theme.rules[keyOf(el)] || {}, cs = getComputedStyle(el), rect = el.getBoundingClientRect();
       const hints = { size: parseInt(cs.fontSize), w: Math.round(rect.width), h: Math.round(rect.height) };
@@ -3629,23 +3693,42 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         i.value = i.type === 'color' ? (r[p] || hex(p === 'bg' ? cs.backgroundColor : cs.color)) : (r[p] || '');
         if (p in hints) i.placeholder = hints[p];
       });
-      $('vt-text').hidden = !isBlock;
+      const editable = canEditText(el);
+      $('vt-text-wrap').hidden = !editable;
       tool.querySelector('[data-a="del"]').hidden = !isBlock;
-      if (isBlock) $('vt-text').value = el.textContent;
+      if (editable) $('vt-text').value = el.textContent;
     }
     place();
   }
 
   tool.addEventListener('input', e => {
     const t = e.target;
-    if (t.dataset.g) theme[t.dataset.g] = t.value;
-    else if (t.dataset.p && sel) {
+    if (t.id === 'vt-text' && sel) {
+      // Gom nhóm thao tác gõ chữ liên tục thành 1 bước Undo
+      if (!textInputTimer) pushHistory();
+      clearTimeout(textInputTimer);
+      textInputTimer = setTimeout(() => { textInputTimer = null; }, 600);
+
+      if (sel.classList.contains('vox-block')) {
+        sel.textContent = t.value;
+        const blk = theme.blocks.find(b => b.id === sel.id);
+        if (blk) blk.text = t.value;
+      } else {
+        setLeafText(sel, t.value);
+        theme.texts[keyOf(sel)] = t.value;
+      }
+      place();
+      return;
+    }
+
+    if (t.dataset.g) {
+      pushHistory();
+      theme[t.dataset.g] = t.value;
+    } else if (t.dataset.p && sel) {
+      pushHistory();
       const r = rule();
       if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
       else delete r[t.dataset.p];
-    } else if (t.id === 'vt-text' && sel) {
-      sel.textContent = t.value;
-      theme.blocks.find(b => b.id === sel.id).text = t.value;
     } else return;
     apply();
     place();
@@ -3654,17 +3737,27 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   tool.addEventListener('click', e => {
     const a = e.target.dataset.a;
     if (!a) return;
+    if (a === 'undo') { undo(); return; }
     if (a === 'min') tool.classList.toggle('min');
     if (a === 'side') tool.classList.toggle('left');
     if (a === 'parent' && sel && sel !== root) select(sel.parentElement);
     if (a === 'add') {
+      pushHistory();
       const b = { id: 'vox-block-' + Date.now(), text: 'Nội dung mới' };
       theme.blocks.push(b);
       renderBlocks();
       select($(b.id));
     }
-    if (a === 'clear' && sel) { delete theme.rules[keyOf(sel)]; apply(); select(sel); }
+    if (a === 'clear' && sel) {
+      pushHistory();
+      const k = keyOf(sel);
+      delete theme.rules[k];
+      if (theme.texts && k in theme.texts) delete theme.texts[k];
+      apply();
+      select(sel);
+    }
     if (a === 'del' && sel) {
+      pushHistory();
       theme.blocks = theme.blocks.filter(b => b.id !== sel.id);
       delete theme.rules[keyOf(sel)];
       select(null);
@@ -3678,10 +3771,18 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         .catch(() => prompt('Bấm Ctrl+C để sao chép:', code));
     }
     if (a === 'reset' && confirm('Xóa toàn bộ chỉnh sửa giao diện?')) {
+      pushHistory();
       theme = empty();
       select(null);
       refresh();
       msg('Đã về mặc định. Bấm "Lưu giao diện" để giữ.');
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && document.activeElement?.id !== 'vt-text') {
+      e.preventDefault();
+      undo();
     }
   });
 
@@ -3690,22 +3791,25 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     const t = e.target;
     if (box.contains(t) && sel) {
       const r = sel.getBoundingClientRect();
-      drag = { mode: 'size', x: e.clientX, y: e.clientY, w: r.width, h: r.height };
+      drag = { mode: 'size', x: e.clientX, y: e.clientY, w: r.width, h: r.height, saved: false };
       e.preventDefault();
       return;
     }
     if (!root.contains(t)) return;
     e.preventDefault();
-    if (!(sel && sel !== root && sel.contains(t))) select(t);
+    // Ưu tiên chọn trực tiếp thẻ chữ bên trong khi click vào chữ, nếu click lần nữa mới giữ khối đang chọn
+    if (sel !== t) select(t);
     const r = theme.rules[keyOf(sel)] || {};
-    drag = { mode: 'move', target: t, x: e.clientX, y: e.clientY, ox: r.x || 0, oy: r.y || 0, moved: false };
+    drag = { mode: 'move', target: t, x: e.clientX, y: e.clientY, ox: r.x || 0, oy: r.y || 0, moved: false, saved: false };
   }, true);
+
   document.addEventListener('pointermove', e => {
     if (!drag || !sel) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
     drag.moved = true;
     if (sel === root) return;
+    if (!drag.saved) { pushHistory(); drag.saved = true; }
     const r = rule();
     if (drag.mode === 'size') {
       r.w = Math.max(20, Math.round(drag.w + dx));
@@ -3718,13 +3822,14 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     apply();
     place();
   });
+
   document.addEventListener('pointerup', () => {
     if (!drag) return;
     if (drag.mode === 'move' && !drag.moved) select(drag.target);
     else if (sel) select(sel);
     drag = null;
   });
-  // Khi đang chỉnh, chặn bấm nút/ô nhập của trang
+
   ['mousedown', 'click', 'dblclick'].forEach(type => document.addEventListener(type, e => {
     if (editing() && root.contains(e.target)) { e.preventDefault(); e.stopPropagation(); }
   }, true));
@@ -3734,7 +3839,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   addEventListener('resize', place);
 })();
 </script>
- 
  
 </body>
 </html>
