@@ -3316,36 +3316,29 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   refresh();
  
  /* ---------- Trang chính: XÓA hẳn mục Khách Hàng Đã Tính Toán & THAY BẰNG Tab Review Giao Diện Khách ---------- */
-  if (!isPreview) {
+ if (!isPreview) {
     window.addEventListener('storage', e => { if (e.key === KEY) { theme = load(); refresh(); } });
+    const tabBtn = $('admin-tab-leads'), wrap = $('vox-review-host'), frame = $('vox-preview-frame');
+    const reloadBtn = $('vox-reload-btn'), fullBtn = $('vox-full-btn');
+    if (!tabBtn || !wrap || !frame) return;
 
-    // 1. Tìm nút Tab 3 cũ ("Khách Hàng Đã Tính Toán")
-    const oldTab = $('admin-tab-leads') || [...document.querySelectorAll('button, [role="tab"], a')].find(
-      el => el.textContent.includes('Khách Hàng Đã Tính Toán')
-    );
+    const previewUrl = () => location.href.split(/[?#]/)[0] + '?preview=1';
+    frame.src = previewUrl();
 
-    // 2. Xóa sạch khung danh sách khách hàng cũ (cả panel tab 3 lẫn khung trắng ở cuối trang nếu có)
-    const oldPanelId = oldTab?.getAttribute('data-target') || oldTab?.getAttribute('aria-controls');
-    const oldPanel = $('admin-panel-leads')
-      || (oldPanelId ? $(oldPanelId) : null)
-      || document.querySelector('[id*="lead"][id*="panel"], [id*="leads"]');
-
-    // Tìm thêm khung trắng chứa tiêu đề "Danh sách Khách hàng đã tính toán trên Web" ở cuối trang và xóa hẳn
-    [...document.querySelectorAll('h2, h3, div')].forEach(el => {
-      if (el.children.length === 0 && el.textContent.trim() === 'Danh sách Khách hàng đã tính toán trên Web') {
-        const card = el.closest('div.bg-white, section, div[class*="rounded"]');
-        if (card) card.remove();
-      }
+    let isFull = false;
+    fullBtn.onclick = () => {
+      isFull = !isFull;
+      wrap.style.cssText = isFull
+        ? 'display:flex;flex-direction:column;gap:8px;position:fixed;inset:0;height:100vh;z-index:99990;background:#fff;padding:10px'
+        : 'display:flex;flex-direction:column;gap:8px;height:85vh;background:#fff;color:#0f172a';
+      fullBtn.textContent = isFull ? '✕ Thu nhỏ' : '⛶ Toàn màn hình';
+    };
+    reloadBtn.onclick = () => { frame.src = previewUrl(); };
+    tabBtn.addEventListener('click', () => {
+      if (!frame.getAttribute('src')) frame.src = previewUrl();
     });
-
-    // Giữ một thẻ ẩn tối thiểu để các hàm renderLeadsTable() cũ trong code không bị báo lỗi JS
-    if (!$('leads-table-body')) {
-      const dummy = document.body.appendChild(document.createElement('div'));
-      dummy.id = 'leads-table-body';
-      dummy.hidden = true;
-    }
-
-    if (!oldTab) return;
+    return;
+  }
 
     // 3. Thay thế nút Tab 3 cũ bằng nút Tab mới: "3. Review & Chỉnh Giao Diện Khách"
     const newTab = oldTab.cloneNode(false);
