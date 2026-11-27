@@ -3282,7 +3282,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   link.rel = 'stylesheet';
   link.href = 'https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap';
 
-  // Đánh dấu cố định cho mọi phần tử trong #view-customer để không bao giờ bị lệch selector
   function tagAllElements() {
     let idx = 0;
     root.querySelectorAll('*').forEach(el => {
@@ -3310,12 +3309,11 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     });
   }
 
-  // Xóa inline style cũ trước khi áp lại
   const MANAGED_PROPS = [
     'background', 'width', 'max-width', 'height', 'min-height',
-    'translate', 'display', 'color', '-webkit-text-fill-color',
-    '-webkit-background-clip', 'background-clip', 'font-family',
-    'font-size', 'font-weight', 'font-style'
+    'translate', 'display', 'border', 'border-radius', 'box-sizing',
+    'color', '-webkit-text-fill-color', '-webkit-background-clip',
+    'background-clip', 'font-family', 'font-size', 'font-weight', 'font-style'
   ];
   function clearInlineRule(el) {
     MANAGED_PROPS.forEach(p => el.style.removeProperty(p));
@@ -3335,6 +3333,23 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     }
     if (r.x || r.y) el.style.setProperty('translate', `${r.x || 0}px ${r.y || 0}px`, 'important');
     if (r.inline) el.style.setProperty('display', 'inline-block', 'important');
+
+    // Áp dụng viền & bo góc cho ô
+    if (r.bw !== undefined && r.bw !== '') {
+      const bw = Math.max(0, Number(r.bw) || 0);
+      if (bw === 0) {
+        el.style.setProperty('border', 'none', 'important');
+      } else {
+        el.style.setProperty('box-sizing', 'border-box', 'important');
+        el.style.setProperty('border', `${bw}px ${r.bs || 'solid'} ${r.bc || '#0f172a'}`, 'important');
+      }
+    } else if (r.bc || r.bs) {
+      el.style.setProperty('box-sizing', 'border-box', 'important');
+      el.style.setProperty('border', `2px ${r.bs || 'solid'} ${r.bc || '#0f172a'}`, 'important');
+    }
+    if (r.br !== undefined && r.br !== '') {
+      el.style.setProperty('border-radius', Math.max(0, Number(r.br) || 0) + 'px', 'important');
+    }
 
     const targets = [el, ...el.querySelectorAll('*')];
     targets.forEach(t => {
@@ -3370,10 +3385,8 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (theme.font) css += `#view-customer,#view-customer *{font-family:'${theme.font}',sans-serif!important}`;
     style.textContent = css;
 
-    // Reset toàn bộ inline style đã quản lý trên root
     root.querySelectorAll('*').forEach(clearInlineRule);
 
-    // Áp lại từng rule trực tiếp lên DOM
     for (const [sel, r] of Object.entries(theme.rules || {})) {
       try {
         const el = root.querySelector(sel);
@@ -3433,7 +3446,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   switchMode('customer');
 
   document.head.appendChild(document.createElement('style')).textContent = `
-    #vox-tool{position:fixed;top:8px;right:8px;width:265px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
+    #vox-tool{position:fixed;top:8px;right:8px;width:270px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
     #vox-tool.left{right:auto;left:8px}
     #vox-tool.min .body{display:none}
     #vox-tool .body,#vt-sel{display:flex;flex-direction:column;gap:6px}
@@ -3457,6 +3470,11 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     <option value="bold">In đậm</option>
     <option value="italic">In nghiêng</option>
     <option value="bold-italic">Đậm + Nghiêng</option>`;
+  const borderStyleOpts = `
+    <option value="solid">Nét liền</option>
+    <option value="dashed">Nét đứt</option>
+    <option value="dotted">Nét chấm</option>
+    <option value="double">Viền đôi</option>`;
 
   const tool = document.body.appendChild(document.createElement('div'));
   tool.id = 'vox-tool';
@@ -3464,14 +3482,14 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     <div class="row"><b>Chỉnh giao diện</b><span><button data-a="undo" id="vt-undo" class="undo" title="Quay lại thao tác trước (Ctrl+Z)" disabled>↶ Quay lại</button> <button data-a="side" title="Đổi bên">⇆</button> <button data-a="min" title="Thu gọn">—</button></span></div>
     <div class="body">
       <label class="row">Chế độ chỉnh <input type="checkbox" id="vt-edit" checked></label>
-      <small>Bấm vào chữ hoặc khối bất kỳ để sửa. Tắt chế độ chỉnh để chuyển bước.</small>
+      <small>Bấm vào chữ hoặc ô bất kỳ để sửa. Tắt chế độ chỉnh để chuyển bước.</small>
       <hr><b>Toàn trang</b>
       <label class="row">Màu nền <input type="color" data-g="pageBg" value="#f4f7f9"></label>
       <label class="row">Phông chữ <select data-g="font">${opts}</select></label>
-      <hr><b>Khối đang chọn</b>
+      <hr><b>Khối / Ô đang chọn</b>
       <small id="vt-name">Bấm vào một khối trên trang</small>
       <div id="vt-sel" hidden>
-        <button data-a="parent">↑ Chọn khối lớn hơn</button>
+        <button data-a="parent">↑ Chọn ô lớn hơn</button>
         <div id="vt-text-wrap" style="display:flex;flex-direction:column;gap:3px">
           <small style="font-weight:700;color:#334155">Nội dung chữ:</small>
           <textarea id="vt-text" rows="2" placeholder="Nhập nội dung chữ..."></textarea>
@@ -3481,6 +3499,13 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         <label class="row">Kiểu chữ <select data-p="style">${styleOpts}</select></label>
         <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
         <label class="row">Cỡ chữ <input type="number" data-p="size" min="8" max="96"></label>
+        <hr style="margin:2px 0;border-color:#e2e8f0">
+        <small style="font-weight:700;color:#334155">Viền &amp; Khung ô:</small>
+        <label class="row">Độ dày viền (px) <input type="number" data-p="bw" min="0" max="20" placeholder="0 = không viền"></label>
+        <label class="row">Kiểu viền <select data-p="bs">${borderStyleOpts}</select></label>
+        <label class="row">Màu viền <input type="color" data-p="bc" value="#0f172a"></label>
+        <label class="row">Bo góc (px) <input type="number" data-p="br" min="0" max="100"></label>
+        <hr style="margin:2px 0;border-color:#e2e8f0">
         <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
         <label class="row">Cao (px) <input type="number" data-p="h" min="20"></label>
         <button data-a="clear">Bỏ chỉnh khối này</button>
@@ -3557,10 +3582,24 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       : `<${el.tagName.toLowerCase()}> ${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 32)}`;
     if (el) {
       const r = theme.rules[keyOf(el)] || {}, cs = getComputedStyle(el), rect = el.getBoundingClientRect();
-      const hints = { size: parseInt(cs.fontSize), w: Math.round(rect.width), h: Math.round(rect.height) };
+      const hints = {
+        size: parseInt(cs.fontSize),
+        w: Math.round(rect.width),
+        h: Math.round(rect.height),
+        bw: parseInt(cs.borderTopWidth) || 0,
+        br: parseInt(cs.borderTopLeftRadius) || 0
+      };
       tool.querySelectorAll('[data-p]').forEach(i => {
         const p = i.dataset.p;
-        i.value = i.type === 'color' ? (r[p] || hex(p === 'bg' ? cs.backgroundColor : cs.color)) : (r[p] || '');
+        if (i.type === 'color') {
+          if (p === 'bg') i.value = r[p] || hex(cs.backgroundColor);
+          else if (p === 'bc') i.value = r[p] || hex(cs.borderTopColor);
+          else i.value = r[p] || hex(cs.color);
+        } else if (p === 'bs') {
+          i.value = r[p] || (cs.borderTopStyle !== 'none' ? cs.borderTopStyle : 'solid');
+        } else {
+          i.value = r[p] !== undefined ? r[p] : '';
+        }
         if (p in hints) i.placeholder = hints[p];
       });
       const editable = canEditText(el);
@@ -3578,8 +3617,18 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     } else if (t.dataset.p && sel) {
       pushHistory();
       const r = rule();
-      if (t.value) r[t.dataset.p] = t.type === 'number' ? +t.value : t.value;
-      else delete r[t.dataset.p];
+      const p = t.dataset.p;
+      if (t.value !== '') {
+        r[p] = t.type === 'number' ? +t.value : t.value;
+        // Nếu người dùng chỉnh màu viền hoặc kiểu viền mà chưa nhập độ dày, tự đặt mặc định 2px để thấy ngay
+        if ((p === 'bc' || p === 'bs') && (r.bw === undefined || r.bw === '')) {
+          r.bw = 2;
+          const bwInput = tool.querySelector('[data-p="bw"]');
+          if (bwInput) bwInput.value = 2;
+        }
+      } else {
+        delete r[p];
+      }
     } else return;
     apply();
     place();
