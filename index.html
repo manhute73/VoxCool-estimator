@@ -3324,6 +3324,10 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   function applyInlineRule(el, r) {
     clearInlineRule(el);
     if (!r) return;
+    if (r.hidden) {
+      el.style.setProperty('display', 'none', 'important');
+      return;
+    }
     if (r.bg) el.style.setProperty('background', r.bg, 'important');
     if (r.w) {
       el.style.setProperty('width', r.w + 'px', 'important');
@@ -3470,6 +3474,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     #vox-tool button:disabled{opacity:0.45;cursor:not-allowed}
     #vox-tool button.main{background:#059669;border-color:#059669;color:#fff;font-weight:700}
     #vox-tool button.undo{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:700}
+    #vox-tool button.danger{background:#fef2f2;border-color:#fca5a5;color:#dc2626;font-weight:700}
     #vox-box{position:fixed;display:none;border:2px dashed #2563eb;pointer-events:none;z-index:99998}
     #vox-box i{position:absolute;right:-9px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:#2563eb;pointer-events:auto;cursor:nwse-resize;touch-action:none}
     body.vox-editing #view-customer,body.vox-editing #view-customer *{cursor:move!important;user-select:none;touch-action:none}`;
@@ -3525,8 +3530,8 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         <hr style="margin:2px 0;border-color:#e2e8f0">
         <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
         <label class="row">Cao (px) <input type="number" data-p="h" min="20"></label>
-        <button data-a="clear">Bỏ chỉnh khối này</button>
-        <button data-a="del">Xóa khối</button>
+        <button data-a="clear">Bỏ chỉnh ô này</button>
+        <button data-a="del" class="danger">🗑 Xóa ô / khối này</button>
       </div>
       <hr>
       <button data-a="add">+ Thêm khối chữ</button>
@@ -3625,7 +3630,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       });
       const editable = canEditText(el);
       $('vt-text-wrap').hidden = !editable;
-      tool.querySelector('[data-a="del"]').hidden = !isBlock;
+      tool.querySelector('[data-a="del"]').hidden = (el === root);
       if (editable) $('vt-text').value = el.textContent;
     }
     place();
@@ -3646,7 +3651,6 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
           const bwInput = tool.querySelector('[data-p="bw"]');
           if (bwInput) bwInput.value = 2;
         }
-        // Khi nhập bo 4 góc chung, xóa các góc lẻ để đồng bộ
         if (p === 'br') {
           ['brtl', 'brtr', 'brbl', 'brbr'].forEach(k => {
             delete r[k];
@@ -3711,12 +3715,18 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       apply();
       select(sel);
     }
-    if (a === 'del' && sel) {
+    if (a === 'del' && sel && sel !== root) {
       pushHistory();
-      theme.blocks = theme.blocks.filter(b => b.id !== sel.id);
-      delete theme.rules[keyOf(sel)];
+      const k = keyOf(sel);
+      if (sel.classList.contains('vox-block')) {
+        theme.blocks = theme.blocks.filter(b => b.id !== sel.id);
+        delete theme.rules[k];
+      } else {
+        theme.rules[k] = { hidden: true };
+      }
       select(null);
       refresh();
+      msg('Đã xóa ô. Bấm "↶ Quay lại" nếu muốn hoàn tác.');
     }
     if (a === 'save') { localStorage.setItem(KEY, JSON.stringify(theme)); msg('Đã lưu trên trình duyệt này.'); }
     if (a === 'copy') {
