@@ -3311,8 +3311,10 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
 
   const MANAGED_PROPS = [
     'background', 'width', 'max-width', 'height', 'min-height',
-    'translate', 'display', 'border', 'border-radius', 'box-sizing',
-    'color', '-webkit-text-fill-color', '-webkit-background-clip',
+    'translate', 'display', 'border', 'border-radius',
+    'border-top-left-radius', 'border-top-right-radius',
+    'border-bottom-right-radius', 'border-bottom-left-radius',
+    'box-sizing', 'color', '-webkit-text-fill-color', '-webkit-background-clip',
     'background-clip', 'font-family', 'font-size', 'font-weight', 'font-style'
   ];
   function clearInlineRule(el) {
@@ -3334,7 +3336,7 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
     if (r.x || r.y) el.style.setProperty('translate', `${r.x || 0}px ${r.y || 0}px`, 'important');
     if (r.inline) el.style.setProperty('display', 'inline-block', 'important');
 
-    // Áp dụng viền & bo góc cho ô
+    // Áp dụng viền cho ô
     if (r.bw !== undefined && r.bw !== '') {
       const bw = Math.max(0, Number(r.bw) || 0);
       if (bw === 0) {
@@ -3347,9 +3349,15 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       el.style.setProperty('box-sizing', 'border-box', 'important');
       el.style.setProperty('border', `2px ${r.bs || 'solid'} ${r.bc || '#0f172a'}`, 'important');
     }
+
+    // Áp dụng bo góc chung & từng góc riêng
     if (r.br !== undefined && r.br !== '') {
       el.style.setProperty('border-radius', Math.max(0, Number(r.br) || 0) + 'px', 'important');
     }
+    if (r.brtl !== undefined && r.brtl !== '') el.style.setProperty('border-top-left-radius', Math.max(0, Number(r.brtl) || 0) + 'px', 'important');
+    if (r.brtr !== undefined && r.brtr !== '') el.style.setProperty('border-top-right-radius', Math.max(0, Number(r.brtr) || 0) + 'px', 'important');
+    if (r.brbr !== undefined && r.brbr !== '') el.style.setProperty('border-bottom-right-radius', Math.max(0, Number(r.brbr) || 0) + 'px', 'important');
+    if (r.brbl !== undefined && r.brbl !== '') el.style.setProperty('border-bottom-left-radius', Math.max(0, Number(r.brbl) || 0) + 'px', 'important');
 
     const targets = [el, ...el.querySelectorAll('*')];
     targets.forEach(t => {
@@ -3446,12 +3454,15 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
   switchMode('customer');
 
   document.head.appendChild(document.createElement('style')).textContent = `
-    #vox-tool{position:fixed;top:8px;right:8px;width:270px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
+    #vox-tool{position:fixed;top:8px;right:8px;width:275px;max-height:calc(100vh - 16px);overflow:auto;z-index:99999;background:#fff;color:#0f172a;border:1px solid #94a3b8;border-radius:12px;box-shadow:0 10px 30px #0004;padding:10px;font:13px/1.4 Arial,sans-serif}
     #vox-tool.left{right:auto;left:8px}
     #vox-tool.min .body{display:none}
     #vox-tool .body,#vt-sel{display:flex;flex-direction:column;gap:6px}
     #vox-tool [hidden]{display:none!important}
     #vox-tool .row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    #vox-tool .corners{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+    #vox-tool .corners label{display:flex;justify-content:space-between;align-items:center;gap:4px;font-size:11px;color:#475569;background:#f8fafc;padding:3px 5px;border-radius:5px;border:1px solid #e2e8f0}
+    #vox-tool .corners input{width:46px!important;padding:2px 4px!important;font-size:12px}
     #vox-tool button,#vox-tool select,#vox-tool textarea,#vox-tool input[type=number]{border:1px solid #cbd5e1;border-radius:6px;background:#fff;color:#0f172a;padding:4px 6px}
     #vox-tool select,#vox-tool input[type=number]{width:132px}
     #vox-tool input[type=color]{width:46px;height:28px;padding:1px;border:1px solid #cbd5e1;border-radius:6px;cursor:pointer;background:#fff}
@@ -3500,11 +3511,17 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         <label class="row">Phông chữ <select data-p="font">${opts}</select></label>
         <label class="row">Cỡ chữ <input type="number" data-p="size" min="8" max="96"></label>
         <hr style="margin:2px 0;border-color:#e2e8f0">
-        <small style="font-weight:700;color:#334155">Viền &amp; Khung ô:</small>
+        <small style="font-weight:700;color:#334155">Viền &amp; Bo góc ô:</small>
         <label class="row">Độ dày viền (px) <input type="number" data-p="bw" min="0" max="20" placeholder="0 = không viền"></label>
         <label class="row">Kiểu viền <select data-p="bs">${borderStyleOpts}</select></label>
         <label class="row">Màu viền <input type="color" data-p="bc" value="#0f172a"></label>
-        <label class="row">Bo góc (px) <input type="number" data-p="br" min="0" max="100"></label>
+        <label class="row">Bo cả 4 góc (px) <input type="number" data-p="br" min="0" max="100"></label>
+        <div class="corners">
+          <label title="Góc trên bên trái">↖ Trái-Trên <input type="number" data-p="brtl" min="0" max="100"></label>
+          <label title="Góc trên bên phải">↗ Phải-Trên <input type="number" data-p="brtr" min="0" max="100"></label>
+          <label title="Góc dưới bên trái">↙ Trái-Dưới <input type="number" data-p="brbl" min="0" max="100"></label>
+          <label title="Góc dưới bên phải">↘ Phải-Dưới <input type="number" data-p="brbr" min="0" max="100"></label>
+        </div>
         <hr style="margin:2px 0;border-color:#e2e8f0">
         <label class="row">Rộng (px) <input type="number" data-p="w" min="20"></label>
         <label class="row">Cao (px) <input type="number" data-p="h" min="20"></label>
@@ -3587,7 +3604,11 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
         w: Math.round(rect.width),
         h: Math.round(rect.height),
         bw: parseInt(cs.borderTopWidth) || 0,
-        br: parseInt(cs.borderTopLeftRadius) || 0
+        br: parseInt(cs.borderTopLeftRadius) || 0,
+        brtl: parseInt(cs.borderTopLeftRadius) || 0,
+        brtr: parseInt(cs.borderTopRightRadius) || 0,
+        brbl: parseInt(cs.borderBottomLeftRadius) || 0,
+        brbr: parseInt(cs.borderBottomRightRadius) || 0
       };
       tool.querySelectorAll('[data-p]').forEach(i => {
         const p = i.dataset.p;
@@ -3620,11 +3641,18 @@ if (!config.lockedFields['adm-room-temp']) setValSafe('adm-room-temp-to', '');
       const p = t.dataset.p;
       if (t.value !== '') {
         r[p] = t.type === 'number' ? +t.value : t.value;
-        // Nếu người dùng chỉnh màu viền hoặc kiểu viền mà chưa nhập độ dày, tự đặt mặc định 2px để thấy ngay
         if ((p === 'bc' || p === 'bs') && (r.bw === undefined || r.bw === '')) {
           r.bw = 2;
           const bwInput = tool.querySelector('[data-p="bw"]');
           if (bwInput) bwInput.value = 2;
+        }
+        // Khi nhập bo 4 góc chung, xóa các góc lẻ để đồng bộ
+        if (p === 'br') {
+          ['brtl', 'brtr', 'brbl', 'brbr'].forEach(k => {
+            delete r[k];
+            const inp = tool.querySelector(`[data-p="${k}"]`);
+            if (inp) inp.value = '';
+          });
         }
       } else {
         delete r[p];
